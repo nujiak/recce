@@ -1,0 +1,53 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="16.933332"
+    android:viewportHeight="16.933332">
+    <path
+        android:fillAlpha="1"
+        android:fillColor="#ffffff"
+        android:pathData="m7.4131,8.6471 l2.1071,-0 -1.0536,8.2862z"
+        android:strokeWidth="0"
+        android:strokeAlpha="1"
+        android:strokeColor="#00000000" />
+    <path
+        android:fillAlpha="1"
+        android:fillColor="#ffffff"
+        android:pathData="M8.4667,5.8m-4.5867,0a4.685,4.5867 89.9999,1 1,9.1733 0a4.685,4.5867 89.9999,1 1,-9.1733 0"
+        android:strokeWidth="0"
+        android:strokeAlpha="1"
+        android:strokeColor="#00000000" />
+    <path
+        android:fillAlpha="1"
+        android:pathData="M8.4667,5.8m-3.6702,0a3.7488,3.6702 90.0001,1 1,7.3403 0a3.7488,3.6702 90.0001,1 1,-7.3403 0"
+        android:strokeWidth="0"
+        android:strokeAlpha="1"
+        android:strokeColor="#00000000">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="12.14087"
+                android:endY="1.9700463"
+                android:startX="4.792428"
+                android:startY="1.9700463"
+                android:type="linear">
+                <item
+                    android:color="#FFF5993D"
+                    android:offset="0" />
+                <item
+                    android:color="#FFF5993D"
+                    android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <group>
+        <clip-path android:pathData="M4.4245,5.8l8.2082,0l0,3.9008l-8.2082,0z" />
+        <path
+            android:fillAlpha="0.25098"
+            android:fillColor="#000000"
+            android:pathData="M8.4667,5.8m-3.6702,0a3.7488,3.6702 89.9999,1 1,7.3403 0a3.7488,3.6702 89.9999,1 1,-7.3403 0"
+            android:strokeWidth="0"
+            android:strokeAlpha="1"
+            android:strokeColor="#00000000" />
+    </group>
+</vector>

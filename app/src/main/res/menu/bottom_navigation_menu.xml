@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/btm_nav_map"
+        android:enabled="true"
+        android:icon="@drawable/ic_map_white_24dp"
+        android:title="@string/map" />
+    <item
+        android:id="@+id/btm_nav_pins"
+        android:enabled="true"
+        android:icon="@drawable/ic_map_pin_icon"
+        android:title="@string/pins" />
+    <item
+        android:id="@+id/btm_nav_gps"
+        android:icon="@drawable/ic_gps_fixed_white_24dp"
+        android:title="@string/gps" />
+    <item
+        android:id="@+id/btm_nav_ruler"
+        android:icon="@drawable/ic_straighten_white_24dp"
+        android:title="@string/ruler" />
+</menu>

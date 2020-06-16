@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/map_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/map_cross_hair"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:elevation="1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/mapView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/mapView"
+        app:srcCompat="@drawable/ic_add_white_24dp"
+        tools:ignore="ContentDescription" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/map_details_card_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/large_padding"
+        android:elevation="1dp"
+        app:cardCornerRadius="@dimen/large_padding"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <LinearLayout
+            android:id="@+id/map_card_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:gravity="bottom"
+                android:paddingStart="@dimen/large_padding"
+                android:paddingEnd="@dimen/large_padding"
+                android:paddingBottom="@dimen/small_padding" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/pinDetailShade"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/map_lat_long_desc"
+                    style="@style/TextAppearance.Reconnaissance.MapNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/large_padding"
+                    android:layout_marginTop="@dimen/small_padding"
+                    android:layout_marginEnd="@dimen/large_padding"
+                    android:text="@string/lat_lng" />
+
+                <TextView
+                    android:id="@+id/map_lat_lng_text"
+                    style="@style/TextAppearance.Reconnaissance.MapNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/large_padding"
+                    android:layout_marginEnd="@dimen/large_padding"
+                    android:ems="10"
+                    tools:text="20.203042 103.293040" />
+
+                <TextView
+                    android:id="@+id/map_grid_system"
+                    style="@style/TextAppearance.Reconnaissance.MapNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/large_padding"
+                    android:layout_marginTop="@dimen/small_padding"
+                    android:layout_marginEnd="@dimen/large_padding"
+                    android:text="@string/utm" />
+
+                <TextView
+                    android:id="@+id/map_grid_text"
+                    style="@style/TextAppearance.Reconnaissance.MapNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/large_padding"
+                    android:layout_marginEnd="@dimen/large_padding"
+                    android:layout_marginBottom="@dimen/small_padding"
+                    android:ems="10"
+                    tools:text="48N 456003 239403" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/map_pin_name_text"
+        style="@style/TextAppearance.Reconnaissance.PinName"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:elevation="1dp"
+        android:ellipsize="end"
+        android:gravity="bottom|start"
+        android:maxLines="2"
+        android:paddingStart="@dimen/large_padding"
+        android:paddingEnd="@dimen/large_padding"
+        android:paddingBottom="@dimen/small_padding"
+        android:text="@string/plus"
+        app:layout_constraintEnd_toEndOf="@+id/map_details_card_view"
+        app:layout_constraintStart_toStartOf="@id/map_details_card_view"
+        app:layout_constraintTop_toTopOf="@id/map_details_card_view"
+        tools:text="Pin Name" />
+
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginBottom="@dimen/large_padding"
+        app:cardCornerRadius="24dp"
+        app:layout_constraintBottom_toTopOf="@id/map_details_card_view"
+        app:layout_constraintRight_toRightOf="@id/map_details_card_view">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/map_zoom_in_button"
+                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_zoom_in_white_24dp" />
+
+            <Button
+                android:id="@+id/map_location_button"
+                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                app:icon="@drawable/ic_gps_fixed_white_24dp" />
+
+            <Button
+                android:id="@+id/map_zoom_out_button"
+                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_zoom_out_white_24dp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

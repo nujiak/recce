@@ -1,0 +1,106 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="BaseTheme.Reconnaissance" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="popupMenuStyle">@style/Widget.MaterialComponents.PopupMenu</item>
+        <item name="actionOverflowMenuStyle">@style/Widget.MaterialComponents.PopupMenu.Overflow
+        </item>
+        <item name="fontFamily">@font/roboto</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="shapeAppearanceLargeComponent">
+            @style/ShapeAppearance.Reconnaissance.LargeComponent
+        </item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeStyle">@style/Widget.AppCompat.ActionMode</item>
+        <item name="actionModeCloseDrawable">@drawable/ic_close_white_24dp</item>
+        <item name="actionBarTheme">@style/ThemeOverlay.Reconnaissance.ActionBar</item>
+    </style>
+
+    <style name="Theme.Reconnaissance" parent="BaseTheme.Reconnaissance" />
+
+    <style name="Theme.Reconnaissance.Badges">
+        <item name="fontFamily">@font/roboto_black</item>
+    </style>
+
+    <style name="ThemeOverlay.Reconnaissance.ActionBar" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
+        <item name="android:colorBackground">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+    </style>
+
+    <style name="Widget.Reconnaissance.Toolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">@color/colorSurface</item>
+    </style>
+
+    <style name="DialogActivity" parent="Theme.MaterialComponents.Dialog">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="Widget.Reconnaissance.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="Widget.Reconnaissance.Button.TextButton.IconOnly" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="iconPadding">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="cornerRadius">24dp</item>
+    </style>
+
+    <style name="TextAppearance.Reconnaissance.PinName" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textStyle">bold</item>
+        <item name="fontFamily">@font/roboto</item>
+    </style>
+
+    <style name="TextAppearance.Reconnaissance.Number" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="TextAppearance.Reconnaissance.NumberHeading" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="TextAppearance.Reconnaissance.GpsHeader" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="TextAppearance.Reconnaissance.GpsNumber" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="TextAppearance.Reconnaissance.MapHeading" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="TextAppearance.Reconnaissance.MapNumber" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="TextAppearance.Reconnaissance.CollapsingToolbar.Expanded" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="fontFamily">@font/roboto</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="TextAppearance.Reconnaissance.CollapsingToolbar.Collapsed" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="fontFamily">@font/roboto</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="TextAppearance.Reconnaissance.SheetHeader" parent="TextAppearance.MaterialComponents.Headline5" />
+
+    <style name="ShapeAppearance.Reconnaissance.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/large_padding</item>
+    </style>
+</resources>

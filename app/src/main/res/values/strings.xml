@@ -1,0 +1,79 @@
+<resources>
+    <string name="app_name">Recce</string>
+    <string name="version_name">Alpha</string>
+
+    <!-- General-use -->
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="pin_name">Pin Name</string>
+    <string name="cancel">Cancel</string>
+    <string name="not_available">N/A</string>
+    <string name="easting">Easting</string>
+    <string name="northing">Northing</string>
+    <string name="pin">Pin</string>
+    <string name="lat_lng">LatLng (WGS 84)</string>
+    <string name="color">Color</string>
+    <string name="settings">Settings</string>
+    <string name="coordinate_system">Coordinate System</string>
+    <string name="utm" translatable="false">UTM</string>
+    <string name="kertau" translatable="false">Kertau (RSO)</string>
+
+    <!-- Pin Selector -->
+    <string name="pins">Pins</string>
+    <string name="add_pin">Add Pin</string>
+    <string name="edit_pin">Edit Pin</string>
+    <string name="latitude_short">Lat</string>
+    <string name="longitude_short">Long</string>
+    <string name="add_to_ruler">Add to ruler</string>
+    <string name="single_selected">%d pin selected</string>
+    <string name="multiple_selected">%d pins selected</string>
+
+    <!-- Pin Creator -->
+    <string name="new_pin">New Pin</string>
+    <string name="delete">Delete</string>
+    <string name="save">Save</string>
+    <string name="add">Add</string>
+    <!-- Errors -->
+    <string name="name_blank_error">Pin name cannot be blank</string>
+    <string name="name_too_long_error"> Pin name cannot exceed 20 characters</string>
+    <string name="lat_empty_error">Latitude cannot be blank</string>
+    <string name="long_empty_error">Longitude cannot be blank</string>
+    <string name="lat_out_of_range_error">Latitude is out of range</string>
+    <string name="long_out_of_range_error">Longitude is out of range</string>
+    <string name="color_error">Choose a color</string>
+
+    <!-- Map -->
+    <string name="map">Map</string>
+    <string name="zone">Zone</string>
+    <string name="plus">+</string>
+
+    <!-- GPS -->
+    <string name="gps">GPS</string>
+    <string name="location">Location</string>
+    <string name="altitude">Altitude</string>
+    <string name="azimuth">Azimuth</string>
+    <string name="pitch">Pitch</string>
+    <string name="roll">Roll</string>
+    <string name="accuracy_warning">Your device\'s sensors are out of calibration\nand readings may be inaccurate</string>
+    <string name="gps_disabled_warning">GPS disabled, satellite grids will not be available.</string>
+    <string name="gps_enabled">GPS enabled</string>
+    <string name="fused_location_provider">Fused Location Provider</string>
+    <string name="gps_location">GPS Location</string>
+    <string name="coordinates_format">%.6f, %.6f, Altitude %.1f</string>
+
+    <!-- Ruler -->
+    <string name="ruler">Ruler</string>
+    <string name="distance">Distance</string>
+    <string name="direction">Direction</string>
+    <string name="bearing">Bearing</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="clear_ruler">Clear Ruler</string>
+    <string name="tip">Tip:</string>
+    <string name="ruler_empty">Ruler is empty</string>
+    <string name="ruler_hint">Tap and hold items in\nthe Pins tab to select them</string>
+
+    <!-- Unimplemented -->
+    <string name="to_be_implemented">To be implemented</string>
+
+</resources>
