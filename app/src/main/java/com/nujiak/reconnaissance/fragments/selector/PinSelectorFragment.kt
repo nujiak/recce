@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.nujiak.reconnaissance.MainViewModel
 import com.nujiak.reconnaissance.MainViewModelFactory
 import com.nujiak.reconnaissance.R
@@ -47,6 +48,8 @@ class PinSelectorFragment : Fragment() {
             { pin -> onPinLongClick(pin) },
             viewModel.coordinateSystem.value ?: 0
         )
+        binding.pinRecyclerview.adapter = pinAdapter
+        binding.pinRecyclerview.layoutManager = GridLayoutManager(context, 2)
 
         // Observe for changes to pins
         viewModel.allPins.observe(viewLifecycleOwner, Observer {
@@ -63,8 +66,18 @@ class PinSelectorFragment : Fragment() {
         viewModel.isInSelectionMode.observe(viewLifecycleOwner, Observer {
             generateAndSubmitList()
         })
-        binding.pinRecyclerview.adapter = pinAdapter
-        binding.pinRecyclerview.layoutManager = GridLayoutManager(context, 2)
+
+        // Observe for recent multiple deletions made through action mode
+        viewModel.lastMultipleDeletedPins.observe(viewLifecycleOwner, Observer {
+            if (it != null) {
+                val snackBar = Snackbar.make(
+                    binding.pinAppBar,
+                    resources.getQuantityString(R.plurals.number_deleted, it.size, it.size),
+                    Snackbar.LENGTH_INDEFINITE
+                ).setAction(R.string.undo) { viewModel.onRestoreLastDeletedPins()}
+                snackBar.show()
+            }
+        })
 
         // Set up FAB
         binding.pinFab.setOnClickListener { viewModel.openPinCreator(null) }

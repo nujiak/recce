@@ -39,6 +39,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var display: Display
 
+    private var lastDeletedPins = listOf<Pin>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -132,10 +134,8 @@ class MainActivity : AppCompatActivity() {
         val callback = object : ActionMode.Callback {
             override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
                 when (item?.itemId) {
-                    R.id.add_to_ruler -> {
-                        viewModel.addSelectionToRuler()
-                        viewModel.exitSelectionMode()
-                    }
+                    R.id.add_to_ruler -> viewModel.onAddSelectionToRuler()
+                    R.id.delete_pins -> viewModel.onDeleteSelectedPins()
                 }
                 return true
             }
@@ -178,11 +178,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.selectedPinsChanged.observe(this, Observer {
             actionMode?.let {
                 val selectedSize = viewModel.selectedPinIds.size
-                if (selectedSize == 1) {
-                    it.title = getString(R.string.single_selected, selectedSize)
-                } else {
-                    it.title = getString(R.string.multiple_selected, selectedSize)
-                }
+                it.title = resources.getQuantityString(R.plurals.number_selected, selectedSize, selectedSize)
             }
         })
 
