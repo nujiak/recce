@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="tiny_padding">4dp</dimen>
+    <dimen name="small_padding">8dp</dimen>
+    <dimen name="large_padding">16dp</dimen>
+
+    <dimen name="map_card_height">88dp</dimen>
+
+    <dimen name="map_pin_size">56dp</dimen>
+</resources>

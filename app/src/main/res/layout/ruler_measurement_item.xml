@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="80dp"
+        android:layout_marginEnd="@dimen/large_padding"
+        android:background="@android:color/white" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/large_padding">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/from" />
+
+            <TextView
+                android:id="@+id/ruler_from"
+                style="@style/TextAppearance.Reconnaissance.PinName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/small_padding"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="RtlSymmetry"
+                tools:text="Pin this" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/to" />
+
+            <TextView
+                android:id="@+id/ruler_to"
+                style="@style/TextAppearance.Reconnaissance.PinName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/small_padding"
+                app:layout_constraintStart_toStartOf="@id/ruler_from"
+                app:layout_constraintTop_toBottomOf="@id/ruler_from"
+                tools:ignore="RtlSymmetry"
+                tools:text="Pin that" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/small_padding"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/ruler_dist_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/distance"
+                app:layout_constraintStart_toStartOf="@id/ruler_from"
+                app:layout_constraintTop_toBottomOf="@id/ruler_to" />
+
+            <TextView
+                android:id="@+id/ruler_dist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/small_padding"
+                tools:ignore="RtlSymmetry"
+                tools:text="330.34m" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/ruler_dir_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/direction"
+                app:layout_constraintStart_toStartOf="@id/ruler_from"
+                app:layout_constraintTop_toBottomOf="@id/ruler_dist_header" />
+
+            <TextView
+                android:id="@+id/ruler_dir"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/small_padding"
+                tools:ignore="RtlSymmetry"
+                tools:text="293.3" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
