@@ -38,7 +38,7 @@ class MainViewModel(dataSource: PinDatabaseDao, application: Application) :
         runBlocking { lastAddedId = insert(pin) } // Blocking to allow pinId to return
 
     fun updatePin(pin: Pin) = uiScope.launch { update(pin) }
-    fun deletePin(pin: Pin) = uiScope.launch { delete(pin) }
+    fun deletePin(pin: Pin) = uiScope.launch { delete(pin.pinId) }
 
     val isLocationGranted: Boolean
         get() = ContextCompat.checkSelfPermission(
@@ -120,20 +120,8 @@ class MainViewModel(dataSource: PinDatabaseDao, application: Application) :
     val rulerList: LiveData<List<RulerItem>>
         get() = _rulerList
 
-    fun addPinToRuler(pin: Pin) {
-        val newList = _rulerList.value?.toMutableList()
-        if (newList != null) {
-            if (newList.size == 1 && newList[0] is RulerItem.RulerEmptyItem) {
-                newList[0] = RulerItem.RulerPinItem(pin)
-            } else {
-                newList.add(RulerItem.RulerMeasurementItem)
-                newList.add(RulerItem.RulerPinItem(pin))
-            }
-        }
-        _rulerList.value = newList
-    }
-
-    fun addSelectionToRuler() {
+    fun onAddSelectionToRuler() {
+        exitSelectionMode()
         allPins.value?.let { allPins ->
             val pinList = allPins.filter {
                 selectedPinIds.contains(it.pinId)
@@ -218,6 +206,34 @@ class MainViewModel(dataSource: PinDatabaseDao, application: Application) :
         }
     }
 
+    private val _lastMultiDeletedPins = MutableLiveData<List<Pin>>()
+    val lastMultipleDeletedPins: LiveData<List<Pin>>
+        get() = _lastMultiDeletedPins
+
+    fun onDeleteSelectedPins() {
+        _lastMultiDeletedPins.value = allPins.value?.filter { it.pinId in selectedPinIds }
+        val idsToDelete = selectedPinIds.toList()
+
+        exitSelectionMode()
+
+        uiScope.launch {
+            for (pinId in idsToDelete) {
+                delete(pinId)
+            }
+        }
+    }
+
+    fun onRestoreLastDeletedPins() {
+        lastMultipleDeletedPins.value?.let{
+            uiScope.launch {
+                for (pin in it) {
+                    addPin(pin)
+                }
+            }
+        }
+
+    }
+
     /**
      * Coroutine database functions
      */
@@ -230,8 +246,8 @@ class MainViewModel(dataSource: PinDatabaseDao, application: Application) :
         database.update(pin)
     }
 
-    private suspend fun delete(pin: Pin) = withContext(Dispatchers.IO) {
-        database.delete(pin.pinId)
+    private suspend fun delete(pinId: Long) = withContext(Dispatchers.IO) {
+        database.delete(pinId)
     }
 
 

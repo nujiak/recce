@@ -25,9 +25,17 @@
     <string name="latitude_short">Lat</string>
     <string name="longitude_short">Long</string>
     <string name="add_to_ruler">Add to ruler</string>
-    <string name="single_selected">%d pin selected</string>
-    <string name="multiple_selected">%d pins selected</string>
-
+    <plurals name="number_selected">
+        <item quantity="one">%d pin selected</item>
+        <item quantity="other">%d pins selected</item>
+    </plurals>
+    <plurals name="number_deleted">
+        <item quantity="one">%d pin was deleted</item>
+        <item quantity="other">%d pins were deleted</item>
+    </plurals>
+    <string name="undo">Undo</string>
+    
+    
     <!-- Pin Creator -->
     <string name="new_pin">New Pin</string>
     <string name="delete">Delete</string>
