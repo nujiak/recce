@@ -72,6 +72,8 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0"
+    // Room Testing
+    testImplementation "androidx.room:room-testing:2.2.5"
 
     // Kotlin Extensions and Coroutines support for Room
     implementation "androidx.room:room-ktx:$room_version"

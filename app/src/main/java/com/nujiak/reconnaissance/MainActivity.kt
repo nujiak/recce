@@ -4,10 +4,8 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.Display
-import android.view.Menu
-import android.view.MenuItem
-import android.view.OrientationEventListener
+import android.view.*
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.app.ActivityCompat
@@ -38,6 +36,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var display: Display
+    private lateinit var imm: InputMethodManager
 
     private var lastDeletedPins = listOf<Pin>()
 
@@ -190,6 +189,11 @@ class MainActivity : AppCompatActivity() {
             }
         }.enable()
 
+        imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        viewModel.hideKeyboardFromThisView.observe(this, Observer {
+            if (it != null) { hideKeyboard(it) }
+        })
+
         if (!viewModel.isLocationGranted) {
             // Permission to access the location is missing. Request permission
             ActivityCompat.requestPermissions(
@@ -233,5 +237,9 @@ class MainActivity : AppCompatActivity() {
                 viewModel.updateLocPerm(grantResults[0] == PackageManager.PERMISSION_GRANTED)
             }
         }
+    }
+
+    private fun hideKeyboard(view: View) {
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }

@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Application
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -54,6 +55,14 @@ class MainViewModel(dataSource: PinDatabaseDao, application: Application) :
         _isLocPermGranted.value = isGranted
     }
 
+    private val _hideKeyboardFromThisView = MutableLiveData<View>(null)
+    val hideKeyboardFromThisView: LiveData<View>
+        get() = _hideKeyboardFromThisView
+    fun hideKeyboardFromView(view: View) {
+        _hideKeyboardFromThisView.value = view
+        _hideKeyboardFromThisView.value = null
+    }
+
     /**
      * FusedLocationLiveData for fetching and observing Fused Location
      */
@@ -67,6 +76,9 @@ class MainViewModel(dataSource: PinDatabaseDao, application: Application) :
     val pinToAdd: LiveData<Pin>
         get() = _pinToAdd
 
+    /**
+     * Pin Creator
+     */
     fun openPinCreator(pin: Pin?) {
         if (pin != null) {
             _pinToAdd.value = pin
@@ -76,6 +88,21 @@ class MainViewModel(dataSource: PinDatabaseDao, application: Application) :
         // Reset to null
         _pinToAdd.value = null
     }
+
+    fun getPinGroups(): MutableList<String> {
+        val groups = mutableListOf<String>()
+        allPins.value?.let {
+            for (pin in it) {
+                if (pin.group !in groups) { groups.add(pin.group) }
+            }
+        }
+        groups.apply {
+            remove("")
+            sort()
+        }
+        return groups
+    }
+
 
     /**
      * Preferences variables and functions

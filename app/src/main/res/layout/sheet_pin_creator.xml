@@ -8,12 +8,10 @@
     android:orientation="vertical"
     android:padding="@dimen/large_padding">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/small_padding"
-        android:layout_marginBottom="@dimen/small_padding"
         android:gravity="start"
         android:orientation="horizontal">
 
@@ -46,30 +44,47 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/new_pin_name_input"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:baselineAligned="false"
-        android:orientation="horizontal">
+        android:layout_marginTop="@dimen/small_padding"
+        android:hint="@string/pin_name"
+        app:counterEnabled="true"
+        app:counterMaxLength="20"
+        app:errorEnabled="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/new_pin_name_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapWords" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
+        android:id="@+id/pin_category_block"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/small_padding"
+        android:baselineAligned="false">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/new_pin_name_input"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:id="@+id/new_pin_group_input"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/tiny_padding"
-            android:layout_marginBottom="@dimen/small_padding"
-            android:layout_weight="3"
-            android:hint="@string/pin_name"
-            android:inputType="textPersonName"
-            app:counterEnabled="true"
-            app:counterMaxLength="20"
+            android:layout_weight="2"
             app:errorEnabled="true">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/new_pin_name_edit_text"
+            <AutoCompleteTextView
+                android:id="@+id/new_pin_group_dropdown"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:hint="@string/group"
+                android:inputType="none"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -78,7 +93,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/tiny_padding"
-            android:layout_weight="2"
+            android:layout_weight="1"
             app:errorEnabled="true">
 
             <AutoCompleteTextView
@@ -94,7 +109,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:baselineAligned="false"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/small_padding">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/new_pin_lat_input"
@@ -110,7 +126,8 @@
                 android:id="@+id/new_pin_lat_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberSigned|numberDecimal" />
+                android:inputType="numberSigned|numberDecimal"
+                android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -127,7 +144,8 @@
                 android:id="@+id/new_pin_long_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberSigned|numberDecimal" />
+                android:inputType="numberSigned|numberDecimal"
+                android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
@@ -135,14 +153,15 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginBottom="@dimen/small_padding"
-        android:background="@color/dividerGrey" />
+        android:background="@color/dividerGrey"
+        android:layout_marginTop="@dimen/small_padding"/>
 
     <TextView
         android:id="@+id/new_pin_grid_system"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/small_padding"
+        android:layout_marginTop="@dimen/small_padding"
         android:text="@string/utm"
         android:textColor="@color/primaryTextColor"
         tools:ignore="RtlSymmetry" />
@@ -186,7 +205,8 @@
                 android:id="@+id/new_pin_easting_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number" />
+                android:inputType="number"
+                android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -203,7 +223,8 @@
                 android:id="@+id/new_pin_northing_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number" />
+                android:inputType="number"
+                android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>

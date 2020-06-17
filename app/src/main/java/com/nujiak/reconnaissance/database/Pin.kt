@@ -1,6 +1,7 @@
 package com.nujiak.reconnaissance.database
 
 import android.os.Parcelable
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.android.parcel.Parcelize
@@ -20,9 +21,10 @@ data class Pin(
 
     val color: Int = 0,
 
-    // var group: String?,
-
     @PrimaryKey(autoGenerate = true)
-    val pinId: Long = 0L
+    val pinId: Long = 0L,
+
+    @ColumnInfo(defaultValue = "")
+    var group: String = ""
 
 ) : Parcelable

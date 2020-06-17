@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Pin::class], version = 1, exportSchema = true)
+@Database(entities = [Pin::class], version = 2, exportSchema = true)
 abstract class PinDatabase : RoomDatabase() {
 
     abstract val pinDatabaseDao: PinDatabaseDao
@@ -37,7 +37,7 @@ abstract class PinDatabase : RoomDatabase() {
                         PinDatabase::class.java,
                         "pin_database"
                     )
-                        .fallbackToDestructiveMigration() // TODO("Create migration object")
+                        .addMigrations(MIGRATION_1_2)
                         .build()
                     // Assign INSTANCE to the newly created database.
                     INSTANCE = instance
@@ -48,4 +48,5 @@ abstract class PinDatabase : RoomDatabase() {
             }
         }
     }
+
 }
