@@ -32,14 +32,13 @@
         <item name="colorAccent">@color/colorPrimary</item>
     </style>
 
-    <style name="Widget.Reconnaissance.Toolbar" parent="Widget.MaterialComponents.Toolbar">
+    <style name="Theme.Reconnaissance.AlertDialog" parent="">
         <item name="android:background">@color/colorSurface</item>
+        <item name="colorSurface">@color/colorSurface</item>
     </style>
 
-    <style name="DialogActivity" parent="Theme.MaterialComponents.Dialog">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+    <style name="Widget.Reconnaissance.Toolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">@color/colorSurface</item>
     </style>
 
     <style name="Widget.Reconnaissance.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">

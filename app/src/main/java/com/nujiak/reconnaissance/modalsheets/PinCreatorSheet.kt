@@ -1,14 +1,22 @@
 package com.nujiak.reconnaissance.modalsheets
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.Filter
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.nujiak.reconnaissance.*
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.PinDatabase
@@ -21,6 +29,7 @@ import com.nujiak.reconnaissance.mapping.utm.getLatLngFromUtm
 import com.nujiak.reconnaissance.mapping.utm.getUtmData
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
+import java.util.*
 import kotlin.math.floor
 
 class PinCreatorSheet : BottomSheetDialogFragment() {
@@ -33,6 +42,8 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
     private var isInputValid: Boolean = false
 
     private var coordSys = 0
+
+    private lateinit var groupArrayAdapter: NoFilterArrayAdapter<String>
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -57,18 +68,34 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         coordSys = viewModel.coordinateSystem.value ?: 0
         setUpTextFields()
 
-        // Set up exposed dropdown menu
-        context?.let {
+        // Set up exposed dropdown menus
+        requireContext().let {
             binding.newPinColorDropdown.setAdapter(
+                // Unable to use NoFilterArrayAdapter as it only supports List (not Array)
                 ArrayAdapter(
                     it, R.layout.dropdown_menu_popup_item, COLORS
                 )
             )
             binding.newPinZoneDropdown.setAdapter(
-                ArrayAdapter(
+                NoFilterArrayAdapter(
                     it, R.layout.dropdown_menu_popup_item, ZONE_BANDS
                 )
             )
+            groupArrayAdapter = NoFilterArrayAdapter(
+                it,
+                R.layout.dropdown_menu_popup_item,
+                viewModel.getPinGroups().apply {
+                    add(0, getString(R.string.new_group_plus))
+                    add(1, getString(R.string.none))
+                }
+            )
+            // Restore newly added group after configuration change (ie rotations)
+            savedInstanceState?.getString("transient_group")?.let { currentGroup ->
+                if (currentGroup !in groupArrayAdapter.items && currentGroup.isNotEmpty()) {
+                    groupArrayAdapter.add(currentGroup)
+                }
+            }
+            binding.newPinGroupDropdown.setAdapter(groupArrayAdapter)
         }
 
         // Get pin passed in as argument
@@ -92,6 +119,10 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             binding.newPinLongEditText.setText("%.6f".format(pin.longitude))
         }
         binding.newPinColorDropdown.setText(COLORS[pin.color], false)
+        binding.newPinGroupDropdown.setText(
+            if (pin.group.isNotEmpty()) pin.group else getString(R.string.none),
+            false
+        )
 
         // Set up buttons
         binding.newPinSave.setOnClickListener { onCompleted() }
@@ -112,12 +143,18 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         onValidateInput()
         if (isInputValid) {
 
+            var group = binding.newPinGroupDropdown.text.toString().trim()
+            if (group == getString(R.string.none)) {
+                group = ""
+            }
+
             // Create new pin instead of modifying old pin
             val newPin = pin.copy(
                 name = binding.newPinNameEditText.text.toString(),
                 latitude = binding.newPinLatEditText.text.toString().toDouble(),
                 longitude = wrapLngDeg(binding.newPinLongEditText.text.toString().toDouble()),
-                color = COLORS.indexOf(binding.newPinColorDropdown.text.toString())
+                color = COLORS.indexOf(binding.newPinColorDropdown.text.toString()),
+                group = group
             )
 
             when (isUpdate) {
@@ -207,6 +244,14 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             updateSheetColor(position)
         }
 
+        binding.newPinColorDropdown.setOnClickListener {
+            viewModel.hideKeyboardFromView(binding.root)
+        }
+
+        binding.newPinGroupDropdown.setOnClickListener {
+            viewModel.hideKeyboardFromView(binding.root)
+        }
+
         if (coordSys != COORD_SYS_ID_UTM) {
             binding.newPinZoneInput.visibility = View.GONE
         }
@@ -218,6 +263,17 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                 else -> throw IllegalArgumentException("Invalid coordinate system id: $coordSys")
             }
         )
+
+        binding.newPinGroupDropdown.setOnItemClickListener { _, _, position, _ ->
+            if (position == 0) {
+                onAddNewGroup()
+                binding.newPinGroupDropdown.setText(
+                    if (pin.group != "") pin.group else getString(
+                        R.string.none
+                    )
+                )
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -314,11 +370,83 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         }
     }
 
+    private fun onAddNewGroup() {
+        val alertDialog = AlertDialog.Builder(requireActivity())
+            .setView(R.layout.dialog_new_group)
+            .create()
+        alertDialog.show()
+
+        // Set up layout and interactions of the dialog
+        alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val inputLayout = alertDialog.findViewById<TextInputLayout>(R.id.new_pin_group_input)
+        val editText = alertDialog.findViewById<TextInputEditText>(R.id.new_pin_group_edit_text)
+        editText.setOnKeyListener { _, _, _ ->
+            editText.text?.let {
+                if (it.length <= 12) {
+                    inputLayout.error = null
+                }
+            }
+            true
+        }
+        val posBtn = alertDialog.findViewById<Button>(R.id.new_pin_group_add_button)
+        posBtn.setOnClickListener {
+            val newGroup = editText.text?.trim()
+            when {
+                newGroup.isNullOrEmpty() -> {
+                    inputLayout.error = getString(R.string.group_empty_error)
+                }
+                newGroup.length > 12 -> {
+                    inputLayout.error = getString(R.string.group_too_long_error)
+                }
+                newGroup.toString().toLowerCase(Locale.ROOT)
+                        == getString(R.string.none).toLowerCase(Locale.ROOT) -> {
+                    inputLayout.error = getString(R.string.group_invalid_error)
+                }
+                else -> {
+                    // Group name is valid, add to ArrayAdapter and set in AutoCompleteTextView
+                    groupArrayAdapter.add(newGroup.toString())
+                    binding.newPinGroupDropdown.setText(newGroup.toString(), false)
+                    alertDialog.dismiss()
+                }
+            }
+        }
+    }
+
     private fun updateSheetColor(colorIdx: Int = 0) {
         val color = ContextCompat.getColor(requireContext(), PIN_CARD_DARK_BACKGROUNDS[colorIdx])
         // binding.creatorSheetRoot.setBackgroundColor(color)
         val bgDraw = ContextCompat.getDrawable(requireContext(), R.drawable.bottom_sheet)
         bgDraw?.setTint(color)
         binding.creatorSheetRoot.background = bgDraw
+    }
+
+    /**
+     * Custom ArrayAdapter for no filtering
+     */
+    private class NoFilterArrayAdapter<T>(context: Context, resource: Int, val items: List<T>) :
+        ArrayAdapter<T>(context, resource, items) {
+
+        private val filter = NoFilter()
+
+        override fun getFilter(): Filter = filter
+
+        private inner class NoFilter : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                return FilterResults().apply {
+                    values = items
+                    count = items.size
+                }
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                notifyDataSetChanged()
+            }
+
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("transient_group", binding.newPinGroupDropdown.text.toString().trim())
+        super.onSaveInstanceState(outState)
     }
 }
