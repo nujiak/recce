@@ -11,6 +11,7 @@
 
     <color name="cardBackground">@color/colorAccent</color>
     <color name="pinDetailShade">#40000000</color>
+    <color name="pinSelectionShade">#7F000000</color>
     <color name="mapCardHeaderShade">#26FFFFFF</color>
 
     <color name="tagRed">#F53D3D</color>

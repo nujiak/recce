@@ -3,8 +3,6 @@ package com.nujiak.reconnaissance.fragments.ruler
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 
 const val ITEM_VIEW_TYPE_PIN = 0
 const val ITEM_VIEW_TYPE_MEASUREMENT = 1
@@ -12,8 +10,6 @@ const val ITEM_VIEW_TYPE_EMPTY = 2
 
 class RulerAdapter :
     androidx.recyclerview.widget.ListAdapter<RulerItem, RecyclerView.ViewHolder>(RulerDiffCallback()) {
-
-    private val adapterScope = CoroutineScope(Dispatchers.Default)
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {

@@ -329,12 +329,21 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             binding.mapDetailsCardView.setCardBackgroundColor(color)
             currentPinColor = pin.color
 
+            if (pin.group.isNotEmpty()) {
+                binding.mapPinGroup.text = pin.group
+                binding.mapPinGroup.setTextColor(color)
+                binding.mapPinGroup.visibility = View.VISIBLE
+            } else {
+                binding.mapPinGroup.visibility = View.INVISIBLE
+            }
+
             // Set card coordinates
             updateLatLong(pin)
 
             isShowingPin = true
         } else {
             binding.mapPinNameText.text = "+"
+            binding.mapPinGroup.visibility = View.INVISIBLE
             isShowingPin = false
         }
     }

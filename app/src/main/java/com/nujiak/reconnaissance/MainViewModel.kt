@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Application
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
@@ -13,7 +14,6 @@ import androidx.lifecycle.Transformations
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.PinDatabaseDao
 import com.nujiak.reconnaissance.fragments.ruler.RulerItem
-import com.nujiak.reconnaissance.fragments.selector.PinWrapper
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_KEY
 import kotlinx.coroutines.*
@@ -148,14 +148,15 @@ class MainViewModel(dataSource: PinDatabaseDao, application: Application) :
         get() = _rulerList
 
     fun onAddSelectionToRuler() {
+        val lastSelectedPinIds = selectedPinIds.toList()
         exitSelectionMode()
         allPins.value?.let { allPins ->
             val pinList = allPins.filter {
-                selectedPinIds.contains(it.pinId)
+                lastSelectedPinIds.contains(it.pinId)
             }.toMutableList()
 
             pinList.sortBy {
-                selectedPinIds.indexOf(it.pinId)
+                lastSelectedPinIds.indexOf(it.pinId)
             }
             val newList = _rulerList.value?.toMutableList()
             if (newList != null) {
@@ -169,6 +170,7 @@ class MainViewModel(dataSource: PinDatabaseDao, application: Application) :
                 }
             }
             _rulerList.value = newList
+            Log.i(this::class.simpleName, "Ruler newList: $newList")
         }
         // Prompt MainActivity to switch ViewPager to Ruler
         switchToRuler()
@@ -199,15 +201,6 @@ class MainViewModel(dataSource: PinDatabaseDao, application: Application) :
     private val _selectedPinsChanged = MutableLiveData(false)
     val selectedPinsChanged: LiveData<Boolean>
         get() = _selectedPinsChanged
-
-    fun generateWrapperList(list: List<Pin>?): List<PinWrapper> {
-        if (list != null) {
-            return list.map { pin ->
-                PinWrapper(pin, selectedPinIds.indexOf(pin.pinId))
-            }
-        }
-        return listOf()
-    }
 
     fun enterSelectionMode() {
         _isInSelectionMode.value = true

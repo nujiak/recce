@@ -48,7 +48,7 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
+                android:layout_height="96dp"
                 android:gravity="bottom"
                 android:paddingStart="@dimen/large_padding"
                 android:paddingEnd="@dimen/large_padding"
@@ -56,7 +56,7 @@
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="96dp"
                 android:background="@color/pinDetailShade"
                 android:orientation="vertical">
 
@@ -102,13 +102,31 @@
                     tools:text="48N 456003 239403" />
             </LinearLayout>
         </LinearLayout>
+        <TextView
+            android:id="@+id/map_pin_group"
+            style="@style/Theme.Reconnaissance.Tags"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="2dp"
+            android:background="@drawable/tag_background"
+            android:elevation="0dp"
+            android:gravity="center"
+            android:fontFamily="@font/roboto_black"
+            android:paddingStart="@dimen/tiny_padding"
+            android:paddingEnd="@dimen/tiny_padding"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            tools:text="Buildings"
+            android:visibility="invisible"
+            android:singleLine="true" />
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/map_pin_name_text"
         style="@style/TextAppearance.Reconnaissance.PinName"
         android:layout_width="0dp"
-        android:layout_height="80dp"
+        android:layout_height="96dp"
         android:elevation="1dp"
         android:ellipsize="end"
         android:gravity="bottom|start"

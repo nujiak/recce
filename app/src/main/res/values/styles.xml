@@ -27,6 +27,10 @@
         <item name="fontFamily">@font/roboto_black</item>
     </style>
 
+    <style name="Theme.Reconnaissance.Tags" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="fontFamily">@font/roboto_black</item>
+    </style>
+
     <style name="ThemeOverlay.Reconnaissance.ActionBar" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
         <item name="android:colorBackground">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorPrimary</item>

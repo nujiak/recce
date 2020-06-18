@@ -15,6 +15,11 @@ import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.PinDatabase
 import com.nujiak.reconnaissance.databinding.FragmentPinSelectorBinding
+import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.ITEM_VIEW_TYPE_HEADER
+import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.ITEM_VIEW_TYPE_PIN
+import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.SORT_BY_GROUP
+import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.SORT_BY_NAME
+import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.SORT_BY_TIME
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet
 
 
@@ -23,6 +28,14 @@ class PinSelectorFragment : Fragment() {
     private lateinit var binding: FragmentPinSelectorBinding
     private lateinit var viewModel: MainViewModel
     private lateinit var pinAdapter: PinAdapter
+
+    private var sortBy = SORT_BY_GROUP
+    private var sortAscending = false
+
+    companion object {
+        private const val SORT_ASCENDING_KEY = "sort_ascending"
+        private const val SORT_BY_KEY = "sort_by"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,11 +62,27 @@ class PinSelectorFragment : Fragment() {
             viewModel.coordinateSystem.value ?: 0
         )
         binding.pinRecyclerview.adapter = pinAdapter
-        binding.pinRecyclerview.layoutManager = GridLayoutManager(context, 2)
+        val gridLayoutManager = GridLayoutManager(context, 2)
+        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (pinAdapter.getItemViewType(position)) {
+                    ITEM_VIEW_TYPE_PIN -> 1
+                    ITEM_VIEW_TYPE_HEADER -> 2
+                    else -> throw IllegalArgumentException(
+                        "Invalid viewType: ${pinAdapter.getItemViewType(
+                            position
+                        )}"
+                    )
+                }
+            }
+
+        }
+        binding.pinRecyclerview.layoutManager = gridLayoutManager
+
 
         // Observe for changes to pins
         viewModel.allPins.observe(viewLifecycleOwner, Observer {
-            generateAndSubmitList(it)
+            refreshList(it)
         })
 
         // Observe for changes to preferred GCS
@@ -64,7 +93,7 @@ class PinSelectorFragment : Fragment() {
 
         // Observe for changes to action/selection mode
         viewModel.isInSelectionMode.observe(viewLifecycleOwner, Observer {
-            generateAndSubmitList()
+            refreshList()
         })
 
         // Observe for recent multiple deletions made through action mode
@@ -74,10 +103,14 @@ class PinSelectorFragment : Fragment() {
                     binding.pinAppBar,
                     resources.getQuantityString(R.plurals.number_deleted, it.size, it.size),
                     Snackbar.LENGTH_INDEFINITE
-                ).setAction(R.string.undo) { viewModel.onRestoreLastDeletedPins()}
+                ).setAction(R.string.undo) { viewModel.onRestoreLastDeletedPins() }
                 snackBar.show()
             }
         })
+
+        // Fetch sorting parameters
+        sortBy = viewModel.sharedPreference.getInt(SORT_BY_KEY, sortBy)
+        sortAscending = viewModel.sharedPreference.getBoolean(SORT_ASCENDING_KEY, sortAscending)
 
         // Set up FAB
         binding.pinFab.setOnClickListener { viewModel.openPinCreator(null) }
@@ -87,6 +120,35 @@ class PinSelectorFragment : Fragment() {
             when (it.itemId) {
                 R.id.settings -> {
                     openSettings()
+                    true
+                }
+                R.id.sort_by_alphabetical_asc -> {
+                    sortBy = SORT_BY_NAME
+                    sortAscending = true
+                    onSortList()
+                    true
+                }
+                R.id.sort_by_alphabetical_dsc -> {
+                    sortBy = SORT_BY_NAME
+                    sortAscending = false
+                    onSortList()
+                    true
+                }
+                R.id.sort_by_time_asc -> {
+                    sortBy = SORT_BY_TIME
+                    sortAscending = true
+                    onSortList()
+                    true
+                }
+                R.id.sort_by_time_dsc -> {
+                    sortBy = SORT_BY_TIME
+                    sortAscending = false
+                    onSortList()
+                    true
+                }
+                R.id.sort_by_group -> {
+                    sortBy = SORT_BY_GROUP
+                    onSortList()
                     true
                 }
                 else -> false
@@ -112,7 +174,7 @@ class PinSelectorFragment : Fragment() {
     private fun onPinClick(pin: Pin) {
         if (viewModel.isInSelectionMode.value!!) {
             viewModel.toggleSelection(pin.pinId)
-            generateAndSubmitList()
+            refreshList()
         } else {
             viewModel.showPinOnMap(pin)
         }
@@ -122,7 +184,7 @@ class PinSelectorFragment : Fragment() {
         if (!viewModel.isInSelectionMode.value!!) {
             viewModel.enterSelectionMode()
             viewModel.toggleSelection(pin.pinId)
-            generateAndSubmitList()
+            refreshList()
         }
         return true
     }
@@ -132,8 +194,15 @@ class PinSelectorFragment : Fragment() {
         settingsSheet.show(parentFragmentManager, settingsSheet.tag)
     }
 
-    private fun generateAndSubmitList(newList: List<Pin>? = viewModel.allPins.value) {
-        val newWrapperList = viewModel.generateWrapperList(newList)
-        pinAdapter.submitList(newWrapperList)
+    private fun onSortList() {
+        viewModel.sharedPreference.edit()
+            .putInt(SORT_BY_KEY, sortBy)
+            .putBoolean(SORT_ASCENDING_KEY, sortAscending)
+            .apply()
+        refreshList()
+    }
+
+    private fun refreshList(newList: List<Pin>? = viewModel.allPins.value) {
+        pinAdapter.sortAndSubmitList(newList, viewModel.selectedPinIds, sortBy, sortAscending)
     }
 }
