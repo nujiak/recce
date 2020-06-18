@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/pin_header_text"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:text="Buildings"
+    android:gravity="bottom"
+    style="@style/TextAppearance.MaterialComponents.Headline4"
+    android:layout_marginTop="@dimen/large_padding"
+    android:layout_marginStart="@dimen/large_padding"
+    android:layout_marginBottom="@dimen/small_padding"
+    android:textColor="@color/primaryTextColor"
+    />
