@@ -2,6 +2,40 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/sort"
+        android:icon="@drawable/ic_sort_white_24dp"
+        android:title="@string/sort"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/sort_by_group"
+                android:title="@string/group" />
+            <item android:title="@string/pin_name">
+                <menu>
+                    <item
+                        android:id="@+id/sort_by_alphabetical_asc"
+                        android:title="@string/a_to_z" />
+                    <item
+                        android:id="@+id/sort_by_alphabetical_dsc"
+                        android:title="@string/z_to_a" />
+                </menu>
+            </item>
+            <item
+                android:id="@+id/sort_by_time_added"
+                android:title="@string/time_added">
+
+                <menu>
+                    <item
+                        android:id="@+id/sort_by_time_dsc"
+                        android:title="@string/newest_first" />
+                    <item
+                        android:id="@+id/sort_by_time_asc"
+                        android:title="@string/oldest_first" />
+                </menu>
+            </item>
+        </menu>
+    </item>
+    <item
         android:id="@+id/settings"
         android:checkable="true"
         android:icon="@drawable/ic_settings_white_24dp"
