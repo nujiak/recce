@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Application
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
@@ -170,7 +169,6 @@ class MainViewModel(dataSource: PinDatabaseDao, application: Application) :
                 }
             }
             _rulerList.value = newList
-            Log.i(this::class.simpleName, "Ruler newList: $newList")
         }
         // Prompt MainActivity to switch ViewPager to Ruler
         switchToRuler()
