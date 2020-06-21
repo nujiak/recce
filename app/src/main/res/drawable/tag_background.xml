@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@android:color/white"/>
-    <corners android:radius="@dimen/tiny_padding"/>
+    <solid android:color="@color/tagBackground" />
+    <corners
+        android:bottomLeftRadius="@dimen/tiny_padding"
+        android:bottomRightRadius="@dimen/tiny_padding"
+        android:topLeftRadius="@dimen/tiny_padding"
+        android:topRightRadius="@dimen/tiny_padding"/>
 </shape>
