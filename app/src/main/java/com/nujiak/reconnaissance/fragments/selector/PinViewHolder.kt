@@ -37,7 +37,7 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
             binding.pinGroup.text = pin.group
             binding.pinGroup.visibility = View.VISIBLE
         } else {
-            binding.pinGroup.visibility = View.GONE
+            binding.pinGroup.visibility = View.INVISIBLE
         }
         binding.pinName.text = pin.name
         binding.pinLatLng.text = String.format("%.6f, %.6f", pin.latitude, pin.longitude)

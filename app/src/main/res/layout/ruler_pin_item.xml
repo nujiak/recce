@@ -25,10 +25,11 @@
             android:id="@+id/ruler_pin_name"
             style="@style/TextAppearance.Reconnaissance.PinName"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="bottom|center"
             android:paddingStart="@dimen/large_padding"
+            android:paddingTop="@dimen/small_padding"
             android:paddingEnd="@dimen/large_padding"
             android:paddingBottom="@dimen/small_padding"
             android:singleLine="true"
@@ -43,7 +44,7 @@
             android:paddingStart="@dimen/large_padding"
             android:paddingTop="@dimen/small_padding"
             android:paddingEnd="@dimen/large_padding"
-            android:paddingBottom="@dimen/large_padding">
+            android:paddingBottom="@dimen/small_padding">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -63,6 +64,13 @@
                     android:layout_height="wrap_content"
                     tools:text="1.363566 103.245243" />
             </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/small_padding"
+                android:layout_marginEnd="@dimen/small_padding"
+                android:background="@color/dividerGrey" />
 
             <LinearLayout
                 android:layout_width="0dp"
