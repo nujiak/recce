@@ -1,93 +1,62 @@
 package com.nujiak.reconnaissance.mapping.kertau
 
 import com.nujiak.reconnaissance.degToRad
+import com.nujiak.reconnaissance.mapping.Ellipsoids
+import com.nujiak.reconnaissance.mapping.Everest1948Params
+import com.nujiak.reconnaissance.mapping.getParams
 import com.nujiak.reconnaissance.radToDeg
 import kotlin.math.*
 
-/**
- * Everest 1948 Constants
+/*
+ Parameters for Kertau (RSO) / RSO Malaya (m) [EPSG::3168]
  */
+private val LAT_C = degToRad(4.0)
+private val LNG_C = degToRad(102.25)
+private val AZI_C = degToRad(323.0257905)
+private val GAMMA_C = degToRad(323.1301024)
+private const val K_C = 0.99984
+private const val FE = 804670.24
+private const val FN = 0.0
 
-sealed class EllipsoidParams {
-    abstract val A_AXIS: Double
-    abstract val B_AXIS: Double
-    abstract val F_INVERSE: Double
-    abstract val E: Double
-    abstract val E_SQR: Double
-    abstract val R4: Double
-    abstract val A2: Double
-    abstract val A4: Double
-    abstract val A6: Double
-    abstract val A8: Double
-    abstract val A10: Double
-    abstract val A12: Double
-    abstract val B2: Double
-    abstract val B4: Double
-    abstract val B6: Double
-    abstract val B8: Double
-    abstract val B10: Double
-    abstract val B12: Double
-}
+/*
+ Aliases for eccentricity values (from Everest Ellipsoid)
+ */
+private val E1 = Everest1948Params.E
+private val E2 = Everest1948Params.E_SQR
+private val E4 = E2.pow(2)
+private val E6 = E2.pow(3)
+private val E8 = E2.pow(4)
 
-private object WgsParams : EllipsoidParams() {
-    override val A_AXIS = 6378137.0000000000000
-    override val B_AXIS = 6356752.3142451794976
-    override val F_INVERSE = 298.257223563
-    override val E = 0.081819190842621494335
-    override val E_SQR = 0.0066943799901413169961
-    override val R4 = 6367449.1458234153093
-    override val A2 = 8.3773182062446983032e-04
-    override val A4 = 7.608527773572489156e-07
-    override val A6 = 1.19764550324249210e-09
-    override val A8 = 2.4291706803973131e-12
-    override val A10 = 5.711818369154105e-15
-    override val A12 = 1.47999802705262e-17
-    override val B2 = -8.3773216405794867707e-04
-    override val B4 = -5.905870152220365181e-08
-    override val B6 = -1.67348266534382493e-10
-    override val B8 = -2.1647981104903862e-13
-    override val B10 = -3.787930968839601e-16
-    override val B12 = -7.23676928796690e-19
-}
+/*
+ Derived parameters
+ */
+private val B =
+    sqrt(1 + (E2 * cos(LAT_C).pow(4) / (1 - E2)))
+private val A =
+    Everest1948Params.A_AXIS * B * K_C * sqrt(1 - E2) /
+            (1 - E2 * sin(LAT_C).pow(2))
+private val t_O = tan(PI / 4 - LAT_C / 2) /
+        ((1 - E1 * sin(LAT_C)) /
+                (1 + E1 * sin(LAT_C))).pow(E1 / 2)
+private val D = B * sqrt(1 - E2) /
+        (cos(LAT_C) * sqrt(1 - E2 * sin(LAT_C).pow(2)))
+private val F = if (D > 1) (D + sqrt(D.pow(2) - 1) * sign(LAT_C)) else D
+private val H = F * t_O.pow(B)
+private val G = (F - 1 / F) / 2
+private val GAMMA_O = asin(sin(AZI_C) / D)
+private val LAMBDA_O = LNG_C - asin(G * tan(GAMMA_O)) / B
 
-private object Everest1948Params : EllipsoidParams() {
-    override val A_AXIS = 6377304.063000
-    override val B_AXIS = 6356103.038993
-    override val F_INVERSE = 300.80170000000000000
-    override val E = 0.081472980982652689208
-    override val E_SQR = 0.0066378466301996867553
-    override val R4 = 6366707.963440
-    override val A2 = 8.3064943111192510534E-04
-    override val A4 = 7.480375027595025021E-07
-    override val A6 = 1.16750772278215999E-09
-    override val A8 = 2.3479972304395461E-12
-    override val A10 = 5.474212231879573E-15
-    override val A12 = 1.40642257446745E-17
-    override val B2 = -8.3064976590443772201E-04
-    override val B4 = -5.805953517555717859E-08
-    override val B6 = -1.63133251663416522E-10
-    override val B8 = -2.0923797199593389E-13
-    override val B10 = -3.630200927775259E-16
-    override val B12 = -6.87666654919219E-19
-
-}
-
-private object Ellipsoids {
-    const val WGS84: Int = 1000
-    const val EVEREST_48: Int = 1001
-}
-
-
-private fun getParams(ellipsoid: Int): EllipsoidParams {
-    return when (ellipsoid) {
-        Ellipsoids.WGS84 -> WgsParams
-        Ellipsoids.EVEREST_48 -> Everest1948Params
-        else -> throw IllegalArgumentException("Invalid Coordinate Reference System index: $ellipsoid")
-    }
-}
 
 /**
- * Converts geographic coordinates (Phi, Lambda, h) to from geocentric coordinates (X, Y, Z)
+ * Converts geographic coordinates (Phi, Lambda, h) to geocentric coordinates (X, Y, Z)
+ *
+ * @param phi Geographic latitude of the point
+ * @param lambda Geographic longitude of the point
+ * @param h Height of the point
+ * @param ellipsoid ID of the ellipsoid to use as given in the EllipsoidUtils.Ellipsoids object
+ *
+ * @return Triple containing the geocentric coordinates X, Y, Z of the point as the first, second,
+ *         and third object respectively.
  */
 private fun geographicToGeocentric(
     phi: Double,
@@ -108,6 +77,14 @@ private fun geographicToGeocentric(
 
 /**
  * Converts from geocentric coordinates (X, Y, Z) to geographic coordinates (Phi, Lambda, h)
+ *
+ * @param X Geocentric coordinate X of the point
+ * @param Y Geocentric coordinate Y of the point
+ * @param Z Geocentric coordinate Z of the point
+ * @param ellipsoid ID of the ellipsoid to use as given in the EllipsoidUtils.Ellipsoids object
+ *
+ * @return Triple containing the geographic latitude, longitude and height of the point as
+ * the first, second, and third object respectively.
  */
 private fun geocentricToGeographic(
     X: Double,
@@ -133,9 +110,31 @@ private fun geocentricToGeographic(
     return Triple(phi, lambda, h)
 }
 
+/**
+ * Overloaded function to convert a Triple containing geocentric coordinates
+ * to geographic coordinates.
+ *
+ * @param XYZ Triple containing the geocentric coordinates X, Y, and Z as the first, second, and
+ *            third object respectively.
+ *
+ * @return Triple containing the geographic latitude, longitude and height of the point as
+ *         the first, second, and third object respectively.
+ */
 private fun geocentricToGeographic(XYZ: Triple<Double, Double, Double>, ellipsoid: Int) =
     geocentricToGeographic(XYZ.first, XYZ.second, XYZ.third, ellipsoid)
 
+/**
+ * Translates geocentric coordinates of a point given a translation vector.
+ *
+ * @param X Geocentric coordinate X of the point
+ * @param Y Geocentric coordinate Y of the point
+ * @param Z Geocentric coordinate Z of the point
+ * @param translation Triple containing the translations in X, Y, and Z as the first, second, and
+ *                    third object respectively.
+ *
+ * @return Triple containing the translated geocentric coordinates X, Y, and Z as the first, second,
+ *         and third object respectively.
+ */
 private fun geocentricTranslate(
     X: Double,
     Y: Double,
@@ -147,40 +146,18 @@ private fun geocentricTranslate(
 }
 
 /**
- * Parameters for Kertau (RSO) / RSO Malaya (m) [EPSG::3168]
+ * Returns the Easting and Northing of a point in the Kertau (RSO) / RSO Malaya system given the
+ * latitude Phi and longitude Lambda. This is the inverse function of getPhiLambda() below.
+ *
+ * This function is obtained from:
+ * EPSG Guidance Note 7 Part 2, 3.2.4.1 Hotine Oblique Mercator of which Variant A is used.
+ *
+ * @param phi Latitude of the point
+ * @param lambda Longitude of the point
+ *
+ * @return Pair containing the easting and northing of the point as the first and second object
+ *         respectively.
  */
-private val LAT_C = degToRad(4.0)
-private val LNG_C = degToRad(102.25)
-private val AZI_C = degToRad(323.0257905)
-private val GAMMA_C = degToRad(323.1301024)
-private const val K_C = 0.99984
-private const val FE = 804670.24
-private const val FN = 0.0
-
-// Aliases for eccentricity values (from Everest Ellipsoid)
-private val E1 = Everest1948Params.E
-private val E2 = Everest1948Params.E_SQR
-private val E4 = E2.pow(2)
-private val E6 = E2.pow(3)
-private val E8 = E2.pow(4)
-
-// Derived parameters
-private val B =
-    sqrt(1 + (E2 * cos(LAT_C).pow(4) / (1 - E2)))
-private val A =
-    Everest1948Params.A_AXIS * B * K_C * sqrt(1 - E2) /
-            (1 - E2 * sin(LAT_C).pow(2))
-private val t_O = tan(PI / 4 - LAT_C / 2) /
-        ((1 - E1 * sin(LAT_C)) /
-                (1 + E1 * sin(LAT_C))).pow(E1 / 2)
-private val D = B * sqrt(1 - E2) /
-        (cos(LAT_C) * sqrt(1 - E2 * sin(LAT_C).pow(2)))
-private val F = if (D > 1) (D + sqrt(D.pow(2) - 1) * sign(LAT_C)) else D
-private val H = F * t_O.pow(B)
-private val G = (F - 1 / F) / 2
-private val GAMMA_O = asin(sin(AZI_C) / D)
-private val LAMBDA_O = LNG_C - asin(G * tan(GAMMA_O)) / B
-
 private fun getEN(phi: Double, lambda: Double): Pair<Double, Double> {
     val t = tan(PI / 4 - phi / 2) / ((1 - E1 * sin(phi)) / (1 + E1 * sin(phi))).pow(E1 / 2)
     val Q = H / t.pow(B)
@@ -197,6 +174,19 @@ private fun getEN(phi: Double, lambda: Double): Pair<Double, Double> {
     return Pair(easting, northing)
 }
 
+/**
+ * Returns the WGS 84 latitude and longitude of a point given the Kertau (RSO) / RSO Malaya grids.
+ * This is the inverse function of getEN() above.
+ *
+ * This function is obtained from:
+ * EPSG Guidance Note 7 Part 2, 3.2.4.1 Hotine Oblique Mercator of which Variant A is used.
+ *
+ * @param E Easting of the point
+ * @param N Northing of the point
+ *
+ * @return Pair containing the WGS 84 latitude and longitude of the point as the first and second
+ *         object respectively.
+ */
 private fun getPhiLambda(E: Double, N: Double): Pair<Double, Double> {
 
     val v = (E - FE) * cos(GAMMA_C) - (N - FN) * sin(GAMMA_C)
@@ -218,6 +208,17 @@ private fun getPhiLambda(E: Double, N: Double): Pair<Double, Double> {
     return Pair(phi, lambda)
 }
 
+/**
+ * Convenience functions that abstracts away all the steps of converting WGS 84 latitude and
+ * longitude of a point into Kertau (RSO) / RSO Malaya grids. This is the inverse function of
+ * getLatLngFromKertau() below
+ *
+ * @param latDeg WGS 84 latitude of the point in degrees
+ * @param lngDeg WGS 84 longitude of the point in degrees
+ *
+ * @return Pair containing the easting and northing of the point as the first and second object
+ *         respectively.
+ */
 fun getKertauGrids(latDeg: Double, lngDeg: Double): Pair<Double, Double>? {
     if (latDeg < 1.21 || latDeg > 6.72 || lngDeg < 99.59 || lngDeg > 104.6) {
         return null
@@ -240,6 +241,17 @@ fun getKertauGrids(latDeg: Double, lngDeg: Double): Pair<Double, Double>? {
     return getEN(translatedGeographic.first, translatedGeographic.second)
 }
 
+/**
+ * Convenience functions that abstracts away all the steps of converting Kertau (RSO) / RSO Malaya
+ * grids of a point into WGS 84 latitude and longitude. This is the inverse function of
+ * getKertauGrids() above
+ *
+ * @param easting Easting of the point in degrees
+ * @param northing Northing of the point in degrees
+ *
+ * @return Pair containing the WGS 84 longitude and latitude of the point as the first and second
+ *         object respectively.
+ */
 fun getLatLngFromKertau(easting: Double, northing: Double): Pair<Double, Double>? {
 
     // Get phi and lambda from Easting and Northing
@@ -260,6 +272,19 @@ fun getLatLngFromKertau(easting: Double, northing: Double): Pair<Double, Double>
     return Pair(radToDeg(transformedGeographic.first), radToDeg(transformedGeographic.second))
 }
 
+/**
+ * Convenience function that returns a one-liner with the Kertau (RSO) / RSO Malaya grids
+ * of a point concatenated in a space-separated string. Grids are rounded down to integers.
+ * This function uses getKertauGrids() above to obtain the grids for formatting into a string.
+ *
+ * Example of output: "650083 150728"
+ *
+ * @param latDeg WGS 84 latitude of the point in degrees
+ * @param lngDeg WGS 84 longitude of the point in degrees
+ *
+ * @return String if the point at latitude and longitude lies within the area of usage
+ * @return null if the point lies outside the area of usage
+ */
 fun getKertauGridsString(latDeg: Double, lngDeg: Double): String? {
     val kertauPair = getKertauGrids(latDeg, lngDeg)
     return if (kertauPair != null) {
