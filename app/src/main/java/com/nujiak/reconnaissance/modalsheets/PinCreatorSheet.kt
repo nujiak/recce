@@ -293,7 +293,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                                 easting.toDouble(),
                                 northing.toDouble(),
                                 zone,
-                                band
+                                band.single()
                             )
                         )
 
