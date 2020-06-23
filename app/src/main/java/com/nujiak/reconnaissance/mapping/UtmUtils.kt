@@ -16,6 +16,26 @@ import kotlin.math.*
  */
 data class UtmData(val x: Double, val y: Double, val zone: Int, val band: Char)
 
+/**
+ * Extension function to print UtmData as a single-line string
+ *
+ * @param precision Number of digits per axes
+ *
+ * @return Single-line string of UTM data
+ *
+ * @throws IllegalArgumentException if precision is not larger than 0
+ */
+fun UtmData.toSingleLine(precision: Int): String {
+    if (precision <= 0) {
+        throw java.lang.IllegalArgumentException("Precision must be more than 0: $precision)")
+    }
+    val x = this.x * 10.0.pow(precision - 5)
+    val y = this.y * 10.0.pow(precision - 5)
+    return this.let {
+        "${it.zone}${it.band} ${x.toInt()} ${y.toInt()}"
+    }
+}
+
 /* WGS Constants */
 
 private val A_AXIS = WgsParams.A_AXIS
@@ -402,29 +422,6 @@ fun getUtmData(latDeg: Double, lngDeg: Double): UtmData? {
         zone,
         band
     )
-}
-
-/**
- * Convenience function that returns a one-liner with all the UTM data of the point at
- * latitude and longitude. This function uses getUtmData() above to obtain the UTM data for
- * formatting into a string.
- *
- * Example of output: "48N 371542 150688"
- *
- * @param latDeg WGS 84 latitude of the point in degrees
- * @param lngDeg WGS 84 longitude of the point in degrees
- *
- * @return String if the point at latitude and longitude lies within the area of usage of UTM
- * @return null if the point lies outside the area of usage of UTM
- */
-fun getUtmString(latDeg: Double, lngDeg: Double): String? {
-    val utmData = getUtmData(latDeg, lngDeg)
-
-    return if (utmData != null) {
-        "${utmData.zone}${utmData.band} %.0f %.0f".format(floor(utmData.x), floor(utmData.y))
-    } else {
-        null
-    }
 }
 
 /**
