@@ -14,7 +14,7 @@ import kotlin.math.*
  * @property zone UTM zone of the point
  * @property band UTM latitude band of the point
  */
-data class UtmData(val x: Double, val y: Double, val zone: Int, val band: String)
+data class UtmData(val x: Double, val y: Double, val zone: Int, val band: Char)
 
 /* WGS Constants */
 
@@ -47,10 +47,10 @@ private const val CHI_TO_PHI_RESOLUTION: Int = 4
  * Array of strings of UTM latitude bands, starting from the south and heading northwards.
  */
 private val LAT_BANDS = arrayOf(
-    "C", "D", "E", "F", "G",
-    "H", "J", "K", "L", "M",
-    "N", "P", "Q", "R", "S",
-    "T", "U", "V", "W", "X"
+    'C', 'D', 'E', 'F', 'G',
+    'H', 'J', 'K', 'L', 'M',
+    'N', 'P', 'Q', 'R', 'S',
+    'T', 'U', 'V', 'W', 'X'
 )
 
 /**
@@ -81,7 +81,7 @@ private fun getUnadjustedUtmZone(longitude: Double): Int {
  * @param latitude Latitude of the point in degrees
  * @return latBand Naive latitude band of the point
  */
-private fun getUnadjustedUtmLatBand(latitude: Double): String {
+private fun getUnadjustedUtmLatBand(latitude: Double): Char {
     if (latitude < -80 || latitude > 84) {
         throw IllegalArgumentException("latitude ($latitude) must be -84.0 - 80")
     }
@@ -109,17 +109,17 @@ private fun getUnadjustedUtmLatBand(latitude: Double): String {
  * @return Pair containing the zone and band of the point as the first and second object
  *         respectively.
  */
-private fun getUtmZoneAndBand(latitude: Double, longitude: Double): Pair<Int, String> {
+private fun getUtmZoneAndBand(latitude: Double, longitude: Double): Pair<Int, Char> {
     val band =
         getUnadjustedUtmLatBand(latitude)
     val zone =
         getUnadjustedUtmZone(longitude)
 
     return when {
-        band == "X" && zone == 32 -> Pair(if (longitude < 9) 31 else 33, band)
-        band == "X" && zone == 34 -> Pair(if (longitude < 21) 33 else 35, band)
-        band == "X" && zone == 36 -> Pair(if (longitude < 24) 35 else 37, band)
-        band == "V" && zone == 31 && longitude >= 3 -> Pair(32, band)
+        band == 'X' && zone == 32 -> Pair(if (longitude < 9) 31 else 33, band)
+        band == 'X' && zone == 34 -> Pair(if (longitude < 21) 33 else 35, band)
+        band == 'X' && zone == 36 -> Pair(if (longitude < 24) 35 else 37, band)
+        band == 'V' && zone == 31 && longitude >= 3 -> Pair(32, band)
         else -> Pair(zone, band)
     }
 }
