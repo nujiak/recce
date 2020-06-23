@@ -1,9 +1,6 @@
-package com.nujiak.reconnaissance.mapping.kertau
+package com.nujiak.reconnaissance.mapping
 
 import com.nujiak.reconnaissance.degToRad
-import com.nujiak.reconnaissance.mapping.Ellipsoids
-import com.nujiak.reconnaissance.mapping.Everest1948Params
-import com.nujiak.reconnaissance.mapping.getParams
 import com.nujiak.reconnaissance.radToDeg
 import kotlin.math.*
 
@@ -37,14 +34,22 @@ private val A =
             (1 - E2 * sin(LAT_C).pow(2))
 private val t_O = tan(PI / 4 - LAT_C / 2) /
         ((1 - E1 * sin(LAT_C)) /
-                (1 + E1 * sin(LAT_C))).pow(E1 / 2)
+                (1 + E1 * sin(
+                    LAT_C
+                ))).pow(E1 / 2)
 private val D = B * sqrt(1 - E2) /
-        (cos(LAT_C) * sqrt(1 - E2 * sin(LAT_C).pow(2)))
-private val F = if (D > 1) (D + sqrt(D.pow(2) - 1) * sign(LAT_C)) else D
-private val H = F * t_O.pow(B)
+        (cos(LAT_C) * sqrt(1 - E2 * sin(
+            LAT_C
+        ).pow(2)))
+private val F = if (D > 1) (D + sqrt(
+    D.pow(2) - 1) * sign(LAT_C)) else D
+private val H = F * t_O.pow(
+    B
+)
 private val G = (F - 1 / F) / 2
 private val GAMMA_O = asin(sin(AZI_C) / D)
-private val LAMBDA_O = LNG_C - asin(G * tan(GAMMA_O)) / B
+private val LAMBDA_O = LNG_C - asin(
+    G * tan(GAMMA_O)) / B
 
 
 /**
@@ -121,7 +126,12 @@ private fun geocentricToGeographic(
  *         the first, second, and third object respectively.
  */
 private fun geocentricToGeographic(XYZ: Triple<Double, Double, Double>, ellipsoid: Int) =
-    geocentricToGeographic(XYZ.first, XYZ.second, XYZ.third, ellipsoid)
+    geocentricToGeographic(
+        XYZ.first,
+        XYZ.second,
+        XYZ.third,
+        ellipsoid
+    )
 
 /**
  * Translates geocentric coordinates of a point given a translation vector.
@@ -159,17 +169,27 @@ private fun geocentricTranslate(
  *         respectively.
  */
 private fun getEN(phi: Double, lambda: Double): Pair<Double, Double> {
-    val t = tan(PI / 4 - phi / 2) / ((1 - E1 * sin(phi)) / (1 + E1 * sin(phi))).pow(E1 / 2)
+    val t = tan(PI / 4 - phi / 2) / ((1 - E1 * sin(phi)) / (1 + E1 * sin(phi))).pow(
+        E1 / 2)
     val Q = H / t.pow(B)
     val S = (Q - 1 / Q) / 2
     val T = (Q + 1 / Q) / 2
     val V = sin(B * (lambda - LAMBDA_O))
-    val U = (-V * cos(GAMMA_O) + S * sin(GAMMA_O)) / T
+    val U = (-V * cos(GAMMA_O) + S * sin(
+        GAMMA_O
+    )) / T
     val v = A * ln((1 - U) / (1 + U)) / (2 * B)
-    val u = A * atan2((S * cos(GAMMA_O)) + V * sin(GAMMA_O), cos(B * (lambda - LAMBDA_O))) / B
+    val u = A * atan2((S * cos(
+        GAMMA_O
+    )) + V * sin(GAMMA_O), cos(
+        B * (lambda - LAMBDA_O))) / B
 
-    val easting = v * cos(GAMMA_C) + u * sin(GAMMA_C) + FE
-    val northing = u * cos(GAMMA_C) - v * sin(GAMMA_C) + FN
+    val easting = v * cos(GAMMA_C) + u * sin(
+        GAMMA_C
+    ) + FE
+    val northing = u * cos(GAMMA_C) - v * sin(
+        GAMMA_C
+    ) + FN
 
     return Pair(easting, northing)
 }
@@ -189,14 +209,20 @@ private fun getEN(phi: Double, lambda: Double): Pair<Double, Double> {
  */
 private fun getPhiLambda(E: Double, N: Double): Pair<Double, Double> {
 
-    val v = (E - FE) * cos(GAMMA_C) - (N - FN) * sin(GAMMA_C)
-    val u = (N - FN) * cos(GAMMA_C) + (E - FE) * sin(GAMMA_C)
+    val v = (E - FE) * cos(GAMMA_C) - (N - FN) * sin(
+        GAMMA_C
+    )
+    val u = (N - FN) * cos(GAMMA_C) + (E - FE) * sin(
+        GAMMA_C
+    )
 
     val Q = kotlin.math.E.pow(-B * v / A)
     val S = (Q - 1 / Q) / 2
     val T = (Q + 1 / Q) / 2
     val V = sin(B * u / A)
-    val U = (V * cos(GAMMA_O) + S * sin(GAMMA_O)) / T
+    val U = (V * cos(GAMMA_O) + S * sin(
+        GAMMA_O
+    )) / T
     val t = (H / sqrt((1 + U) / (1 - U))).pow(1 / B)
     val chi = PI / 2 - 2 * atan(t)
 
@@ -204,7 +230,11 @@ private fun getPhiLambda(E: Double, N: Double): Pair<Double, Double> {
             sin(4 * chi) * (7 * E4 / 48 + 29 * E6 / 240 + 811 * E8 / 11520) +
             sin(6 * chi) * (7 * E6 / 120 + 81 * E8 / 1120) +
             sin(8 * chi) * (4279 * E8 / 161280)
-    val lambda = LAMBDA_O - atan2((S * cos(GAMMA_O) - V * sin(GAMMA_O)), cos(B * u / A)) / B
+    val lambda = LAMBDA_O - atan2((S * cos(
+        GAMMA_O
+    ) - V * sin(GAMMA_O)), cos(
+        B * u / A
+    )) / B
     return Pair(phi, lambda)
 }
 
@@ -228,17 +258,34 @@ fun getKertauGrids(latDeg: Double, lngDeg: Double): Pair<Double, Double>? {
     val lambda = degToRad(lngDeg)
 
     // Convert to WGS 84 geocentric coordinates
-    val (X, Y, Z) = geographicToGeocentric(phi, lambda, 0.0, Ellipsoids.WGS84)
+    val (X, Y, Z) = geographicToGeocentric(
+        phi,
+        lambda,
+        0.0,
+        Ellipsoids.WGS84
+    )
 
     // Transform to Everest 1948 geocentric coordinates
     val translatedGeocentric =
-        geocentricTranslate(X, Y, Z, Triple(11.0, -851.0, -5.0))
+        geocentricTranslate(
+            X,
+            Y,
+            Z,
+            Triple(11.0, -851.0, -5.0)
+        )
 
     // Convert to Everest 1948 geographic coordinates
-    val translatedGeographic = geocentricToGeographic(translatedGeocentric, Ellipsoids.EVEREST_48)
+    val translatedGeographic =
+        geocentricToGeographic(
+            translatedGeocentric,
+            Ellipsoids.EVEREST_48
+        )
 
     // Return Easting and Northing using X and Y of translated geographic coordinates
-    return getEN(translatedGeographic.first, translatedGeographic.second)
+    return getEN(
+        translatedGeographic.first,
+        translatedGeographic.second
+    )
 }
 
 /**
@@ -286,43 +333,12 @@ fun getLatLngFromKertau(easting: Double, northing: Double): Pair<Double, Double>
  * @return null if the point lies outside the area of usage
  */
 fun getKertauGridsString(latDeg: Double, lngDeg: Double): String? {
-    val kertauPair = getKertauGrids(latDeg, lngDeg)
+    val kertauPair =
+        getKertauGrids(latDeg, lngDeg)
     return if (kertauPair != null) {
         val (easting, northing) = kertauPair
         "%.0f %.0f".format(floor(easting), floor(northing))
     } else {
         null
     }
-}
-
-fun main() {
-    if (false) {
-        val lat = degToRad(1.3998391682)
-        val lng = degToRad(103.7386691917)
-
-        val (X, Y, Z) = geographicToGeocentric(lat, lng, ellipsoid = Ellipsoids.WGS84)
-        val (newX, newY, newZ) = geocentricTranslate(X, Y, Z, Triple(11.0, -851.0, -5.0))
-        val (newLat, newLng, _) = geocentricToGeographic(
-            newX,
-            newY,
-            newZ,
-            ellipsoid = Ellipsoids.EVEREST_48
-        )
-        val (easting, northing) = getEN(newLat, newLng)
-        println("E: $easting\nN: $northing")
-
-    }
-
-    if (false) {
-        val X = 3771793.968
-        val Y = 140253.342
-        val Z = 5124304.349
-        val (lat, lng, h) = geocentricToGeographic(X, Y, Z, Ellipsoids.WGS84)
-        println("lat: $lat, lng: $lng, h: $h")
-        val (newX, newY, newZ) = geographicToGeocentric(lat, lng, h, Ellipsoids.WGS84)
-        println("newX: $newX, newY: $newY, newZ: $newZ")
-        val (newLat, newLng, newH) = geocentricToGeographic(newX, newY, newZ, Ellipsoids.WGS84)
-        println("newLat: $newLat, newLng: $newLng, newH: $newH")
-    }
-
 }

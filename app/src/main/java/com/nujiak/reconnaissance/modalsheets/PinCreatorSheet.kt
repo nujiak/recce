@@ -21,12 +21,12 @@ import com.nujiak.reconnaissance.*
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.PinDatabase
 import com.nujiak.reconnaissance.databinding.SheetPinCreatorBinding
-import com.nujiak.reconnaissance.mapping.kertau.getKertauGrids
-import com.nujiak.reconnaissance.mapping.kertau.getLatLngFromKertau
-import com.nujiak.reconnaissance.mapping.utm.UtmData
-import com.nujiak.reconnaissance.mapping.utm.ZONE_BANDS
-import com.nujiak.reconnaissance.mapping.utm.getLatLngFromUtm
-import com.nujiak.reconnaissance.mapping.utm.getUtmData
+import com.nujiak.reconnaissance.mapping.getKertauGrids
+import com.nujiak.reconnaissance.mapping.getLatLngFromKertau
+import com.nujiak.reconnaissance.mapping.UtmData
+import com.nujiak.reconnaissance.mapping.ZONE_BANDS
+import com.nujiak.reconnaissance.mapping.getLatLngFromUtm
+import com.nujiak.reconnaissance.mapping.getUtmData
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
 import java.util.*
@@ -78,7 +78,8 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             )
             binding.newPinZoneDropdown.setAdapter(
                 NoFilterArrayAdapter(
-                    it, R.layout.dropdown_menu_popup_item, ZONE_BANDS
+                    it, R.layout.dropdown_menu_popup_item,
+                    ZONE_BANDS
                 )
             )
             groupArrayAdapter = NoFilterArrayAdapter(
@@ -312,7 +313,11 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                 val northing = binding.newPinNorthingEditText.text.toString()
 
                 if (!easting.isBlank() && !northing.isBlank()) {
-                    val latLngPair = getLatLngFromKertau(easting.toDouble(), northing.toDouble())
+                    val latLngPair =
+                        getLatLngFromKertau(
+                            easting.toDouble(),
+                            northing.toDouble()
+                        )
                     if (latLngPair != null) {
                         // Lat Lng are valid and kertau grids were within bounds
                         val (lat, lng) = latLngPair
@@ -349,7 +354,11 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                     }
                 }
                 COORD_SYS_ID_KERTAU -> {
-                    val kertauData = getKertauGrids(lat.toDouble(), lng.toDouble())
+                    val kertauData =
+                        getKertauGrids(
+                            lat.toDouble(),
+                            lng.toDouble()
+                        )
                     if (kertauData != null) {
                         // Kertau data is valid, set texts then return
                         val (easting, northing) = kertauData

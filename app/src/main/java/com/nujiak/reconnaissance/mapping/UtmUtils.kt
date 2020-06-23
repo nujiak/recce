@@ -1,8 +1,7 @@
-package com.nujiak.reconnaissance.mapping.utm
+package com.nujiak.reconnaissance.mapping
 
 import com.nujiak.reconnaissance.cot
 import com.nujiak.reconnaissance.degToRad
-import com.nujiak.reconnaissance.mapping.WgsParams
 import com.nujiak.reconnaissance.radToDeg
 import com.nujiak.reconnaissance.wrapLngDeg
 import kotlin.math.*
@@ -187,7 +186,9 @@ private fun phiToChi(phi: Double): Pair<Double, Double> {
  */
 private fun chiToPhi(chi: Pair<Double, Double>): Double {
     val (cosChi, sinChi) = chi
-    val (sinPhi, p) = chiToPhiIntermediate(sinChi)
+    val (sinPhi, p) = chiToPhiIntermediate(
+        sinChi
+    )
 
     val cosPhi = (((1 + sinPhi) / p + (1 - sinPhi) * p) / 2) * cosChi
 
@@ -391,8 +392,16 @@ fun getUtmData(latDeg: Double, lngDeg: Double): UtmData? {
         )
     }
 
-    val (zone, band) = getUtmZoneAndBand(latDeg, wrapLngDeg(lngDeg))
-    return UtmData(easting, northing, zone, band)
+    val (zone, band) = getUtmZoneAndBand(
+        latDeg,
+        wrapLngDeg(lngDeg)
+    )
+    return UtmData(
+        easting,
+        northing,
+        zone,
+        band
+    )
 }
 
 /**
@@ -436,11 +445,4 @@ fun getLatLngFromUtm(utmData: UtmData): Pair<Double, Double> {
     }
 
     return Pair(radToDeg(lat), radToDeg(lng))
-}
-
-fun main() {
-    val utmData = UtmData(377465.0, 155412.0, 48, "N")
-    val (lat, lng) = getLatLngFromUtm(utmData)
-    println("lat: $lat, lng: $lng")
-    println(getUtmData(lat, lng))
 }

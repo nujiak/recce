@@ -18,8 +18,8 @@ import com.nujiak.reconnaissance.*
 import com.nujiak.reconnaissance.database.PinDatabase
 import com.nujiak.reconnaissance.databinding.FragmentGpsBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
-import com.nujiak.reconnaissance.mapping.kertau.getKertauGridsString
-import com.nujiak.reconnaissance.mapping.utm.getUtmString
+import com.nujiak.reconnaissance.mapping.getKertauGridsString
+import com.nujiak.reconnaissance.mapping.getUtmString
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet
 import kotlin.math.PI
 import kotlin.math.abs
@@ -209,10 +209,16 @@ class GpsFragment : Fragment(), SensorEventListener {
 
             binding.gpsGrids.text = when (coordSysId) {
                 SettingsSheet.COORD_SYS_ID_UTM -> {
-                    getUtmString(locationData.latitude, locationData.longitude)
+                    getUtmString(
+                        locationData.latitude,
+                        locationData.longitude
+                    )
                 }
                 SettingsSheet.COORD_SYS_ID_KERTAU -> {
-                    getKertauGridsString(locationData.latitude, locationData.longitude)
+                    getKertauGridsString(
+                        locationData.latitude,
+                        locationData.longitude
+                    )
                 }
                 else -> throw IllegalArgumentException("Invalid coordinate system index: $coordSysId")
             } ?: getString(R.string.not_available)
