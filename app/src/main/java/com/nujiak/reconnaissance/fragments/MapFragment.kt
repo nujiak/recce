@@ -24,7 +24,8 @@ import com.nujiak.reconnaissance.database.PinDatabase
 import com.nujiak.reconnaissance.databinding.FragmentMapBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
 import com.nujiak.reconnaissance.mapping.getKertauGridsString
-import com.nujiak.reconnaissance.mapping.getUtmString
+import com.nujiak.reconnaissance.mapping.getUtmData
+import com.nujiak.reconnaissance.mapping.toSingleLine
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
 
@@ -229,10 +230,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
         binding.mapGridText.text = when (coordSysId) {
             COORD_SYS_ID_UTM -> {
-                getUtmString(
+                getUtmData(
                     latitude,
                     longitude
-                )
+                )?.toSingleLine(5)
             }
             COORD_SYS_ID_KERTAU -> {
                 getKertauGridsString(

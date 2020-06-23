@@ -11,7 +11,8 @@ import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.databinding.PinListHeaderItemBinding
 import com.nujiak.reconnaissance.databinding.PinListItemBinding
 import com.nujiak.reconnaissance.mapping.getKertauGridsString
-import com.nujiak.reconnaissance.mapping.getUtmString
+import com.nujiak.reconnaissance.mapping.getUtmData
+import com.nujiak.reconnaissance.mapping.toSingleLine
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
 
@@ -47,10 +48,10 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
 
         binding.pinGrid.text = when (coordSysId) {
             COORD_SYS_ID_UTM -> {
-                getUtmString(
+                getUtmData(
                     pin.latitude,
                     pin.longitude
-                )
+                )?.toSingleLine(5)
             }
             COORD_SYS_ID_KERTAU -> {
                 getKertauGridsString(
