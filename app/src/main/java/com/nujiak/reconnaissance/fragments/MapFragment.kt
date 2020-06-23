@@ -23,8 +23,8 @@ import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.PinDatabase
 import com.nujiak.reconnaissance.databinding.FragmentMapBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
-import com.nujiak.reconnaissance.mapping.kertau.getKertauGridsString
-import com.nujiak.reconnaissance.mapping.utm.getUtmString
+import com.nujiak.reconnaissance.mapping.getKertauGridsString
+import com.nujiak.reconnaissance.mapping.getUtmString
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
 
@@ -164,6 +164,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         Manifest.permission.ACCESS_FINE_LOCATION
     ) == PackageManager.PERMISSION_GRANTED
 
+    @SuppressLint("MissingPermission")
     private fun onLocationGranted(firstRun: Boolean = false) {
         map.isMyLocationEnabled = true
         binding.mapLocationButton.isEnabled = true
@@ -187,6 +188,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun onLocPermChange(isGranted: Boolean) {
 
         map.isMyLocationEnabled = isGranted
@@ -227,10 +229,16 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
         binding.mapGridText.text = when (coordSysId) {
             COORD_SYS_ID_UTM -> {
-                getUtmString(latitude, longitude)
+                getUtmString(
+                    latitude,
+                    longitude
+                )
             }
             COORD_SYS_ID_KERTAU -> {
-                getKertauGridsString(latitude, longitude)
+                getKertauGridsString(
+                    latitude,
+                    longitude
+                )
             }
             else -> throw IllegalArgumentException("Invalid coordinate system index: $coordSysId")
         } ?: binding.root.resources.getString(R.string.not_available)

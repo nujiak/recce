@@ -12,7 +12,7 @@ import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.databinding.RulerEmptyItemBinding
 import com.nujiak.reconnaissance.databinding.RulerMeasurementItemBinding
 import com.nujiak.reconnaissance.databinding.RulerPinItemBinding
-import com.nujiak.reconnaissance.mapping.utm.getUtmData
+import com.nujiak.reconnaissance.mapping.getUtmData
 import kotlin.math.floor
 
 /**
@@ -40,7 +40,10 @@ class RulerPinViewHolder private constructor(private val binding: RulerPinItemBi
         // Grid System
         val gridSystem = binding.root.resources.getString(R.string.utm)
         binding.rulerPinGridSystem.text = gridSystem
-        val utmData = getUtmData(pin.latitude, pin.longitude)
+        val utmData = getUtmData(
+            pin.latitude,
+            pin.longitude
+        )
 
         // Format into string
         utmData?.let {

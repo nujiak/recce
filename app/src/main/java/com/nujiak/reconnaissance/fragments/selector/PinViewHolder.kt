@@ -10,8 +10,8 @@ import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.databinding.PinListHeaderItemBinding
 import com.nujiak.reconnaissance.databinding.PinListItemBinding
-import com.nujiak.reconnaissance.mapping.kertau.getKertauGridsString
-import com.nujiak.reconnaissance.mapping.utm.getUtmString
+import com.nujiak.reconnaissance.mapping.getKertauGridsString
+import com.nujiak.reconnaissance.mapping.getUtmString
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
 
@@ -47,10 +47,16 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
 
         binding.pinGrid.text = when (coordSysId) {
             COORD_SYS_ID_UTM -> {
-                getUtmString(pin.latitude, pin.longitude)
+                getUtmString(
+                    pin.latitude,
+                    pin.longitude
+                )
             }
             COORD_SYS_ID_KERTAU -> {
-                getKertauGridsString(pin.latitude, pin.longitude)
+                getKertauGridsString(
+                    pin.latitude,
+                    pin.longitude
+                )
             }
             else -> throw IllegalArgumentException("Invalid coordinate system index: $coordSysId")
         } ?: binding.root.resources.getString(R.string.not_available)
