@@ -10,11 +10,7 @@ import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.databinding.PinListHeaderItemBinding
 import com.nujiak.reconnaissance.databinding.PinListItemBinding
-import com.nujiak.reconnaissance.mapping.getKertauGridsString
-import com.nujiak.reconnaissance.mapping.getUtmData
-import com.nujiak.reconnaissance.mapping.toSingleLine
-import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
-import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
+import com.nujiak.reconnaissance.getGridString
 
 class PinViewHolder private constructor(private val binding: PinListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
@@ -46,22 +42,7 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
         binding.pinGridSystem.text =
             binding.root.resources.getStringArray(R.array.coordinate_systems)[coordSysId]
 
-        binding.pinGrid.text = when (coordSysId) {
-            COORD_SYS_ID_UTM -> {
-                getUtmData(
-                    pin.latitude,
-                    pin.longitude
-                )?.toSingleLine(5)
-            }
-            COORD_SYS_ID_KERTAU -> {
-                getKertauGridsString(
-                    pin.latitude,
-                    pin.longitude
-                )
-            }
-            else -> throw IllegalArgumentException("Invalid coordinate system index: $coordSysId")
-        } ?: binding.root.resources.getString(R.string.not_available)
-
+        binding.pinGrid.text = getGridString(pin.latitude, pin.longitude, coordSysId, binding.root.resources)
 
         val context = binding.root.context
         val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[pin.color])

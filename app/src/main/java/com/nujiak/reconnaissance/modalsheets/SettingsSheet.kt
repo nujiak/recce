@@ -22,7 +22,8 @@ class SettingsSheet : BottomSheetDialogFragment() {
     companion object {
         const val COORD_SYS_KEY = "coordinate_system"
         const val COORD_SYS_ID_UTM = 0
-        const val COORD_SYS_ID_KERTAU = 1
+        const val COORD_SYS_ID_MGRS = 1
+        const val COORD_SYS_ID_KERTAU = 2
     }
 
     override fun onCreateView(

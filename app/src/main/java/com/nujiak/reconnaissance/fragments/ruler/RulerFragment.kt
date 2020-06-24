@@ -42,13 +42,19 @@ class RulerFragment : Fragment() {
         }!!
 
         // Set up RecyclerView
-        val rulerAdapter = RulerAdapter()
+        val rulerAdapter = RulerAdapter(viewModel.coordinateSystem.value ?: 0)
         binding.rulerList.adapter = rulerAdapter
         viewModel.rulerList.observe(viewLifecycleOwner, Observer {
             rulerAdapter.submitList(it)
 
             // Scroll to bottom of ruler
             binding.rulerList.smoothScrollToPosition(it.size)
+        })
+
+        // Observe for changes to preferred GCS
+        viewModel.coordinateSystem.observe(viewLifecycleOwner, Observer {
+            rulerAdapter.updateCoordSys(it)
+            rulerAdapter.notifyDataSetChanged()
         })
 
         binding.rulerTopAppBar.setOnMenuItemClickListener {

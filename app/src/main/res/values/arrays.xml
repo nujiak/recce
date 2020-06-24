@@ -2,6 +2,7 @@
 <resources>
     <string-array name="coordinate_systems">
         <item>@string/utm</item>
+        <item>@string/mgrs</item>
         <item>@string/kertau</item>
     </string-array>
 </resources>
