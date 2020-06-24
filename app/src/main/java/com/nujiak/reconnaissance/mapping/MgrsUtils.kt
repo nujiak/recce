@@ -1,5 +1,6 @@
 package com.nujiak.reconnaissance.mapping
 
+import java.util.*
 import kotlin.math.floor
 import kotlin.math.pow
 
@@ -96,7 +97,7 @@ private fun intsFromMgrsGridString(gridStr: String): Pair<Double, Double> {
  * @return MgrsData containing the data of the point in MGRS
  */
 fun parseMgrsFrom(mgrsString: String): MgrsData? {
-    val matchResult = mgrsRegex.find(mgrsString.filterWhitespaces())
+    val matchResult = mgrsRegex.find(mgrsString.filterWhitespaces().toUpperCase(Locale.getDefault()))
     if (matchResult != null) {
         val matchGroupValues = matchResult.groupValues
 

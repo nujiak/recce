@@ -23,11 +23,6 @@ import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.PinDatabase
 import com.nujiak.reconnaissance.databinding.FragmentMapBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
-import com.nujiak.reconnaissance.mapping.getKertauGridsString
-import com.nujiak.reconnaissance.mapping.getUtmData
-import com.nujiak.reconnaissance.mapping.toSingleLine
-import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
-import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
 
 
 class MapFragment : Fragment(), OnMapReadyCallback,
@@ -228,21 +223,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
         binding.mapLatLngText.text = "%.6f %.6f".format(latitude, longitude)
 
-        binding.mapGridText.text = when (coordSysId) {
-            COORD_SYS_ID_UTM -> {
-                getUtmData(
-                    latitude,
-                    longitude
-                )?.toSingleLine(5)
-            }
-            COORD_SYS_ID_KERTAU -> {
-                getKertauGridsString(
-                    latitude,
-                    longitude
-                )
-            }
-            else -> throw IllegalArgumentException("Invalid coordinate system index: $coordSysId")
-        } ?: binding.root.resources.getString(R.string.not_available)
+        binding.mapGridText.text = getGridString(latitude, longitude, coordSysId, resources)
     }
 
     private fun updateCardGridSystem(coordSysId: Int) {

@@ -21,13 +21,9 @@ import com.nujiak.reconnaissance.*
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.PinDatabase
 import com.nujiak.reconnaissance.databinding.SheetPinCreatorBinding
-import com.nujiak.reconnaissance.mapping.getKertauGrids
-import com.nujiak.reconnaissance.mapping.getLatLngFromKertau
-import com.nujiak.reconnaissance.mapping.UtmData
-import com.nujiak.reconnaissance.mapping.ZONE_BANDS
-import com.nujiak.reconnaissance.mapping.getLatLngFromUtm
-import com.nujiak.reconnaissance.mapping.getUtmData
+import com.nujiak.reconnaissance.mapping.*
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
+import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_MGRS
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
 import java.util.*
 import kotlin.math.floor
@@ -228,17 +224,35 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             false
         }
 
-        binding.newPinZoneDropdown.setOnItemClickListener { _, _, _, _ ->
-            updateLatLng()
+        // Set up zone dropdown for UTM, or else hide the dropdown
+        if (coordSys == COORD_SYS_ID_UTM) {
+            binding.newPinZoneDropdown.setOnItemClickListener { _, _, _, _ ->
+                updateLatLng()
+            }
+        } else {
+            binding.newPinZoneInput.visibility = View.GONE
         }
 
-        binding.newPinEastingEditText.setOnKeyListener { _, _, _ ->
-            updateLatLng()
-            false
+        // Set up easting/northing EditTexts for relevant coordinate systems
+        if (coordSys == COORD_SYS_ID_UTM || coordSys == COORD_SYS_ID_KERTAU) {
+            binding.newPinEastingEditText.setOnKeyListener { _, _, _ ->
+                updateLatLng()
+                false
+            }
+            binding.newPinNorthingEditText.setOnKeyListener { _, _, _ ->
+                updateLatLng()
+                false
+            }
         }
-        binding.newPinNorthingEditText.setOnKeyListener { _, _, _ ->
-            updateLatLng()
-            false
+
+        // Set up MGRS String EditText for MGRS
+        if (coordSys == COORD_SYS_ID_MGRS) {
+            binding.newPinMgrsEditText.setOnKeyListener { _, _, _ ->
+                updateLatLng()
+                false
+            }
+            binding.newPinGridGroup.visibility = View.GONE
+            binding.newPinMgrsGroup.visibility = View.VISIBLE
         }
 
         binding.newPinColorDropdown.setOnItemClickListener { _, _, position, _ ->
@@ -253,13 +267,10 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             viewModel.hideKeyboardFromView(binding.root)
         }
 
-        if (coordSys != COORD_SYS_ID_UTM) {
-            binding.newPinZoneInput.visibility = View.GONE
-        }
-
         binding.newPinGridSystem.text = getString(
             when (coordSys) {
                 COORD_SYS_ID_UTM -> R.string.utm
+                COORD_SYS_ID_MGRS -> R.string.mgrs
                 COORD_SYS_ID_KERTAU -> R.string.kertau
                 else -> throw IllegalArgumentException("Invalid coordinate system id: $coordSys")
             }
@@ -308,6 +319,18 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                     }
                 }
             }
+            COORD_SYS_ID_MGRS -> {
+                val mgrsData = parseMgrsFrom(binding.newPinMgrsEditText.text.toString())
+                val latLng = mgrsData?.toUtmData()?.toLatLng()
+
+                if (latLng != null) {
+                    binding.newPinLatEditText.setText("%.6f".format(latLng.first))
+                    binding.newPinLongEditText.setText("%.6f".format(latLng.second))
+                } else {
+                    binding.newPinLatEditText.setText("")
+                    binding.newPinLongEditText.setText("")
+                }
+            }
             COORD_SYS_ID_KERTAU -> {
                 val easting = binding.newPinEastingEditText.text.toString()
                 val northing = binding.newPinNorthingEditText.text.toString()
@@ -353,6 +376,15 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                         return
                     }
                 }
+                COORD_SYS_ID_MGRS -> {
+                    binding.newPinMgrsEditText.setText(
+                        getMgrsData(
+                            lat.toDouble(),
+                            lng.toDouble()
+                        )?.toSingleLine(includeWhitespace = true)
+                    )
+                    return
+                }
                 COORD_SYS_ID_KERTAU -> {
                     val kertauData =
                         getKertauGrids(
@@ -374,8 +406,6 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             binding.newPinEastingEditText.setText("")
             binding.newPinNorthingEditText.setText("")
             binding.newPinZoneDropdown.setText("", false)
-
-
         }
     }
 

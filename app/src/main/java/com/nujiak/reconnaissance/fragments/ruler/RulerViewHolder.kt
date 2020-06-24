@@ -12,8 +12,7 @@ import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.databinding.RulerEmptyItemBinding
 import com.nujiak.reconnaissance.databinding.RulerMeasurementItemBinding
 import com.nujiak.reconnaissance.databinding.RulerPinItemBinding
-import com.nujiak.reconnaissance.mapping.getUtmData
-import kotlin.math.floor
+import com.nujiak.reconnaissance.getGridString
 
 /**
  * ViewHolder for Pins in the Ruler fragment
@@ -29,7 +28,7 @@ class RulerPinViewHolder private constructor(private val binding: RulerPinItemBi
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(rulerPinItem: RulerItem.RulerPinItem) {
+    fun bind(rulerPinItem: RulerItem.RulerPinItem, coordSysId: Int) {
         val pin = rulerPinItem.pin
 
         // Pin name
@@ -38,24 +37,15 @@ class RulerPinViewHolder private constructor(private val binding: RulerPinItemBi
         binding.rulerPinName.isSelected = true
 
         // Grid System
-        val gridSystem = binding.root.resources.getString(R.string.utm)
-        binding.rulerPinGridSystem.text = gridSystem
-        val utmData = getUtmData(
-            pin.latitude,
-            pin.longitude
-        )
-
-        // Format into string
-        utmData?.let {
-            binding.rulerPinGrid.text =
-                "${it.zone}${it.band} %.0f %.0f".format(floor(it.x), floor(it.y))
-        }
+        binding.rulerPinGridSystem.text =
+            binding.root.resources.getStringArray(R.array.coordinate_systems)[coordSysId]
+        binding.rulerPinGrid.text =
+            getGridString(pin.latitude, pin.longitude, coordSysId, binding.root.resources)
 
         val context = binding.root.context
         val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[pin.color])
         binding.rulerPinItemCardView.setCardBackgroundColor(color)
     }
-
 }
 
 /**

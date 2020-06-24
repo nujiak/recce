@@ -8,7 +8,7 @@ const val ITEM_VIEW_TYPE_PIN = 0
 const val ITEM_VIEW_TYPE_MEASUREMENT = 1
 const val ITEM_VIEW_TYPE_EMPTY = 2
 
-class RulerAdapter :
+class RulerAdapter(private var coordSysId: Int) :
     androidx.recyclerview.widget.ListAdapter<RulerItem, RecyclerView.ViewHolder>(RulerDiffCallback()) {
 
     override fun getItemViewType(position: Int): Int {
@@ -31,7 +31,7 @@ class RulerAdapter :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is RulerPinViewHolder -> {
-                holder.bind(getItem(position) as RulerItem.RulerPinItem)
+                holder.bind(getItem(position) as RulerItem.RulerPinItem, coordSysId)
             }
             is RulerMeasurementViewHolder -> holder.bind(
                 getItem(position - 1) as RulerItem.RulerPinItem,
@@ -39,6 +39,10 @@ class RulerAdapter :
             )
             is RulerEmptyViewHolder -> holder.bind()
         }
+    }
+
+    fun updateCoordSys(newCoordSysId: Int) {
+        coordSysId = newCoordSysId
     }
 }
 
