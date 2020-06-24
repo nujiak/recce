@@ -6,6 +6,12 @@ import com.nujiak.reconnaissance.radToDeg
 import com.nujiak.reconnaissance.wrapLngDeg
 import kotlin.math.*
 
+/*
+ Constant chars for north and south bands
+ */
+const val NORTH_BAND = 'N'
+const val SOUTH_BAND = 'S'
+
 /**
  * Encapsulates the data of a point in UTM
  *
@@ -36,6 +42,23 @@ fun UtmData.toSingleLine(precision: Int): String {
     }
 }
 
+/**
+ * Extension function to get an MgrsData from UtmData
+ *
+ * @return MgrsData of the point represented by the UtmData
+ * @return null if UtmData is null
+ */
+fun UtmData.toMgrsData() = getMgrsData(this)
+
+/**
+ * Extension function to get a lat lng Pair from UtmData
+ *
+ * @return Pair containing WGS 84 latitude and longitude as the first and second item, corresponding
+ *         to the point represented by the UtmData
+ * @return null if UtmData is null
+ */
+fun UtmData.toLatLng() = getLatLngFromUtm(this)
+
 /* WGS Constants */
 
 private val A_AXIS = WgsParams.A_AXIS
@@ -64,64 +87,30 @@ private val B12 = WgsParams.B12
 private const val CHI_TO_PHI_RESOLUTION: Int = 4
 
 /**
- * Array of strings of UTM latitude bands, starting from the south and heading northwards.
- */
-private val LAT_BANDS = arrayOf(
-    'C', 'D', 'E', 'F', 'G',
-    'H', 'J', 'K', 'L', 'M',
-    'N', 'P', 'Q', 'R', 'S',
-    'T', 'U', 'V', 'W', 'X'
-)
-
-/**
  * Array of strings of UTM zone and band configurations. This only accounts for
  * the 2 major bands N and S.
  */
 val ZONE_BANDS = List(120) { index ->
     if (index % 2 == 0) {
-        "%.0fN".format(floor(index / 2.0) + 1)
+        "%.0f".format(floor(index / 2.0) + 1) + NORTH_BAND
     } else {
-        "%.0fS".format(floor(index / 2.0) + 1)
+        "%.0fS".format(floor(index / 2.0) + 1) + SOUTH_BAND
     }
 }
 
 /**
  * Helper function that returns only the zone of a given WGS 84 longitude.
+ *
+ * @param longitude Longitude in degrees
+ * @return UTM zone as an integer
  */
-private fun getUnadjustedUtmZone(longitude: Double): Int {
+private fun getUtmZone(longitude: Double): Int {
     val lng = wrapLngDeg(longitude)
     return floor((lng + 180) / 6).toInt() + 1
 }
 
 /**
- * Helper function that returns the naive latitude bands given a WGS 84 latitude which
- * does not account for exceptions. This function should NOT be used anywhere
- * except in getUtmZoneAndBand() as a helper function.
- *
- * @param latitude Latitude of the point in degrees
- * @return latBand Naive latitude band of the point
- */
-private fun getUnadjustedUtmLatBand(latitude: Double): Char {
-    if (latitude < -80 || latitude > 84) {
-        throw IllegalArgumentException("latitude ($latitude) must be -84.0 - 80")
-    }
-    val remappedLat = latitude + 80
-    val index = when {
-        remappedLat - 80 > 72 -> 19
-        else -> floor(remappedLat / 8).toInt()
-    }
-    return LAT_BANDS[index]
-}
-
-/**
- * Returns the UTM zone and band given the latitude and longitude of the point. This function
- * accounts for the exceptions (such as the non-existence of 32X, 34X, etc). This function uses
- * getUnadjustedUtmLatBand() and getUnadjustedUtmZone() to obtain a naive latitude band and zone,
- * then subsequently accounts for the exceptions.
- *
- * This function also acts as a helper to getUtmData(), which should be used over this function
- * as the latter conducts sanity checks for whether the given point lies in
- * the area of usage of UTM.
+ * Returns the UTM zone and band given the latitude and longitude of the point.
  *
  * @param latitude WGS 84 latitude of the point in degrees
  * @param longitude WGS 84 longitude of the point in degrees
@@ -130,18 +119,10 @@ private fun getUnadjustedUtmLatBand(latitude: Double): Char {
  *         respectively.
  */
 private fun getUtmZoneAndBand(latitude: Double, longitude: Double): Pair<Int, Char> {
-    val band =
-        getUnadjustedUtmLatBand(latitude)
-    val zone =
-        getUnadjustedUtmZone(longitude)
+    val band = if (latitude >= 0) NORTH_BAND else SOUTH_BAND
+    val zone = getUtmZone(longitude)
 
-    return when {
-        band == 'X' && zone == 32 -> Pair(if (longitude < 9) 31 else 33, band)
-        band == 'X' && zone == 34 -> Pair(if (longitude < 21) 33 else 35, band)
-        band == 'X' && zone == 36 -> Pair(if (longitude < 24) 35 else 37, band)
-        band == 'V' && zone == 31 && longitude >= 3 -> Pair(32, band)
-        else -> Pair(zone, band)
-    }
+    return Pair(zone, band)
 }
 
 /**
@@ -434,7 +415,7 @@ fun getUtmData(latDeg: Double, lngDeg: Double): UtmData? {
 fun getLatLngFromUtm(utmData: UtmData): Pair<Double, Double> {
     val (x, y, zone, band) = utmData
     val lambdaCM = degToRad(-183.0 + zone * 6)
-    val isNorth = LAT_BANDS.indexOf(band) >= 10
+    val isNorth = band == NORTH_BAND
 
     val (lng, lat) = when (isNorth) {
         true -> getLambdaPhi(x, y, lambdaCM, 0.9996, 500000.0, 0.0)
