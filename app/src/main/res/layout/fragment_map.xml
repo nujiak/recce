@@ -38,16 +38,20 @@
         android:layout_marginTop="40dp"
         android:paddingTop="@dimen/small_padding"
         android:paddingBottom="@dimen/small_padding"
-        android:paddingStart="@dimen/large_padding"
-        android:paddingEnd="@dimen/large_padding"
+        android:paddingStart="@dimen/small_padding"
+        android:paddingEnd="@dimen/small_padding"
         android:visibility="invisible"
         tools:visibility="visible">
         <TextView
+            style="@style/TextAppearance.MaterialComponents.Caption"
+            android:textColor="@android:color/white"
             android:id="@+id/map_current_distance"
-            android:layout_width="100sp"
+            android:layout_width="80sp"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            tools:text="XXXX.Xm"/>
+            android:gravity="end"
+            android:maxLines="1"
+            android:fadingEdge="horizontal"
+            tools:text="100023.2 km"/>
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
@@ -55,11 +59,14 @@
             android:layout_marginStart="@dimen/small_padding"
             android:layout_marginEnd="@dimen/small_padding"/>
         <TextView
+            style="@style/TextAppearance.MaterialComponents.Caption"
+            android:textColor="@android:color/white"
             android:id="@+id/map_current_direction"
-            android:layout_width="100sp"
+            android:layout_width="64sp"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            tools:text="XXX.X mils"/>
+            android:gravity="start"
+            android:maxLines="1"
+            tools:text="0393.4 mils"/>
     </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
@@ -136,6 +143,8 @@
                 <TextView
                     android:id="@+id/map_lat_lng_text"
                     style="@style/TextAppearance.Reconnaissance.Number"
+                    android:maxLines="1"
+                    android:ellipsize="end"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ems="10"
