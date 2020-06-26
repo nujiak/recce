@@ -1,13 +1,14 @@
 package com.nujiak.reconnaissance.fragments
 
-import android.Manifest
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -18,11 +19,14 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
+import com.google.maps.android.SphericalUtil
 import com.nujiak.reconnaissance.*
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.PinDatabase
 import com.nujiak.reconnaissance.databinding.FragmentMapBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
+import kotlin.math.hypot
+import kotlin.math.roundToInt
 
 
 class MapFragment : Fragment(), OnMapReadyCallback,
@@ -38,6 +42,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private var markersMap = HashMap<Marker, Pin>()
 
     private var isShowingPin = false
+    private var isShowingMyLocation = false
+
+    private var isLiveMeasurementVisible = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -90,7 +97,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             coordSysId = it
             updateCardGridSystem(coordSysId)
             if (this::map.isInitialized) {
-                updateLatLong() // Force card update
+                // Force card update
+                updateLatLong()
             }
         })
 
@@ -116,6 +124,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             uiSetting.isZoomControlsEnabled = true
 
             viewModel.isLocPermGranted.observe(viewLifecycleOwner, Observer { onLocPermChange(it) })
+
+            // Observe location to update Live Measurement
+            viewModel.fusedLocationData.observe(viewLifecycleOwner, Observer {
+                updateLiveMeasurements()
+            })
 
             // Disable built-in Maps controls
             map.uiSettings.isZoomControlsEnabled = false
@@ -152,35 +165,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 Bitmap.createBitmap(intrinsicWidth, intrinsicHeight, Bitmap.Config.ARGB_8888)
             draw(Canvas(bitmap))
             BitmapDescriptorFactory.fromBitmap(bitmap)
-        }
-    }
-
-    private fun isLocationGranted() = ContextCompat.checkSelfPermission(
-        this.requireContext(),
-        Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
-
-    @SuppressLint("MissingPermission")
-    private fun onLocationGranted(firstRun: Boolean = false) {
-        map.isMyLocationEnabled = true
-        binding.mapLocationButton.isEnabled = true
-
-        // Observe my location once
-        if (firstRun) {
-            viewModel.fusedLocationData.observe(
-                viewLifecycleOwner,
-                object : Observer<FusedLocationLiveData.LocationData> {
-                    override fun onChanged(location: FusedLocationLiveData.LocationData) {
-                        val cameraPosition = CameraPosition.builder()
-                            .target(LatLng(location.latitude, location.longitude))
-                            .zoom(15f)
-                            .build()
-                        map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
-                        updateLatLong()
-
-                        viewModel.fusedLocationData.removeObserver(this)
-                    }
-                })
         }
     }
 
@@ -222,8 +206,35 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             longitude = target.longitude
         }
         binding.mapLatLngText.text = "%.6f %.6f".format(latitude, longitude)
-
         binding.mapGridText.text = getGridString(latitude, longitude, coordSysId, resources)
+
+        updateLiveMeasurements(latitude, longitude)
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updateLiveMeasurements(lat: Double? = null, lng: Double? = null) {
+        var targetLat = lat
+        var targetLng = lng
+        if (targetLat == null || targetLng == null) {
+            val mapTarget = map.cameraPosition.target
+            targetLat = mapTarget.latitude
+            targetLng = mapTarget.longitude
+        }
+        val fusedLocationData = viewModel.fusedLocationData.value ?: return
+
+        val myLatLng = LatLng(fusedLocationData.latitude, fusedLocationData.longitude)
+        val targetLatLng = LatLng(targetLat, targetLng)
+
+        val distance = SphericalUtil.computeDistanceBetween(myLatLng, targetLatLng)
+        var direction = SphericalUtil.computeHeading(myLatLng, targetLatLng)
+        if (direction < 0) {
+            direction += 360
+        }
+        val directionMils = degToNatoMils(direction)
+
+        binding.mapCurrentDistance.text = "%.1fm".format(distance)
+        binding.mapCurrentDirection.text =
+            "${directionMils.roundToInt().toString().padStart(4, '0')} mils"
     }
 
     private fun updateCardGridSystem(coordSysId: Int) {
@@ -263,6 +274,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onMyLocationPressed() {
+        isShowingMyLocation = true
         val currentZoom = map.cameraPosition.zoom
         val location = viewModel.fusedLocationData.value
         if (location != null) {
@@ -270,7 +282,17 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 .target(LatLng(location.latitude, location.longitude))
                 .zoom(if (currentZoom < 10) 15f else currentZoom)
                 .build()
-            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 500, null)
+            map.animateCamera(
+                CameraUpdateFactory.newCameraPosition(cameraPosition),
+                500,
+                object : GoogleMap.CancelableCallback {
+                    override fun onFinish() {
+                        toggleLiveMeasurement(false)
+                        isShowingMyLocation = false
+                    }
+
+                    override fun onCancel() {}
+                })
             showPinInCard(null)
         }
     }
@@ -285,6 +307,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         val pin = markersMap[marker]
         return if (pin != null) {
             viewModel.putPinInFocus(pin)
+            toggleLiveMeasurement(true)
             true
         } else {
             false
@@ -294,6 +317,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private fun onCameraMoveStarted(reason: Int) {
         if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
             showPinInCard(null)
+            if (!isShowingMyLocation) {
+                toggleLiveMeasurement(true)
+            }
         }
     }
 
@@ -335,6 +361,65 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             binding.mapPinNameText.text = "+"
             binding.mapPinGroup.visibility = View.INVISIBLE
             isShowingPin = false
+        }
+    }
+
+    private fun toggleLiveMeasurement(makeVisible: Boolean = true) {
+
+        if (isLiveMeasurementVisible == makeVisible) { return }
+
+        val liveMeasurement = binding.mapLiveMeasurement
+
+        val centreX = liveMeasurement.width / 2
+        val centreY = liveMeasurement.height / 2
+
+        // Get radius of circle covering entire element
+        val radius = hypot(centreX.toDouble(), centreY.toDouble()).toFloat()
+
+        if (makeVisible) {
+            try {
+                // Attempt to create and start the animation
+                val anim = ViewAnimationUtils.createCircularReveal(
+                    liveMeasurement,
+                    centreX,
+                    centreY,
+                    0f,
+                    radius
+                )
+                liveMeasurement.visibility = View.VISIBLE
+                anim.duration = 200
+                anim.start()
+            } catch (e: Exception) {
+                // If view is detached, just toggle visibility without animation
+                liveMeasurement.visibility = View.VISIBLE
+            } finally {
+                isLiveMeasurementVisible = true
+            }
+        } else {
+            try {
+                // Attempt to create and start the animation
+                val anim = ViewAnimationUtils.createCircularReveal(
+                    liveMeasurement,
+                    centreX,
+                    centreY,
+                    radius,
+                    0f
+                )
+                anim.addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        liveMeasurement.visibility = View.INVISIBLE
+                        isLiveMeasurementVisible = false
+                    }
+
+                })
+                anim.duration = 200
+                anim.start()
+            } catch (e: Exception) {
+                // If view is detached, just toggle visibility without animation
+                liveMeasurement.visibility = View.INVISIBLE
+                isLiveMeasurementVisible = false
+            }
         }
     }
 
