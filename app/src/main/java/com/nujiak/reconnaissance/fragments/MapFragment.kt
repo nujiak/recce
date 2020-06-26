@@ -25,6 +25,9 @@ import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.PinDatabase
 import com.nujiak.reconnaissance.databinding.FragmentMapBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
+import java.text.NumberFormat
+import java.util.*
+import kotlin.collections.HashMap
 import kotlin.math.hypot
 import kotlin.math.roundToInt
 
@@ -32,7 +35,6 @@ import kotlin.math.roundToInt
 class MapFragment : Fragment(), OnMapReadyCallback,
     ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private val LOCATION_REQUEST_CODE = 1
     private lateinit var binding: FragmentMapBinding
     lateinit var viewModel: MainViewModel
     lateinit var map: GoogleMap
@@ -45,6 +47,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private var isShowingMyLocation = false
 
     private var isLiveMeasurementVisible = false
+
+    private lateinit var numberFormat: NumberFormat
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -101,6 +105,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 updateLatLong()
             }
         })
+
+        // NumberFormat used to format distances in Live Measurements
+        numberFormat = NumberFormat.getNumberInstance(Locale.US)
+        numberFormat.minimumFractionDigits = 1
+        numberFormat.maximumFractionDigits = 1
 
         return binding.root
     }
@@ -232,7 +241,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
         val directionMils = degToNatoMils(direction)
 
-        binding.mapCurrentDistance.text = "%.1fm".format(distance)
+        binding.mapCurrentDistance.text = if (distance < 1000000) {
+            numberFormat.format(distance) + " m"
+        } else {
+            numberFormat.format(distance / 1000) + " km"
+        }
         binding.mapCurrentDirection.text =
             "${directionMils.roundToInt().toString().padStart(4, '0')} mils"
     }
