@@ -28,6 +28,14 @@ fun degToRad(deg: Float): Float {
     return deg / 180 * PI.toFloat()
 }
 
+fun degToNatoMils(deg: Double): Double {
+    return deg / 180 * 3200
+}
+
+fun degToNatoMils(deg: Float): Float {
+    return deg / 180 * 3200
+}
+
 
 fun wrapLngDeg(longitude: Double): Double {
     return (longitude + 180) % 360 - 180
