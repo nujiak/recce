@@ -5,6 +5,8 @@ import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Matrix
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,6 +31,7 @@ import com.nujiak.reconnaissance.location.FusedLocationLiveData
 import java.text.NumberFormat
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.roundToInt
 
@@ -49,7 +52,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private var isShowingMyLocation = false
 
     private var isLiveMeasurementVisible = false
-    private var isLayersPopupVisible = false
+    private var isMapCompassVisible = false
+    private var compassImageDrawable: Drawable? = null
 
     private lateinit var numberFormat: NumberFormat
 
@@ -129,6 +133,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         numberFormat.minimumFractionDigits = 1
         numberFormat.maximumFractionDigits = 1
 
+        // Set up Map rotation reset
+        binding.mapCompass.setOnClickListener { onResetMapRotation() }
+
         return binding.root
     }
 
@@ -148,12 +155,14 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             val newMapType = viewModel.sharedPreference.getInt(MAP_TYPE_KEY, currentMapType)
             map.mapType = newMapType
             currentMapType = newMapType
-            binding.mapTypeGroup.check(when (newMapType) {
-                GoogleMap.MAP_TYPE_NORMAL -> R.id.map_normal_type
-                GoogleMap.MAP_TYPE_HYBRID -> R.id.map_hybrid_type
-                GoogleMap.MAP_TYPE_SATELLITE -> R.id.map_satellite_type
-                else -> R.id.map_normal_type
-            })
+            binding.mapTypeGroup.check(
+                when (newMapType) {
+                    GoogleMap.MAP_TYPE_NORMAL -> R.id.map_normal_type
+                    GoogleMap.MAP_TYPE_HYBRID -> R.id.map_hybrid_type
+                    GoogleMap.MAP_TYPE_SATELLITE -> R.id.map_satellite_type
+                    else -> R.id.map_normal_type
+                }
+            )
 
             map.setOnCameraMoveListener {
                 onCameraMove()
@@ -176,11 +185,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             })
 
             // Disable built-in Maps controls
-            map.uiSettings.isZoomControlsEnabled = false
-            map.uiSettings.isMyLocationButtonEnabled = false
-            val scale = resources.displayMetrics.density
-            val padding = (24 * scale).roundToInt()
-            map.setPadding(padding, padding, padding, padding)
+            map.uiSettings.apply {
+                isZoomControlsEnabled = false
+                isMyLocationButtonEnabled = false
+                isCompassEnabled = false
+            }
 
             // Add markers
             viewModel.allPins.observe(viewLifecycleOwner, Observer { allPins ->
@@ -353,6 +362,15 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         if (!isShowingPin) {
             updateLatLong()
         }
+
+        val bearing = map.cameraPosition.bearing
+        val tilt = map.cameraPosition.tilt
+        if (bearing != 0f || tilt != 0f) {
+            toggleMapCompass(true)
+            updateMapCompass(bearing, tilt)
+        } else {
+            toggleMapCompass(false)
+        }
     }
 
     private fun onMarkerClick(marker: Marker): Boolean {
@@ -473,6 +491,102 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 // If view is detached, just toggle visibility without animation
                 liveMeasurement.visibility = View.INVISIBLE
                 isLiveMeasurementVisible = false
+            }
+        }
+    }
+
+    private fun updateMapCompass(bearing: Float, tilt: Float) {
+
+        if (compassImageDrawable == null) {
+            compassImageDrawable = binding.mapCompassImg.drawable
+        }
+        val matrix = Matrix().apply {
+            postRotate(
+                -bearing,
+                compassImageDrawable!!.intrinsicWidth / 2f,
+                compassImageDrawable!!.intrinsicHeight / 2f
+            )
+            postScale(1f, cos(degToRad(tilt)),
+                compassImageDrawable!!.intrinsicWidth / 2f,
+                compassImageDrawable!!.intrinsicHeight / 2f)
+        }
+        binding.mapCompassImg.imageMatrix = matrix
+    }
+
+    private fun onResetMapRotation() {
+        val cameraPosition = map.cameraPosition
+        val newPosition = CameraPosition(cameraPosition.target, cameraPosition.zoom, 0f, 0f)
+
+        map.animateCamera(
+            CameraUpdateFactory.newCameraPosition(newPosition),
+            350,
+            object : GoogleMap.CancelableCallback {
+                override fun onFinish() {
+                    toggleMapCompass(false)
+                }
+
+                override fun onCancel() {}
+
+            })
+    }
+
+    private fun toggleMapCompass(makeVisible: Boolean = true) {
+
+        if (isMapCompassVisible == makeVisible) {
+            return
+        }
+
+        val mapCompass = binding.mapCompass
+
+        val centreX = mapCompass.width / 2
+        val centreY = mapCompass.height / 2
+
+        // Get radius of circle covering entire element
+        val radius = hypot(centreX.toDouble(), centreY.toDouble()).toFloat()
+
+        if (makeVisible) {
+            try {
+                // Attempt to create and start the animation
+                val anim = ViewAnimationUtils.createCircularReveal(
+                    mapCompass,
+                    centreX,
+                    centreY,
+                    0f,
+                    radius
+                )
+                mapCompass.visibility = View.VISIBLE
+                anim.duration = 200
+                anim.start()
+            } catch (e: Exception) {
+                // If view is detached, just toggle visibility without animation
+                mapCompass.visibility = View.VISIBLE
+            } finally {
+                isMapCompassVisible = true
+            }
+        } else {
+            try {
+                // Attempt to create and start the animation
+                val anim = ViewAnimationUtils.createCircularReveal(
+                    mapCompass,
+                    centreX,
+                    centreY,
+                    radius,
+                    0f
+                )
+                anim.addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        mapCompass.visibility = View.INVISIBLE
+                        isMapCompassVisible = false
+                    }
+
+                })
+                anim.duration = 200
+                anim.start()
+            } catch (e: Exception) {
+                // If view is detached, just toggle visibility without animation
+                mapCompass.visibility = View.INVISIBLE
+                isMapCompassVisible = false
             }
         }
     }

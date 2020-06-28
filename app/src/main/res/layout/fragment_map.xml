@@ -10,10 +10,10 @@
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/map_cross_hair"
@@ -62,6 +62,27 @@
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_outline_traffic_24" />
         </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <FrameLayout
+        android:id="@+id/map_compass"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_margin="@dimen/large_padding"
+        android:background="@drawable/map_compass_background"
+        android:padding="6dp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map_type_group"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/map_compass_img"
+            android:scaleType="matrix"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/compass_needle_24dp"
+            tools:ignore="ContentDescription"/>
+    </FrameLayout>
 
         <LinearLayout
             android:id="@+id/map_live_measurement"
