@@ -225,8 +225,9 @@
                     </LinearLayout>
 
                     <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_width="240dp"
+                        android:layout_height="240dp"
+                        android:layout_gravity="center_horizontal"
                         android:layout_marginStart="@dimen/large_padding"
                         android:layout_marginTop="@dimen/large_padding"
                         android:layout_marginEnd="@dimen/large_padding">
@@ -248,17 +249,17 @@
                             android:layout_height="wrap_content"
                             android:adjustViewBounds="true"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/compass_circle" />
+                            android:src="@drawable/compass_circle"
+                            tools:ignore="ContentDescription" />
 
                         <ImageView
                             android:id="@+id/gps_compass_arrow"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:adjustViewBounds="true"
-                            android:padding="32dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/compass_needle" />
+                            android:scaleType="matrix"
+                            android:src="@drawable/compass_needle"
+                            tools:ignore="ContentDescription" />
                     </FrameLayout>
 
                     <TextView
