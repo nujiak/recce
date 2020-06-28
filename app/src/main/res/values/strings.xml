@@ -1,16 +1,13 @@
 <resources>
     <string name="app_name">Recce</string>
-    <string name="version_name">Alpha</string>
 
     <!-- General-use -->
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="pin_name">Pin Name</string>
-    <string name="cancel">Cancel</string>
     <string name="not_available">N/A</string>
     <string name="easting">Easting</string>
     <string name="northing">Northing</string>
-    <string name="pin">Pin</string>
     <string name="lat_lng">LatLng (WGS 84)</string>
     <string name="color">Color</string>
     <string name="group">Group</string>
@@ -24,8 +21,6 @@
     <string name="pins">Pins</string>
     <string name="add_pin">Add Pin</string>
     <string name="edit_pin">Edit Pin</string>
-    <string name="latitude_short">Lat</string>
-    <string name="longitude_short">Long</string>
     <string name="add_to_ruler">Add to ruler</string>
     <plurals name="number_selected">
         <item quantity="one">%d pin selected</item>
@@ -45,7 +40,6 @@
     <string name="oldest_first">Oldest First</string>
     
     <!-- Pin Creator -->
-    <string name="new_pin">New Pin</string>
     <string name="delete">Delete</string>
     <string name="save">Save</string>
     <string name="add">Add</string>
@@ -61,8 +55,6 @@
     <string name="lat_empty_error">Latitude cannot be blank</string>
     <string name="long_empty_error">Longitude cannot be blank</string>
     <string name="lat_out_of_range_error">Latitude is out of range</string>
-    <string name="long_out_of_range_error">Longitude is out of range</string>
-    <string name="color_error">Choose a color</string>
     <string name="group_empty_error">Group cannot be blank</string>
     <string name="group_too_long_error">Group name cannot exceed 12 characters</string>
     <string name="group_invalid_error">Group name invalid</string>
@@ -71,24 +63,14 @@
     <string name="map">Map</string>
     <string name="zone">Zone</string>
     <string name="plus">+</string>
-    <string name="map_type">Map Type</string>
-    <string name="map_normal">Normal</string>
-    <string name="map_hybrid">Hybrid</string>
-    <string name="map_satellite">Satellite</string>
-    <string name="map_terrain">Terrain</string>
 
     <!-- GPS -->
     <string name="gps">GPS</string>
     <string name="location">Location</string>
-    <string name="altitude">Altitude</string>
     <string name="azimuth">Azimuth</string>
     <string name="pitch">Pitch</string>
     <string name="roll">Roll</string>
     <string name="accuracy_warning">Your device\'s sensors are out of calibration\nand readings may be inaccurate</string>
-    <string name="gps_disabled_warning">GPS disabled, satellite grids will not be available.</string>
-    <string name="gps_enabled">GPS enabled</string>
-    <string name="fused_location_provider">Fused Location Provider</string>
-    <string name="gps_location">GPS Location</string>
     <string name="coordinates_format">%.6f, %.6f, Altitude %.1f</string>
 
     <!-- Ruler -->
