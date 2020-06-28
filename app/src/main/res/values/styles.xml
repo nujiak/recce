@@ -59,6 +59,17 @@
         <item name="android:minHeight">48dp</item>
         <item name="cornerRadius">24dp</item>
     </style>
+    <style name="Widget.Reconnaissance.Button.TextButton.IconOnly.Small" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="iconPadding">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
+        <item name="android:minWidth">36dp</item>
+        <item name="android:minHeight">36dp</item>
+        <item name="android:backgroundTint">@color/colorSurface</item>
+        <item name="iconSize">20dp</item>
+    </style>
 
     <style name="TextAppearance.Reconnaissance.PinName" parent="TextAppearance.MaterialComponents.Headline5">
         <item name="android:textColor">@color/primaryTextColor</item>
@@ -105,5 +116,12 @@
     <style name="ShapeAppearance.Reconnaissance.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/large_padding</item>
+    </style>
+
+    <style name="TextAppearance.Reconnaissance.MapLayerOption" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:layout_height">48dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:padding">@dimen/small_padding</item>
+        <item name="android:layout_width">match_parent</item>
     </style>
 </resources>

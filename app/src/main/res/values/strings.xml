@@ -71,6 +71,11 @@
     <string name="map">Map</string>
     <string name="zone">Zone</string>
     <string name="plus">+</string>
+    <string name="map_type">Map Type</string>
+    <string name="map_normal">Normal</string>
+    <string name="map_hybrid">Hybrid</string>
+    <string name="map_satellite">Satellite</string>
+    <string name="map_terrain">Terrain</string>
 
     <!-- GPS -->
     <string name="gps">GPS</string>

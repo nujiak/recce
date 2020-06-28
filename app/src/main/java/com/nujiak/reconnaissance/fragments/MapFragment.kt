@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewGroup
+import android.widget.PopupWindow
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -38,6 +39,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private lateinit var binding: FragmentMapBinding
     lateinit var viewModel: MainViewModel
     lateinit var map: GoogleMap
+    lateinit var layerPopup: PopupWindow
     private var coordSysId = 0
 
     private var currentPinColor = 0
@@ -47,8 +49,12 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private var isShowingMyLocation = false
 
     private var isLiveMeasurementVisible = false
+    private var isLayersPopupVisible = false
 
     private lateinit var numberFormat: NumberFormat
+
+    private val MAP_TYPE_KEY = "map_type"
+    private var currentMapType = GoogleMap.MAP_TYPE_HYBRID
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -106,6 +112,18 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             }
         })
 
+        // Set up Map Type toggle buttons
+        binding.mapNormalType.setOnClickListener {
+            updateMapType(GoogleMap.MAP_TYPE_NORMAL)
+
+        }
+        binding.mapHybridType.setOnClickListener {
+            updateMapType(GoogleMap.MAP_TYPE_HYBRID)
+        }
+        binding.mapSatelliteType.setOnClickListener {
+            updateMapType(GoogleMap.MAP_TYPE_SATELLITE)
+        }
+
         // NumberFormat used to format distances in Live Measurements
         numberFormat = NumberFormat.getNumberInstance(Locale.US)
         numberFormat.minimumFractionDigits = 1
@@ -114,11 +132,29 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         return binding.root
     }
 
+    private fun updateMapType(newMapType: Int) {
+        if (currentMapType == newMapType) {
+            return
+        }
+        currentMapType = newMapType
+        map.mapType = newMapType
+        viewModel.sharedPreference.edit().putInt(MAP_TYPE_KEY, newMapType).apply()
+    }
+
     override fun onMapReady(mMap: GoogleMap?) {
         if (mMap != null) {
             map = mMap
 
-            map.mapType = GoogleMap.MAP_TYPE_HYBRID
+            val newMapType = viewModel.sharedPreference.getInt(MAP_TYPE_KEY, currentMapType)
+            map.mapType = newMapType
+            currentMapType = newMapType
+            binding.mapTypeGroup.check(when (newMapType) {
+                GoogleMap.MAP_TYPE_NORMAL -> R.id.map_normal_type
+                GoogleMap.MAP_TYPE_HYBRID -> R.id.map_hybrid_type
+                GoogleMap.MAP_TYPE_SATELLITE -> R.id.map_satellite_type
+                else -> R.id.map_normal_type
+            })
+
             map.setOnCameraMoveListener {
                 onCameraMove()
             }
@@ -142,6 +178,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             // Disable built-in Maps controls
             map.uiSettings.isZoomControlsEnabled = false
             map.uiSettings.isMyLocationButtonEnabled = false
+            val scale = resources.displayMetrics.density
+            val padding = (24 * scale).roundToInt()
+            map.setPadding(padding, padding, padding, padding)
 
             // Add markers
             viewModel.allPins.observe(viewLifecycleOwner, Observer { allPins ->
@@ -379,7 +418,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private fun toggleLiveMeasurement(makeVisible: Boolean = true) {
 
-        if (isLiveMeasurementVisible == makeVisible) { return }
+        if (isLiveMeasurementVisible == makeVisible) {
+            return
+        }
 
         val liveMeasurement = binding.mapLiveMeasurement
 
