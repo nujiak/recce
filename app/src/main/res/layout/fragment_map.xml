@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/map_root"
@@ -11,7 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <ImageView
         android:id="@+id/map_cross_hair"
@@ -19,31 +21,60 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:elevation="1dp"
-        app:layout_constraintBottom_toBottomOf="@+id/mapView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/mapView"
         app:srcCompat="@drawable/ic_add_white_24dp"
-        tools:ignore="ContentDescription" />
+        tools:ignore="ContentDescription"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/map_type_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="@dimen/large_padding"
+            android:layout_marginStart="@dimen/large_padding"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <Button
+                android:id="@+id/map_normal_type"
+                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_map_white_24dp" />
+
+            <Button
+                android:id="@+id/map_satellite_type"
+                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_outline_satellite_24" />
+
+            <Button
+                android:id="@+id/map_hybrid_type"
+                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_outline_traffic_24" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <LinearLayout
             android:id="@+id/map_live_measurement"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/small_padding"
             android:background="@drawable/map_live_measurement_background"
-            android:fitsSystemWindows="true"
             android:orientation="horizontal"
             android:paddingStart="@dimen/small_padding"
             android:paddingTop="@dimen/small_padding"
             android:paddingEnd="@dimen/small_padding"
             android:paddingBottom="@dimen/small_padding"
             android:visibility="invisible"
+            android:layout_marginTop="40dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -195,7 +226,7 @@
             app:layout_constraintStart_toStartOf="@id/map_details_card_view"
             app:layout_constraintTop_toTopOf="@id/map_details_card_view"
             tools:text="Pin Name" />
-        
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/materialCardView"
             android:layout_width="wrap_content"
@@ -233,6 +264,4 @@
                     app:icon="@drawable/ic_zoom_out_white_24dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
