@@ -2,6 +2,7 @@ package com.nujiak.reconnaissance.fragments
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Matrix
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -9,8 +10,6 @@ import android.hardware.SensorManager
 import android.hardware.SensorManager.*
 import android.os.Bundle
 import android.view.*
-import android.view.animation.Animation
-import android.view.animation.RotateAnimation
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -20,6 +19,7 @@ import com.nujiak.reconnaissance.databinding.FragmentGpsBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.cos
 import kotlin.math.roundToInt
 
 
@@ -175,27 +175,25 @@ class GpsFragment : Fragment(), SensorEventListener {
                     .padStart(4, '0')} mils"
             binding.gpsRollMils.text = rolMilsStr
         }
-        updateCompass(radToDeg(aziRad))
+        updateCompass(aziRad, pitRad, rolRad)
 
     }
 
-    private fun updateCompass(bearingFromNorthDeg: Float) {
+    private fun updateCompass(aziRad: Float, pitRad: Float, rolRad: Float) {
 
-        // Target angle is bearing from current direction to North
-        val targetAngleDeg = -bearingFromNorthDeg
+        val compassDrawable = binding.gpsCompassArrow.drawable
 
-        val rotateAnimation = RotateAnimation(
-            currentCompassAngleDeg,
-            targetAngleDeg,
-            Animation.RELATIVE_TO_SELF, 0.5f,
-            Animation.RELATIVE_TO_SELF, 0.5f
-        )
-
-        rotateAnimation.duration = 0
-        rotateAnimation.fillAfter = true
-        binding.gpsCompassArrow.startAnimation(rotateAnimation)
-
-        currentCompassAngleDeg = targetAngleDeg
+        val matrix = Matrix().apply {
+            postRotate(
+                -radToDeg(aziRad),
+                compassDrawable!!.intrinsicWidth / 2f,
+                compassDrawable.intrinsicHeight / 2f
+            )
+            postScale(cos(rolRad), cos(pitRad),
+                compassDrawable.intrinsicWidth / 2f,
+                compassDrawable.intrinsicHeight / 2f)
+        }
+        binding.gpsCompassArrow.imageMatrix = matrix
     }
 
     private fun updateLocationUI(locationData: FusedLocationLiveData.LocationData? = lastLocationData) {
