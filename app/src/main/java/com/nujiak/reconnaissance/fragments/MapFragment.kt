@@ -47,6 +47,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private var currentPinColor = 0
     private var markersMap = HashMap<Marker, Pin>()
+    private var myLocationMarker: Marker? = null
+    private var myLocationCircle: Circle? = null
 
     private var isShowingPin = false
     private var isShowingMyLocation = false
@@ -182,6 +184,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             // Observe location to update Live Measurement
             viewModel.fusedLocationData.observe(viewLifecycleOwner, Observer {
                 updateLiveMeasurements()
+                updateMyLocation(it)
             })
 
             // Disable built-in Maps controls
@@ -197,21 +200,58 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             })
 
             updateLatLong()
-
+            drawMyLocation(viewModel.fusedLocationData.value)
         }
     }
 
     private fun drawMarkers(allPins: List<Pin>) {
         map.clear()
+        drawMyLocation(viewModel.fusedLocationData.value)
+
         for (pin in allPins) {
             val marker = map.addMarker(
                 MarkerOptions()
                     .position(LatLng(pin.latitude, pin.longitude))
                     .title(pin.name)
                     .icon(bitmapDescriptorFromVector(PIN_VECTOR_DRAWABLE[pin.color]))
-                //.icon(BitmapDescriptorFactory.defaultMarker(PIN_COLOR_HUES[pin.color]))
             )
             markersMap[marker] = pin
+        }
+    }
+
+    private fun drawMyLocation(locationData: FusedLocationLiveData.LocationData?) {
+        if (locationData == null) { return }
+
+        myLocationMarker?.isVisible = false
+        myLocationCircle?.isVisible = false
+        val position = LatLng(locationData.latitude, locationData.longitude)
+        myLocationMarker = map.addMarker(
+            MarkerOptions()
+                .position(position)
+                .anchor(0.5f, 0.5f)
+                .flat(true)
+                .zIndex(Float.MAX_VALUE)
+                .icon(bitmapDescriptorFromVector(R.drawable.ic_map_my_location))
+        )
+        myLocationCircle = map.addCircle(
+            CircleOptions()
+                .center(position)
+                .radius(locationData.accuracy.toDouble())
+                .strokeColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
+                .strokeWidth(1f)
+                .zIndex(Float.MAX_VALUE)
+                .fillColor(ContextCompat.getColor(requireContext(), R.color.myLocationFill))
+        )
+    }
+
+    private fun updateMyLocation(locationData: FusedLocationLiveData.LocationData?) {
+        if (locationData == null) { return }
+        val position = LatLng(locationData.latitude, locationData.longitude)
+        if (myLocationMarker != null && myLocationCircle != null) {
+            myLocationMarker!!.position = position
+            myLocationCircle!!.center = position
+        } else {
+            drawMyLocation(locationData)
         }
     }
 
@@ -228,7 +268,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     @SuppressLint("MissingPermission")
     private fun onLocPermChange(isGranted: Boolean) {
 
-        map.isMyLocationEnabled = isGranted
         binding.mapLocationButton.isEnabled = isGranted
         // Observe my location once
         if (isGranted) {
@@ -242,7 +281,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                             .build()
                         map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
                         updateLatLong()
-
+                        drawMyLocation(location)
                         viewModel.fusedLocationData.removeObserver(this)
                     }
                 })
@@ -336,12 +375,15 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private fun onMyLocationPressed() {
         isShowingMyLocation = true
-        val currentZoom = map.cameraPosition.zoom
+        val currentCameraPosition = map.cameraPosition
+        val currentZoom = currentCameraPosition.zoom
         val location = viewModel.fusedLocationData.value
         if (location != null) {
             val cameraPosition = CameraPosition.builder()
                 .target(LatLng(location.latitude, location.longitude))
                 .zoom(if (currentZoom < 10) 15f else currentZoom)
+                .tilt(currentCameraPosition.tilt)
+                .bearing(currentCameraPosition.bearing)
                 .build()
             map.animateCamera(
                 CameraUpdateFactory.newCameraPosition(cameraPosition),
@@ -374,6 +416,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onMarkerClick(marker: Marker): Boolean {
+        if (marker == myLocationMarker) {
+            onMyLocationPressed()
+            return true
+        }
+
         val pin = markersMap[marker]
         return if (pin != null) {
             viewModel.putPinInFocus(pin)
@@ -506,9 +553,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 compassImageDrawable!!.intrinsicWidth / 2f,
                 compassImageDrawable!!.intrinsicHeight / 2f
             )
-            postScale(1f, cos(degToRad(tilt)),
+            postScale(
+                1f, cos(degToRad(tilt)),
                 compassImageDrawable!!.intrinsicWidth / 2f,
-                compassImageDrawable!!.intrinsicHeight / 2f)
+                compassImageDrawable!!.intrinsicHeight / 2f
+            )
         }
         binding.mapCompassImg.imageMatrix = matrix
     }
