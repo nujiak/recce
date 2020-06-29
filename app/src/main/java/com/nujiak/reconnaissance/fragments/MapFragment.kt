@@ -2,12 +2,15 @@ package com.nujiak.reconnaissance.fragments
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
+import android.animation.TypeEvaluator
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Property
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewAnimationUtils
@@ -220,10 +223,12 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun drawMyLocation(locationData: FusedLocationLiveData.LocationData?) {
-        if (locationData == null) { return }
+        if (locationData == null) {
+            return
+        }
 
-        myLocationMarker?.isVisible = false
-        myLocationCircle?.isVisible = false
+        myLocationMarker?.remove()
+        myLocationCircle?.remove()
         val position = LatLng(locationData.latitude, locationData.longitude)
         myLocationMarker = map.addMarker(
             MarkerOptions()
@@ -245,11 +250,40 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun updateMyLocation(locationData: FusedLocationLiveData.LocationData?) {
-        if (locationData == null) { return }
+        if (locationData == null) {
+            return
+        }
         val position = LatLng(locationData.latitude, locationData.longitude)
         if (myLocationMarker != null && myLocationCircle != null) {
-            myLocationMarker!!.position = position
-            myLocationCircle!!.center = position
+            val latLngEvaluator =
+                TypeEvaluator<LatLng> { fraction, startValue, endValue ->
+                    SphericalUtil.interpolate(
+                        startValue,
+                        endValue,
+                        fraction.toDouble()
+                    )
+                }
+
+            val doubleEvaluator =
+                TypeEvaluator<Double> { fraction, startValue, endValue ->
+                    startValue + fraction * (endValue - startValue)
+                }
+
+            val markerProperty = Property.of(Marker::class.java, LatLng::class.java,"position")
+            val circleCenterProperty = Property.of(Circle::class.java, LatLng::class.java,"center")
+            val circleRadiusProperty = Property.of(Circle::class.java, Double::class.java,"radius")
+
+            val markerAnimator = ObjectAnimator.ofObject(myLocationMarker, markerProperty, latLngEvaluator, position)
+            val circleCenterAnimator = ObjectAnimator.ofObject(myLocationCircle, circleCenterProperty, latLngEvaluator, position)
+            val circleRadiusAnimator = ObjectAnimator.ofObject(myLocationCircle, circleRadiusProperty, doubleEvaluator, locationData.accuracy.toDouble())
+
+            markerAnimator.duration = 300
+            circleCenterAnimator.duration = 300
+            circleRadiusAnimator.duration = 300
+
+            markerAnimator.start()
+            circleCenterAnimator.start()
+            circleRadiusAnimator.start()
         } else {
             drawMyLocation(locationData)
         }
