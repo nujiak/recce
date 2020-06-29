@@ -62,7 +62,7 @@
     <!-- Map -->
     <string name="map">Map</string>
     <string name="zone">Zone</string>
-    <string name="plus">+</string>
+    <string name="add_pin_plus">+ Add pin</string>
 
     <!-- GPS -->
     <string name="gps">GPS</string>

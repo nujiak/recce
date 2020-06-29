@@ -428,7 +428,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
             isShowingPin = true
         } else {
-            binding.mapPinNameText.text = "+"
+            binding.mapPinNameText.text = resources.getString(R.string.add_pin_plus)
             binding.mapPinGroup.visibility = View.INVISIBLE
             isShowingPin = false
         }

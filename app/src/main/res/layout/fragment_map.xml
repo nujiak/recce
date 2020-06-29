@@ -242,7 +242,7 @@
             android:paddingStart="@dimen/large_padding"
             android:paddingEnd="@dimen/large_padding"
             android:paddingBottom="@dimen/small_padding"
-            android:text="@string/plus"
+            android:text="@string/add_pin_plus"
             app:layout_constraintEnd_toEndOf="@+id/map_details_card_view"
             app:layout_constraintStart_toStartOf="@id/map_details_card_view"
             app:layout_constraintTop_toTopOf="@id/map_details_card_view"
