@@ -204,15 +204,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        if (viewPager.currentItem == MAP_INDEX) {
-            viewPager.currentItem = PINS_INDEX
-            bottomNavigation.selectedItemId = R.id.btm_nav_pins
-        } else {
-            super.onBackPressed()
-        }
-    }
-
     private fun switchToMap() {
         viewPager.currentItem = MAP_INDEX
         bottomNavigation.selectedItemId = R.id.btm_nav_map
