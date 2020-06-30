@@ -287,6 +287,26 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         } else {
             drawMyLocation(locationData)
         }
+
+        if (isShowingMyLocation) {
+            val cameraPosition = map.cameraPosition
+            val newCameraPosition = CameraPosition.Builder()
+                .target(position)
+                .bearing(cameraPosition.bearing)
+                .tilt(cameraPosition.tilt)
+                .zoom(cameraPosition.zoom)
+                .build()
+            map.animateCamera(CameraUpdateFactory.newCameraPosition(newCameraPosition), 750, object : GoogleMap.CancelableCallback {
+                override fun onFinish() {}
+                override fun onCancel() {
+                    // If animation is cancelled prematurely (i.e through map rotation reset), set
+                    // isShowingMyLocation to false and switch on Live Measurement
+                    isShowingMyLocation = false
+                    toggleLiveMeasurement(true)
+                }
+
+            })
+        }
     }
 
     private fun bitmapDescriptorFromVector(vectorResId: Int): BitmapDescriptor? {
@@ -425,7 +445,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 object : GoogleMap.CancelableCallback {
                     override fun onFinish() {
                         toggleLiveMeasurement(false)
-                        isShowingMyLocation = false
                     }
 
                     override fun onCancel() {}
@@ -468,9 +487,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private fun onCameraMoveStarted(reason: Int) {
         if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
             showPinInCard(null)
-            if (!isShowingMyLocation) {
-                toggleLiveMeasurement(true)
-            }
+        }
+        if (reason != GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION || isShowingPin) {
+            isShowingMyLocation = false
+            toggleLiveMeasurement(true)
         }
     }
 
