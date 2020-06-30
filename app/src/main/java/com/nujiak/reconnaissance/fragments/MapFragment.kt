@@ -277,9 +277,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             val circleCenterAnimator = ObjectAnimator.ofObject(myLocationCircle, circleCenterProperty, latLngEvaluator, position)
             val circleRadiusAnimator = ObjectAnimator.ofObject(myLocationCircle, circleRadiusProperty, doubleEvaluator, locationData.accuracy.toDouble())
 
-            markerAnimator.duration = 300
-            circleCenterAnimator.duration = 300
-            circleRadiusAnimator.duration = 300
+            markerAnimator.duration = 750
+            circleCenterAnimator.duration = 750
+            circleRadiusAnimator.duration = 750
 
             markerAnimator.start()
             circleCenterAnimator.start()
