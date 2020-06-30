@@ -244,7 +244,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 .radius(locationData.accuracy.toDouble())
                 .strokeColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
                 .strokeWidth(1f)
-                .zIndex(Float.MAX_VALUE)
+                .zIndex(Float.MAX_VALUE-1)
                 .fillColor(ContextCompat.getColor(requireContext(), R.color.myLocationFill))
         )
     }
