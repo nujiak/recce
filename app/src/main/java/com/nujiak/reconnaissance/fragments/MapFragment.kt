@@ -266,7 +266,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             val polyline = map.addPolyline(PolylineOptions())
             polyline.apply {
                 color = ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[chain.color])
-                width = 2 * scale
+                width = 4 * scale
                 jointType = JointType.ROUND
                 startCap = ButtCap()
                 endCap = startCap
