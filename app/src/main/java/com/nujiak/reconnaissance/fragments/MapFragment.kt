@@ -262,6 +262,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 isClickable = false
             }
             polyline.points = points
+            chainsMap[polyline] = chain
         }
     }
 
