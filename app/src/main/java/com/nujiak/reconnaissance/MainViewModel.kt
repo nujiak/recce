@@ -41,9 +41,11 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
         runBlocking { lastAddedId = insert(pin) } // Blocking to allow pinId to return
 
     fun updatePin(pin: Pin) = uiScope.launch { update(pin) }
-    fun deletePin(pin: Pin) = uiScope.launch { delete(pin.pinId) }
+    fun deletePin(pin: Pin) = uiScope.launch { deletePin(pin.pinId) }
 
     fun addChain(chain: Chain) = uiScope.launch { insert(chain) }
+    fun updateChain(chain: Chain) = uiScope.launch { update(chain) }
+    fun deleteChain(chain: Chain) = uiScope.launch { deleteChain(chain.chainId) }
 
     val isLocationGranted: Boolean
         get() = ContextCompat.checkSelfPermission(
@@ -81,6 +83,14 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
         get() = _pinToAdd
 
     /**
+     * LiveData to hold chain to be added, MainActivity observes this
+     * to start ChainCreatorSheet
+     */
+    private val _chainToAdd = MutableLiveData<Chain>()
+    val chainToAdd: LiveData<Chain>
+        get() = _chainToAdd
+
+    /**
      * Pin Creator
      */
     fun openPinCreator(pin: Pin?) {
@@ -105,6 +115,17 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
             sort()
         }
         return groups
+    }
+
+    /**
+     * Chain Creator
+     */
+
+    fun openChainCreator(chain: Chain) {
+        _chainToAdd.value = chain
+
+        // Reset to null
+        _chainToAdd.value = null
     }
 
 
@@ -256,7 +277,7 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
 
         uiScope.launch {
             for (pinId in idsToDelete) {
-                delete(pinId)
+                deletePin(pinId)
             }
         }
     }
@@ -284,7 +305,7 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
         database.update(pin)
     }
 
-    private suspend fun delete(pinId: Long) = withContext(Dispatchers.IO) {
+    private suspend fun deletePin(pinId: Long) = withContext(Dispatchers.IO) {
         database.deletePin(pinId)
     }
 
@@ -292,6 +313,13 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
         database.insert(chain)
     }
 
+    private suspend fun update(chain: Chain) = withContext(Dispatchers.IO) {
+        database.update(chain)
+    }
+
+    private suspend fun deleteChain(chainId: Long) = withContext(Dispatchers.IO) {
+        database.deleteChain(chainId)
+    }
 
     /**
      * Override's ViewModel onCleared() to stop any ongoing coroutine database operations

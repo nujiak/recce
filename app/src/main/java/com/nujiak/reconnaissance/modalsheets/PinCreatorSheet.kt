@@ -122,10 +122,10 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         )
 
         // Set up buttons
-        binding.newPinSave.setOnClickListener { onCompleted() }
+        binding.newChainSave.setOnClickListener { onCompleted() }
         if (isUpdate) {
-            binding.newPinDelete.visibility = View.VISIBLE
-            binding.newPinDelete.setOnClickListener {
+            binding.newChainDelete.visibility = View.VISIBLE
+            binding.newChainDelete.setOnClickListener {
                 viewModel.deletePin(pin)
                 dismiss()
             }

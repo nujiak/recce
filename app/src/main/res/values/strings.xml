@@ -59,6 +59,10 @@
     <string name="group_too_long_error">Group name cannot exceed 12 characters</string>
     <string name="group_invalid_error">Group name invalid</string>
 
+    <!-- Chain Creator -->
+    <string name="add_chain">Add Chain</string>
+    <string name="chain_name">Chain Name</string>
+
     <!-- Map -->
     <string name="map">Map</string>
     <string name="zone">Zone</string>
