@@ -233,8 +233,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun drawMarkers(allPins: List<Pin>) {
-        map.clear()
-        drawMyLocation(viewModel.fusedLocationData.value)
+        for (marker in markersMap.keys) {
+            marker.remove()
+        }
+        markersMap.clear()
 
         for (pin in allPins) {
             val marker = map.addMarker(
@@ -248,6 +250,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun drawChains(allChains: List<Chain>) {
+        for (polyline in chainsMap.keys) {
+            polyline.remove()
+        }
+        chainsMap.clear()
+
         val scale = resources.displayMetrics.density
         for (chain in allChains) {
             val chainData = chain.getParsedData()
