@@ -13,8 +13,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.ReconDatabase
+import com.nujiak.reconnaissance.modalsheets.ChainCreatorSheet
 import com.nujiak.reconnaissance.modalsheets.PinCreatorSheet
 
 
@@ -117,6 +119,13 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        // Set up chain-adding sequence
+        viewModel.chainToAdd.observe(this, Observer { chain ->
+            if (chain != null) {
+                openChainCreator(chain)
+            }
+        })
+
 
         // Set up show-pin sequence
         viewModel.pinInFocus.observe(this, Observer { switchToMap() })
@@ -216,6 +225,16 @@ class MainActivity : AppCompatActivity() {
             PinCreatorSheet()
         pinCreatorSheet.arguments = bundle
         pinCreatorSheet.show(supportFragmentManager, pinCreatorSheet.tag)
+    }
+
+    private fun openChainCreator(chain: Chain) {
+        val bundle = Bundle()
+        bundle.putParcelable("chain", chain)
+        val chainCreatorSheet =
+            ChainCreatorSheet()
+        chainCreatorSheet.arguments = bundle
+        chainCreatorSheet.show(supportFragmentManager, chainCreatorSheet.tag)
+
     }
 
     override fun onRequestPermissionsResult(

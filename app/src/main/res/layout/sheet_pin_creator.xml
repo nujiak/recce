@@ -25,7 +25,7 @@
             android:text="@string/add_pin" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/new_pin_delete"
+            android:id="@+id/new_chain_delete"
             style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
 
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/new_pin_save"
+            android:id="@+id/new_chain_save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"

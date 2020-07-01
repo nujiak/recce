@@ -115,7 +115,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
         binding.mapPolylineAdd.setOnClickListener {
             if (!viewModel.isInPolylineMode.value!!) {
-                enterPolylineMode()
+                viewModel.enterPolylineMode()
             } else {
                 onAddPolylinePoint()
             }
@@ -124,10 +124,18 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         binding.mapPolylineUndo.apply {
             setOnClickListener { undoPolyline() }
             setOnLongClickListener {
-                exitPolylineMode()
+                viewModel.exitPolylineMode()
                 true
             }
         }
+
+        viewModel.isInPolylineMode.observe(viewLifecycleOwner, Observer { isInPolylineMode ->
+            if (isInPolylineMode) {
+                onEnterPolylineMode()
+            } else {
+                onExitPolylineMode()
+            }
+        })
 
         binding.mapPolylineSave.setOnClickListener { onSavePolyline() }
 
@@ -189,16 +197,12 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 }
             )
 
-            map.setOnCameraMoveListener {
-                onCameraMove()
+            map.apply {
+                setOnCameraMoveListener { onCameraMove() }
+                setOnMarkerClickListener { onMarkerClick(it) }
+                setOnCameraMoveStartedListener { onCameraMoveStarted(it) }
+                setOnPolylineClickListener { onPolylineClick(it) }
             }
-            map.setOnMarkerClickListener { marker ->
-                onMarkerClick(marker)
-            }
-            map.setOnCameraMoveStartedListener {
-                onCameraMoveStarted(it)
-            }
-
             val uiSetting = map.uiSettings
             uiSetting.isZoomControlsEnabled = true
 
@@ -266,7 +270,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 jointType = JointType.ROUND
                 startCap = ButtCap()
                 endCap = startCap
-                isClickable = false
+                isClickable = true
             }
             polyline.points = points
             chainsMap[polyline] = chain
@@ -763,15 +767,12 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
     }
 
-    private fun enterPolylineMode() {
-        viewModel.enterPolylineMode()
+    private fun onEnterPolylineMode() {
         viewModel.currentPolylinePoints.add(map.cameraPosition.target to "")
         binding.mapPolylineUndo.isEnabled = true
-        binding.mapPolylineSave.isEnabled = true
     }
 
-    private fun exitPolylineMode() {
-        viewModel.exitPolylineMode()
+    private fun onExitPolylineMode() {
         currentPolyline?.remove()
         currentPolyline = null
         binding.mapPolylineUndo.isEnabled = false
@@ -779,8 +780,21 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onAddPolylinePoint() {
-        viewModel.currentPolylinePoints.add(map.cameraPosition.target to "")
+        viewModel.currentPolylinePoints.let {
+            it.add(map.cameraPosition.target to "")
+            if (it.size >= 2) {
+                binding.mapPolylineSave.isEnabled = true
+            }
+        }
         drawCurrentPolyline()
+    }
+
+    private fun onPolylineClick(polyline: Polyline) {
+        Log.i(this::class.simpleName, "Polyline clicked")
+        chainsMap[polyline]?.let {
+            Log.i(this::class.simpleName, "Chain found")
+            viewModel.openChainCreator(it)
+        }
     }
 
     private fun drawCurrentPolyline() {
@@ -801,7 +815,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 color = ContextCompat.getColor(requireContext(), R.color.colorPrimaryLight)
                 jointType = JointType.ROUND
                 endCap = ButtCap()
-
             }
         } else {
             currentPolyline?.points = viewModel.currentPolylinePoints
@@ -820,14 +833,15 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             drawCurrentPolyline()
 
             if (it.size == 0) {
-                exitPolylineMode()
+                viewModel.exitPolylineMode()
+            } else if (it.size < 2) {
+                binding.mapPolylineSave.isEnabled = false
             }
         }
     }
 
     private fun onSavePolyline() {
-        viewModel.addChain(Chain("test", viewModel.currentPolylinePoints.toChainDataString()))
-        exitPolylineMode()
+        viewModel.openChainCreator(Chain("", viewModel.currentPolylinePoints.toChainDataString()))
     }
 
     /**

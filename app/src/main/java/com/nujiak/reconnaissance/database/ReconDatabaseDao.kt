@@ -44,6 +44,9 @@ interface ReconDatabaseDao {
     @Query("SELECT * FROM chains_table WHERE chainId == :chainId LIMIT 1")
     fun getChain(chainId: Long): Chain
 
+    @Query("DELETE FROM chains_table WHERE chainId == :chainId")
+    fun deleteChain(chainId: Long)
+
     @Query("SELECT * FROM chains_table ORDER BY chainId DESC")
     fun getAllChains(): LiveData<List<Chain>>
 
