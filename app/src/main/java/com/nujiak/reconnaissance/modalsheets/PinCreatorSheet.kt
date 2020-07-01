@@ -19,7 +19,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.nujiak.reconnaissance.*
 import com.nujiak.reconnaissance.database.Pin
-import com.nujiak.reconnaissance.database.PinDatabase
+import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.SheetPinCreatorBinding
 import com.nujiak.reconnaissance.mapping.*
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
@@ -51,7 +51,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
 
         // Set up ViewModel
         val application = requireNotNull(this.activity).application
-        val dataSource = PinDatabase.getInstance(application).pinDatabaseDao
+        val dataSource = ReconDatabase.getInstance(application).pinDatabaseDao
         val viewModelFactory = MainViewModelFactory(dataSource, application)
         viewModel = activity?.let {
             ViewModelProvider(

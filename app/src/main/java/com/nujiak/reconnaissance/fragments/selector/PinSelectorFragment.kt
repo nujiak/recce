@@ -13,7 +13,7 @@ import com.nujiak.reconnaissance.MainViewModel
 import com.nujiak.reconnaissance.MainViewModelFactory
 import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.Pin
-import com.nujiak.reconnaissance.database.PinDatabase
+import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.FragmentPinSelectorBinding
 import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.ITEM_VIEW_TYPE_HEADER
 import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.ITEM_VIEW_TYPE_PIN
@@ -46,7 +46,7 @@ class PinSelectorFragment : Fragment() {
 
         // Set up ViewModel
         val application = requireNotNull(this.activity).application
-        val dataSource = PinDatabase.getInstance(application).pinDatabaseDao
+        val dataSource = ReconDatabase.getInstance(application).pinDatabaseDao
         val viewModelFactory = MainViewModelFactory(dataSource, application)
         viewModel = activity?.let {
             ViewModelProvider(

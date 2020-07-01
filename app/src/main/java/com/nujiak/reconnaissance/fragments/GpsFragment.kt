@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.nujiak.reconnaissance.*
-import com.nujiak.reconnaissance.database.PinDatabase
+import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.FragmentGpsBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
 import kotlin.math.PI
@@ -60,7 +60,7 @@ class GpsFragment : Fragment(), SensorEventListener {
 
         // Set up ViewModel
         val application = requireNotNull(this.activity).application
-        val dataSource = PinDatabase.getInstance(application).pinDatabaseDao
+        val dataSource = ReconDatabase.getInstance(application).pinDatabaseDao
         val viewModelFactory = MainViewModelFactory(dataSource, application)
         viewModel = activity?.let {
             ViewModelProvider(

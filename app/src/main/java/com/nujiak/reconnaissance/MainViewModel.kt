@@ -11,13 +11,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.nujiak.reconnaissance.database.Pin
-import com.nujiak.reconnaissance.database.PinDatabaseDao
+import com.nujiak.reconnaissance.database.ReconDatabaseDao
 import com.nujiak.reconnaissance.fragments.ruler.RulerItem
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_KEY
 import kotlinx.coroutines.*
 
-class MainViewModel(dataSource: PinDatabaseDao, application: Application) :
+class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
     AndroidViewModel(application) {
 
     private val database = dataSource
@@ -265,7 +265,7 @@ class MainViewModel(dataSource: PinDatabaseDao, application: Application) :
     }
 
     private suspend fun delete(pinId: Long) = withContext(Dispatchers.IO) {
-        database.delete(pinId)
+        database.deletePin(pinId)
     }
 
 

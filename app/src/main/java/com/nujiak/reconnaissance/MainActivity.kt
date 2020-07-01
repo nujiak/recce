@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.nujiak.reconnaissance.database.Pin
-import com.nujiak.reconnaissance.database.PinDatabase
+import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.modalsheets.PinCreatorSheet
 
 
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
 
         // Set up ViewModel
         val application = requireNotNull(this).application
-        val dataSource = PinDatabase.getInstance(application).pinDatabaseDao
+        val dataSource = ReconDatabase.getInstance(application).pinDatabaseDao
         val viewModelFactory = MainViewModelFactory(dataSource, application)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
 

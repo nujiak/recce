@@ -9,3 +9,9 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         database.execSQL("ALTER TABLE pins_table ADD COLUMN 'group' TEXT NOT NULL DEFAULT ''")
     }
 }
+
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE TABLE chains_table (`name` TEXT NOT NULL,`data` TEXT NOT NULL, `color` INTEGER NOT NULL, `chainId` INTEGER NOT NULL, `group` TEXT NOT NULL DEFAULT '', PRIMARY KEY (`chainId`))")
+    }
+}

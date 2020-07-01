@@ -3,10 +3,10 @@ package com.nujiak.reconnaissance
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.nujiak.reconnaissance.database.PinDatabaseDao
+import com.nujiak.reconnaissance.database.ReconDatabaseDao
 
 class MainViewModelFactory(
-    private val dataSource: PinDatabaseDao,
+    private val dataSource: ReconDatabaseDao,
     private val application: Application
 ) : ViewModelProvider.Factory {
 
