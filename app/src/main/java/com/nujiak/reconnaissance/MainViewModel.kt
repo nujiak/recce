@@ -10,6 +10,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import com.google.android.gms.maps.model.LatLng
+import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.ReconDatabaseDao
 import com.nujiak.reconnaissance.fragments.ruler.RulerItem
@@ -29,6 +31,7 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
     var screenRotation = 0
 
     val allPins = database.getAllPins()
+    val allChains = database.getAllChains()
     val lastPin = Transformations.map(allPins) { it.firstOrNull() }
 
     var lastAddedId = 0L // Tracks pinId of the last added pin for Map Fragment
@@ -39,6 +42,8 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
 
     fun updatePin(pin: Pin) = uiScope.launch { update(pin) }
     fun deletePin(pin: Pin) = uiScope.launch { delete(pin.pinId) }
+
+    fun addChain(chain: Chain) = uiScope.launch { insert(chain) }
 
     val isLocationGranted: Boolean
         get() = ContextCompat.checkSelfPermission(
@@ -137,6 +142,21 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
     private val _toAddPinFromMap = MutableLiveData(false)
     val toAddPinFromMap: LiveData<Boolean>
         get() = _toAddPinFromMap
+
+    private val _isInPolylineMode = MutableLiveData<Boolean>(false)
+    val isInPolylineMode: LiveData<Boolean>
+        get() = _isInPolylineMode
+
+    val currentPolylinePoints = mutableListOf<Pair<LatLng, String>>()
+
+    fun enterPolylineMode() {
+        _isInPolylineMode.value = true
+    }
+
+    fun exitPolylineMode() {
+        _isInPolylineMode.value = false
+        currentPolylinePoints.clear()
+    }
 
     /**
      * Ruler variables
@@ -266,6 +286,10 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
 
     private suspend fun delete(pinId: Long) = withContext(Dispatchers.IO) {
         database.deletePin(pinId)
+    }
+
+    private suspend fun insert(chain: Chain) = withContext(Dispatchers.IO) {
+        database.insert(chain)
     }
 
 
