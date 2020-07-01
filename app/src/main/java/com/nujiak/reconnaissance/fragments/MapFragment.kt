@@ -10,6 +10,7 @@ import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.util.Property
 import android.view.LayoutInflater
 import android.view.View
@@ -27,8 +28,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.SphericalUtil
 import com.nujiak.reconnaissance.*
-import com.nujiak.reconnaissance.database.Pin
-import com.nujiak.reconnaissance.database.ReconDatabase
+import com.nujiak.reconnaissance.database.*
 import com.nujiak.reconnaissance.databinding.FragmentMapBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
 import java.text.NumberFormat
@@ -50,8 +50,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private var currentPinColor = 0
     private var markersMap = HashMap<Marker, Pin>()
+    private var chainsMap = HashMap<Polyline, Chain>()
     private var myLocationMarker: Marker? = null
     private var myLocationCircle: Circle? = null
+    private var currentPolyline: Polyline? = null
 
     private var isShowingPin = false
     private var isShowingMyLocation = false
@@ -110,6 +112,24 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[currentPinColor])
             binding.mapDetailsCardView.setCardBackgroundColor(color)
         }
+
+        binding.mapPolylineAdd.setOnClickListener {
+            if (!viewModel.isInPolylineMode.value!!) {
+                enterPolylineMode()
+            } else {
+                onAddPolylinePoint()
+            }
+        }
+
+        binding.mapPolylineUndo.apply {
+            setOnClickListener { undoPolyline() }
+            setOnLongClickListener {
+                exitPolylineMode()
+                true
+            }
+        }
+
+        binding.mapPolylineSave.setOnClickListener { onSavePolyline() }
 
         // Set up Coordinate System
         viewModel.coordinateSystem.observe(viewLifecycleOwner, Observer {
@@ -202,6 +222,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 drawMarkers(allPins)
             })
 
+            // Add polylines
+            viewModel.allChains.observe(viewLifecycleOwner, Observer { allChains ->
+                drawChains(allChains)
+            })
+
             updateLatLong()
             drawMyLocation(viewModel.fusedLocationData.value)
         }
@@ -219,6 +244,24 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     .icon(bitmapDescriptorFromVector(PIN_VECTOR_DRAWABLE[pin.color]))
             )
             markersMap[marker] = pin
+        }
+    }
+
+    private fun drawChains(allChains: List<Chain>) {
+        val scale = resources.displayMetrics.density
+        for (chain in allChains) {
+            val chainData = chain.getParsedData()
+            val points = chainData.map { it.first }
+            val polyline = map.addPolyline(PolylineOptions())
+            polyline.apply {
+                color = ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[chain.color])
+                width = 2 * scale
+                jointType = JointType.ROUND
+                startCap = ButtCap()
+                endCap = startCap
+                isClickable = false
+            }
+            polyline.points = points
         }
     }
 
@@ -244,7 +287,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 .radius(locationData.accuracy.toDouble())
                 .strokeColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
                 .strokeWidth(1f)
-                .zIndex(Float.MAX_VALUE-1)
+                .zIndex(Float.MAX_VALUE - 1)
                 .fillColor(ContextCompat.getColor(requireContext(), R.color.myLocationFill))
         )
     }
@@ -269,13 +312,24 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     startValue + fraction * (endValue - startValue)
                 }
 
-            val markerProperty = Property.of(Marker::class.java, LatLng::class.java,"position")
-            val circleCenterProperty = Property.of(Circle::class.java, LatLng::class.java,"center")
-            val circleRadiusProperty = Property.of(Circle::class.java, Double::class.java,"radius")
+            val markerProperty = Property.of(Marker::class.java, LatLng::class.java, "position")
+            val circleCenterProperty = Property.of(Circle::class.java, LatLng::class.java, "center")
+            val circleRadiusProperty = Property.of(Circle::class.java, Double::class.java, "radius")
 
-            val markerAnimator = ObjectAnimator.ofObject(myLocationMarker, markerProperty, latLngEvaluator, position)
-            val circleCenterAnimator = ObjectAnimator.ofObject(myLocationCircle, circleCenterProperty, latLngEvaluator, position)
-            val circleRadiusAnimator = ObjectAnimator.ofObject(myLocationCircle, circleRadiusProperty, doubleEvaluator, locationData.accuracy.toDouble())
+            val markerAnimator =
+                ObjectAnimator.ofObject(myLocationMarker, markerProperty, latLngEvaluator, position)
+            val circleCenterAnimator = ObjectAnimator.ofObject(
+                myLocationCircle,
+                circleCenterProperty,
+                latLngEvaluator,
+                position
+            )
+            val circleRadiusAnimator = ObjectAnimator.ofObject(
+                myLocationCircle,
+                circleRadiusProperty,
+                doubleEvaluator,
+                locationData.accuracy.toDouble()
+            )
 
             markerAnimator.duration = 750
             circleCenterAnimator.duration = 750
@@ -296,16 +350,19 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 .tilt(cameraPosition.tilt)
                 .zoom(cameraPosition.zoom)
                 .build()
-            map.animateCamera(CameraUpdateFactory.newCameraPosition(newCameraPosition), 750, object : GoogleMap.CancelableCallback {
-                override fun onFinish() {}
-                override fun onCancel() {
-                    // If animation is cancelled prematurely (i.e through map rotation reset), set
-                    // isShowingMyLocation to false and switch on Live Measurement
-                    isShowingMyLocation = false
-                    toggleLiveMeasurement(true)
-                }
+            map.animateCamera(
+                CameraUpdateFactory.newCameraPosition(newCameraPosition),
+                750,
+                object : GoogleMap.CancelableCallback {
+                    override fun onFinish() {}
+                    override fun onCancel() {
+                        // If animation is cancelled prematurely (i.e through map rotation reset), set
+                        // isShowingMyLocation to false and switch on Live Measurement
+                        isShowingMyLocation = false
+                        toggleLiveMeasurement(true)
+                    }
 
-            })
+                })
         }
     }
 
@@ -465,6 +522,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             updateMapCompass(bearing, tilt)
         } else {
             toggleMapCompass(false)
+        }
+
+        if (viewModel.isInPolylineMode.value!!) {
+            drawCurrentPolyline()
         }
     }
 
@@ -692,6 +753,73 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 isMapCompassVisible = false
             }
         }
+    }
+
+    private fun enterPolylineMode() {
+        viewModel.enterPolylineMode()
+        viewModel.currentPolylinePoints.add(map.cameraPosition.target to "")
+        binding.mapPolylineUndo.isEnabled = true
+        binding.mapPolylineSave.isEnabled = true
+    }
+
+    private fun exitPolylineMode() {
+        viewModel.exitPolylineMode()
+        currentPolyline?.remove()
+        currentPolyline = null
+        binding.mapPolylineUndo.isEnabled = false
+        binding.mapPolylineSave.isEnabled = false
+    }
+
+    private fun onAddPolylinePoint() {
+        viewModel.currentPolylinePoints.add(map.cameraPosition.target to "")
+        drawCurrentPolyline()
+    }
+
+    private fun drawCurrentPolyline() {
+        if (currentPolyline == null) {
+            val polylineOptions = PolylineOptions()
+            for (point in viewModel.currentPolylinePoints) {
+                polylineOptions.add(point.first)
+            }
+            polylineOptions.add(map.cameraPosition.target)
+            currentPolyline = map.addPolyline(polylineOptions)
+            val scale = resources.displayMetrics.density
+            currentPolyline?.apply {
+                pattern = listOf(
+                    Dash(8 * scale),
+                    Gap(4 * scale)
+                )
+                width = 6 * scale
+                color = ContextCompat.getColor(requireContext(), R.color.colorPrimaryLight)
+                jointType = JointType.ROUND
+                endCap = ButtCap()
+
+            }
+        } else {
+            currentPolyline?.points = viewModel.currentPolylinePoints
+                .map { it.first }
+                .toMutableList().apply {
+                    add(map.cameraPosition.target)
+                }
+        }
+    }
+
+    private fun undoPolyline() {
+        viewModel.currentPolylinePoints.let {
+            Log.i(this::class.simpleName, "Undoing polyline...")
+            Log.i(this::class.simpleName, "$it")
+            it.removeAt(it.size - 1)
+            drawCurrentPolyline()
+
+            if (it.size == 0) {
+                exitPolylineMode()
+            }
+        }
+    }
+
+    private fun onSavePolyline() {
+        viewModel.addChain(Chain("test", viewModel.currentPolylinePoints.toChainDataString()))
+        exitPolylineMode()
     }
 
     /**
