@@ -5,10 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Pin::class], version = 2, exportSchema = true)
-abstract class PinDatabase : RoomDatabase() {
+@Database(entities = [Pin::class, Chain::class], version = 3, exportSchema = true)
+abstract class ReconDatabase : RoomDatabase() {
 
-    abstract val pinDatabaseDao: PinDatabaseDao
+    abstract val pinDatabaseDao: ReconDatabaseDao
 
     companion object {
         /**
@@ -21,9 +21,9 @@ abstract class PinDatabase : RoomDatabase() {
          *  thread to shared data are visible to other threads.
          */
         @Volatile
-        private var INSTANCE: PinDatabase? = null
+        private var INSTANCE: ReconDatabase? = null
 
-        fun getInstance(context: Context): PinDatabase {
+        fun getInstance(context: Context): ReconDatabase {
 
             synchronized(this) {
 
@@ -34,10 +34,11 @@ abstract class PinDatabase : RoomDatabase() {
                 if (instance == null) {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
-                        PinDatabase::class.java,
+                        ReconDatabase::class.java,
                         "pin_database"
                     )
                         .addMigrations(MIGRATION_1_2)
+                        .addMigrations(MIGRATION_2_3)
                         .build()
                     // Assign INSTANCE to the newly created database.
                     INSTANCE = instance

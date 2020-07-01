@@ -19,8 +19,8 @@ package com.nujiak.reconnaissance
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.nujiak.reconnaissance.database.PinDatabase
-import com.nujiak.reconnaissance.database.PinDatabaseDao
+import com.nujiak.reconnaissance.database.ReconDatabase
+import com.nujiak.reconnaissance.database.ReconDatabaseDao
 import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
@@ -36,15 +36,15 @@ import java.io.IOException
 @RunWith(AndroidJUnit4::class)
 class SleepDatabaseTest {
 
-    private lateinit var pinDao: PinDatabaseDao
-    private lateinit var db: PinDatabase
+    private lateinit var pinDao: ReconDatabaseDao
+    private lateinit var db: ReconDatabase
 
     @Before
     fun createDb() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         // Using an in-memory database because the information stored here disappears when the
         // process is killed.
-        db = Room.inMemoryDatabaseBuilder(context, PinDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(context, ReconDatabase::class.java)
             // Allowing main thread queries, just for testing.
             .allowMainThreadQueries()
             .build()

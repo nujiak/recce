@@ -28,7 +28,7 @@ import com.google.android.gms.maps.model.*
 import com.google.maps.android.SphericalUtil
 import com.nujiak.reconnaissance.*
 import com.nujiak.reconnaissance.database.Pin
-import com.nujiak.reconnaissance.database.PinDatabase
+import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.FragmentMapBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
 import java.text.NumberFormat
@@ -72,7 +72,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     ): View? {
         // Set up ViewModel
         val application = requireNotNull(this.activity).application
-        val dataSource = PinDatabase.getInstance(application).pinDatabaseDao
+        val dataSource = ReconDatabase.getInstance(application).pinDatabaseDao
         val viewModelFactory = MainViewModelFactory(dataSource, application)
         viewModel = activity?.let {
             ViewModelProvider(
