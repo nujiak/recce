@@ -12,9 +12,11 @@ import com.google.android.material.snackbar.Snackbar
 import com.nujiak.reconnaissance.MainViewModel
 import com.nujiak.reconnaissance.MainViewModelFactory
 import com.nujiak.reconnaissance.R
+import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.FragmentPinSelectorBinding
+import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.ITEM_VIEW_TYPE_CHAIN
 import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.ITEM_VIEW_TYPE_HEADER
 import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.ITEM_VIEW_TYPE_PIN
 import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.SORT_BY_GROUP
@@ -59,7 +61,10 @@ class PinSelectorFragment : Fragment() {
         pinAdapter = PinAdapter(
             { pin -> onPinClick(pin) },
             { pin -> onPinLongClick(pin) },
-            viewModel.coordinateSystem.value ?: 0
+            { chain -> onChainClick(chain)},
+            { chain -> onChainLongClick(chain)},
+            viewModel.coordinateSystem.value ?: 0,
+            resources
         )
         binding.pinRecyclerview.adapter = pinAdapter
         val gridLayoutManager = GridLayoutManager(context, 2)
@@ -67,6 +72,7 @@ class PinSelectorFragment : Fragment() {
             override fun getSpanSize(position: Int): Int {
                 return when (pinAdapter.getItemViewType(position)) {
                     ITEM_VIEW_TYPE_PIN -> 1
+                    ITEM_VIEW_TYPE_CHAIN -> 2
                     ITEM_VIEW_TYPE_HEADER -> 2
                     else -> throw IllegalArgumentException(
                         "Invalid viewType: ${pinAdapter.getItemViewType(
@@ -80,9 +86,12 @@ class PinSelectorFragment : Fragment() {
         binding.pinRecyclerview.layoutManager = gridLayoutManager
 
 
-        // Observe for changes to pins
+        // Observe for changes to pins and chains
         viewModel.allPins.observe(viewLifecycleOwner, Observer {
-            refreshList(it)
+            refreshList(newPins = it)
+        })
+        viewModel.allChains.observe(viewLifecycleOwner, Observer {
+            refreshList(newChains = it)
         })
 
         // Observe for changes to preferred GCS
@@ -173,7 +182,7 @@ class PinSelectorFragment : Fragment() {
 
     private fun onPinClick(pin: Pin) {
         if (viewModel.isInSelectionMode.value!!) {
-            viewModel.toggleSelection(pin.pinId)
+            viewModel.togglePinSelection(pin.pinId)
             refreshList()
         } else {
             viewModel.showPinOnMap(pin)
@@ -183,7 +192,23 @@ class PinSelectorFragment : Fragment() {
     private fun onPinLongClick(pin: Pin): Boolean {
         if (!viewModel.isInSelectionMode.value!!) {
             viewModel.enterSelectionMode()
-            viewModel.toggleSelection(pin.pinId)
+            viewModel.togglePinSelection(pin.pinId)
+            refreshList()
+        }
+        return true
+    }
+
+    private fun onChainClick(chain: Chain) {
+        if (viewModel.isInSelectionMode.value!!) {
+            viewModel.toggleChainSelection(chain.chainId)
+            refreshList()
+        }
+    }
+
+    private fun onChainLongClick(chain: Chain): Boolean {
+        if (!viewModel.isInSelectionMode.value!!) {
+            viewModel.enterSelectionMode()
+            viewModel.toggleChainSelection(chain.chainId)
             refreshList()
         }
         return true
@@ -202,7 +227,7 @@ class PinSelectorFragment : Fragment() {
         refreshList()
     }
 
-    private fun refreshList(newList: List<Pin>? = viewModel.allPins.value) {
-        pinAdapter.sortAndSubmitList(newList, viewModel.selectedPinIds, sortBy, sortAscending)
+    private fun refreshList(newPins: List<Pin>? = viewModel.allPins.value, newChains: List<Chain>? = viewModel.allChains.value) {
+        pinAdapter.sortAndSubmitList(newPins, newChains, viewModel.selectedPinIds, viewModel.selectedChainIds, sortBy, sortAscending)
     }
 }
