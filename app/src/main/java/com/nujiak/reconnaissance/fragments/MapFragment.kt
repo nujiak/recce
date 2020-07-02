@@ -5,9 +5,12 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.animation.TypeEvaluator
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Matrix
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
@@ -16,6 +19,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.PopupWindow
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -26,6 +30,8 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.maps.android.SphericalUtil
 import com.nujiak.reconnaissance.*
 import com.nujiak.reconnaissance.database.*
@@ -51,9 +57,12 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private var currentPinColor = 0
     private var markersMap = HashMap<Marker, Pin>()
     private var chainsMap = HashMap<Polyline, Chain>()
+    private var checkpointsMap = HashMap<Marker, Chain>()
+
     private var myLocationMarker: Marker? = null
     private var myLocationCircle: Circle? = null
     private var currentPolyline: Polyline? = null
+    private val currentPolylineMarkers = mutableListOf<Marker>()
 
     private var isShowingPin = false
     private var isShowingMyLocation = false
@@ -113,13 +122,22 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             binding.mapDetailsCardView.setCardBackgroundColor(color)
         }
 
-        binding.mapPolylineAdd.setOnClickListener {
-            if (!viewModel.isInPolylineMode.value!!) {
-                viewModel.enterPolylineMode()
-            } else {
+        binding.mapPolylineAdd.apply {
+            setOnClickListener {
+                if (!viewModel.isInPolylineMode.value!!) {
+                    viewModel.enterPolylineMode()
+                }
                 onAddPolylinePoint()
             }
+            setOnLongClickListener {
+                if (!viewModel.isInPolylineMode.value!!) {
+                    viewModel.enterPolylineMode()
+                }
+                onAddPolylineNamedPoint()
+                true
+            }
         }
+
 
         binding.mapPolylineUndo.apply {
             setOnClickListener { undoPolyline() }
@@ -259,6 +277,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
         chainsMap.clear()
 
+        for (marker in checkpointsMap.keys) {
+            marker.remove()
+        }
+        checkpointsMap.clear()
+
         val scale = resources.displayMetrics.density
         for (chain in allChains) {
             val chainData = chain.getParsedData()
@@ -274,7 +297,24 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             }
             polyline.points = points
             chainsMap[polyline] = chain
+
+            for (point in chainData) {
+                if (point.second.isNotBlank()) {
+                    val marker = map.addMarker(
+                        MarkerOptions()
+                            .position(point.first)
+                            .anchor(0.5f, 0.5f)
+                            .flat(true)
+                            .title(point.second)
+                            .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
+                    )
+                    checkpointsMap[marker] = chain
+                }
+            }
         }
+
+
+
     }
 
     private fun drawMyLocation(locationData: FusedLocationLiveData.LocationData?) {
@@ -547,6 +587,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             return true
         }
 
+        if (marker in checkpointsMap.keys) {
+            return false
+        }
+
         val pin = markersMap[marker]
         return if (pin != null) {
             viewModel.putPinInFocus(pin)
@@ -768,7 +812,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onEnterPolylineMode() {
-        viewModel.currentPolylinePoints.add(map.cameraPosition.target to "")
         binding.mapPolylineUndo.isEnabled = true
     }
 
@@ -779,14 +822,54 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         binding.mapPolylineSave.isEnabled = false
     }
 
-    private fun onAddPolylinePoint() {
+    private fun onAddPolylinePoint(name: String = "") {
         viewModel.currentPolylinePoints.let {
-            it.add(map.cameraPosition.target to "")
+            it.add(map.cameraPosition.target to name)
             if (it.size >= 2) {
                 binding.mapPolylineSave.isEnabled = true
             }
         }
-        drawCurrentPolyline()
+        drawCurrentPolyline(true)
+    }
+
+    private fun onAddPolylineNamedPoint() {
+        val alertDialog = AlertDialog.Builder(requireActivity())
+            .setView(R.layout.dialog_new_checkpoint)
+            .create()
+        alertDialog.show()
+
+        // Set up layout and interactions of the dialog
+        alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val inputLayout = alertDialog.findViewById<TextInputLayout>(R.id.new_checkpoint_input)
+        val editText = alertDialog.findViewById<TextInputEditText>(R.id.new_checkpoint_edit_text)
+        editText.setOnKeyListener { _, _, _ ->
+            editText.text?.let {
+                if (it.length <= 12) {
+                    inputLayout.error = null
+                }
+            }
+            true
+        }
+
+        val posBtn = alertDialog.findViewById<Button>(R.id.new_checkpoint_add_button)
+        posBtn.setOnClickListener {
+            editText.text?.trim()?.let {
+                when {
+                    it.contains(',', true) || it.contains(';', true) -> {
+                        inputLayout.error = getString(R.string.checkpoint_invalid_error)
+                    }
+                    it.length > 20 -> {
+                        inputLayout.error = getString(R.string.checkpoint_name_too_long_error)
+                    }
+                    else -> {
+                        // Group name is valid, add to ArrayAdapter and set in AutoCompleteTextView
+                        onAddPolylinePoint(it.toString())
+                        alertDialog.dismiss()
+                    }
+                }
+            }
+
+        }
     }
 
     private fun onPolylineClick(polyline: Polyline) {
@@ -797,7 +880,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
     }
 
-    private fun drawCurrentPolyline() {
+    private fun drawCurrentPolyline(redrawCheckpoints: Boolean = false) {
         if (currentPolyline == null) {
             val polylineOptions = PolylineOptions()
             for (point in viewModel.currentPolylinePoints) {
@@ -823,6 +906,26 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     add(map.cameraPosition.target)
                 }
         }
+
+        if (redrawCheckpoints) {
+            for (marker in currentPolylineMarkers) {
+                marker.remove()
+            }
+            currentPolylineMarkers.clear()
+
+            for (point in viewModel.currentPolylinePoints) {
+                if (point.second.isNotBlank()) {
+                    val marker = map.addMarker(
+                        MarkerOptions()
+                            .position(point.first)
+                            .anchor(0.5f, 0.5f)
+                            .flat(true)
+                            .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
+                    )
+                    currentPolylineMarkers.add(marker)
+                }
+            }
+        }
     }
 
     private fun undoPolyline() {
@@ -830,7 +933,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             Log.i(this::class.simpleName, "Undoing polyline...")
             Log.i(this::class.simpleName, "$it")
             it.removeAt(it.size - 1)
-            drawCurrentPolyline()
+            drawCurrentPolyline(true)
 
             if (it.size == 0) {
                 viewModel.exitPolylineMode()
