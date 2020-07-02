@@ -16,6 +16,7 @@
     <string name="utm" translatable="false">UTM</string>
     <string name="kertau" translatable="false">Kertau (RSO)</string>
     <string name="mgrs" translatable="false">MGRS</string>
+    <string name="name">Name</string>
 
     <!-- Pin Selector -->
     <string name="pins">Pins</string>
@@ -67,6 +68,11 @@
     <string name="map">Map</string>
     <string name="zone">Zone</string>
     <string name="add_pin_plus">+ Add pin</string>
+    <string name="new_checkpoint">New Checkpoint</string>
+    <string name="checkpoint_name">Checkpoint Name</string>
+    <!-- Errors -->
+    <string name="checkpoint_name_too_long_error">Checkpoint name cannot exceed 20 characters</string>
+    <string name="checkpoint_invalid_error">Checkpoint name contains invalid characters</string>
 
     <!-- GPS -->
     <string name="gps">GPS</string>
