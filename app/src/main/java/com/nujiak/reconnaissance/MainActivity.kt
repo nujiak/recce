@@ -183,9 +183,9 @@ class MainActivity : AppCompatActivity() {
         })
 
         // Observe for pin selection changes
-        viewModel.selectedPinsChanged.observe(this, Observer {
+        viewModel.selectionChanged.observe(this, Observer {
             actionMode?.let {
-                val selectedSize = viewModel.selectedPinIds.size
+                val selectedSize = viewModel.selectedPinIds.size + viewModel.selectedChainIds.size
                 it.title = resources.getQuantityString(R.plurals.number_selected, selectedSize, selectedSize)
             }
         })

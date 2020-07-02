@@ -7,7 +7,10 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.nujiak.reconnaissance.PIN_CARD_BACKGROUNDS
 import com.nujiak.reconnaissance.R
+import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
+import com.nujiak.reconnaissance.database.getParsedData
+import com.nujiak.reconnaissance.databinding.PinListChainItemBinding
 import com.nujiak.reconnaissance.databinding.PinListHeaderItemBinding
 import com.nujiak.reconnaissance.databinding.PinListItemBinding
 import com.nujiak.reconnaissance.getGridString
@@ -42,7 +45,8 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
         binding.pinGridSystem.text =
             binding.root.resources.getStringArray(R.array.coordinate_systems)[coordSysId]
 
-        binding.pinGrid.text = getGridString(pin.latitude, pin.longitude, coordSysId, binding.root.resources)
+        binding.pinGrid.text =
+            getGridString(pin.latitude, pin.longitude, coordSysId, binding.root.resources)
 
         val context = binding.root.context
         val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[pin.color])
@@ -59,6 +63,62 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
             binding.selectionShade.visibility = View.VISIBLE
         } else {
             binding.pinSelectedIndex.visibility = View.INVISIBLE
+            binding.selectionShade.visibility = View.GONE
+        }
+    }
+}
+
+class ChainViewHolder private constructor(private val binding: PinListChainItemBinding) :
+    RecyclerView.ViewHolder(binding.root) {
+
+    companion object {
+        fun from(parent: ViewGroup): ChainViewHolder {
+            val layoutInflater = LayoutInflater.from(parent.context)
+            val binding = PinListChainItemBinding.inflate(layoutInflater, parent, false)
+            return ChainViewHolder(binding)
+        }
+    }
+
+    fun bind(
+        item: ChainWrapper,
+        onItemClick: (Chain) -> Unit,
+        onItemLongClick: (Chain) -> Boolean
+    ) {
+        val chain = item.chain
+        if (chain.group != "") {
+            binding.chainGroup.text = chain.group
+            binding.chainGroup.visibility = View.VISIBLE
+        } else {
+            binding.chainGroup.visibility = View.INVISIBLE
+        }
+        binding.chainName.text = chain.name
+
+        val context = binding.root.context
+        val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[chain.color])
+        binding.pinListItemParent.setCardBackgroundColor(color)
+        binding.chainGroup.setTextColor(color)
+
+        binding.pinListItemParent.setOnClickListener { onItemClick(chain) }
+        binding.pinListItemParent.setOnLongClickListener { onItemLongClick(chain) }
+
+        val chainData = chain.getParsedData()
+        val checkpoints = mutableListOf<String>()
+        for (point in chainData) {
+            if (point.second.isNotBlank()) {
+                checkpoints.add(point.second)
+            }
+        }
+        binding.chainCheckpoints.text = when (checkpoints.isEmpty()) {
+            true -> binding.root.resources.getString(R.string.none)
+            false -> checkpoints.joinToString()
+        }
+
+        if (item.isSelected) {
+            binding.chainSelected.visibility = View.VISIBLE
+            binding.chainSelected.setTextColor(color)
+            binding.selectionShade.visibility = View.VISIBLE
+        } else {
+            binding.chainSelected.visibility = View.INVISIBLE
             binding.selectionShade.visibility = View.GONE
         }
     }

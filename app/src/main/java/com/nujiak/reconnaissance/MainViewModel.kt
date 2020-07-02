@@ -237,9 +237,11 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
         get() = _isInSelectionMode
 
     val selectedPinIds = mutableListOf<Long>()
-    private val _selectedPinsChanged = MutableLiveData(false)
-    val selectedPinsChanged: LiveData<Boolean>
-        get() = _selectedPinsChanged
+    val selectedChainIds = mutableListOf<Long>()
+    private val _selectionChanged = MutableLiveData(false)
+    val selectionChanged: LiveData<Boolean>
+        get() = _selectionChanged
+
 
     fun enterSelectionMode() {
         _isInSelectionMode.value = true
@@ -247,21 +249,36 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
 
     fun exitSelectionMode() {
         // Remove all items from list of selected IDs
-        selectedPinIds.removeAll { true }
+        selectedPinIds.clear()
+        selectedChainIds.clear()
         _isInSelectionMode.value = false
     }
 
-    fun toggleSelection(pinId: Long) {
+    fun togglePinSelection(pinId: Long) {
         if (selectedPinIds.contains(pinId)) {
             selectedPinIds.remove(pinId)
         } else {
             selectedPinIds.add(pinId)
         }
-        if (selectedPinIds.size == 0) {
+        if (selectedChainIds.size + selectedPinIds.size == 0) {
             exitSelectionMode()
         } else {
-            _selectedPinsChanged.value = true
-            _selectedPinsChanged.value = false
+            _selectionChanged.value = true
+            _selectionChanged.value = false
+        }
+    }
+
+    fun toggleChainSelection(chainId: Long) {
+        if (selectedChainIds.contains(chainId)) {
+            selectedChainIds.remove(chainId)
+        } else {
+            selectedChainIds.add(chainId)
+        }
+        if (selectedChainIds.size + selectedPinIds.size == 0) {
+            exitSelectionMode()
+        } else {
+            _selectionChanged.value = true
+            _selectionChanged.value = false
         }
     }
 

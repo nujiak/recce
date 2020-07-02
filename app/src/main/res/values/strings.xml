@@ -20,18 +20,20 @@
 
     <!-- Pin Selector -->
     <string name="pins">Pins</string>
+    <string name="chains">Chains</string>
     <string name="add_pin">Add Pin</string>
     <string name="edit_pin">Edit Pin</string>
     <string name="add_to_ruler">Add to ruler</string>
     <plurals name="number_selected">
-        <item quantity="one">%d pin selected</item>
-        <item quantity="other">%d pins selected</item>
+        <item quantity="one">%d item selected</item>
+        <item quantity="other">%d items selected</item>
     </plurals>
     <plurals name="number_deleted">
         <item quantity="one">%d pin was deleted</item>
         <item quantity="other">%d pins were deleted</item>
     </plurals>
     <string name="undo">Undo</string>
+    <string name="checkpoints">Checkpoints</string>
     <!-- Sorting -->
     <string name="sort">Sort</string>
     <string name="time_added">Time added</string>
@@ -94,5 +96,4 @@
     <string name="tip">Tip:</string>
     <string name="ruler_empty">Ruler is empty</string>
     <string name="ruler_hint">Tap and hold items in\nthe Pins tab to select them</string>
-
 </resources>
