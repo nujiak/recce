@@ -13,7 +13,6 @@ import android.graphics.Matrix
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.util.Property
 import android.view.LayoutInflater
 import android.view.View
@@ -983,9 +982,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onPolylineClick(polyline: Polyline) {
-        Log.i(this::class.simpleName, "Polyline clicked")
         chainsMap[polyline]?.let {
-            Log.i(this::class.simpleName, "Chain found")
             viewModel.openChainCreator(it)
         }
     }
