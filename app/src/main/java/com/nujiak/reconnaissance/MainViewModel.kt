@@ -57,10 +57,6 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
     val isLocPermGranted: LiveData<Boolean>
         get() = _isLocPermGranted
 
-    fun updateLocPerm(isGranted: Boolean) {
-        _isLocPermGranted.value = isGranted
-    }
-
     private val _hideKeyboardFromThisView = MutableLiveData<View>(null)
     val hideKeyboardFromThisView: LiveData<View>
         get() = _hideKeyboardFromThisView

@@ -20,7 +20,6 @@ import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.PopupWindow
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -51,7 +50,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private lateinit var binding: FragmentMapBinding
     lateinit var viewModel: MainViewModel
     lateinit var map: GoogleMap
-    lateinit var layerPopup: PopupWindow
     private var coordSysId = 0
 
     private var currentPinColor = 0
@@ -226,7 +224,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             val uiSetting = map.uiSettings
             uiSetting.isZoomControlsEnabled = true
 
-            viewModel.isLocPermGranted.observe(viewLifecycleOwner, Observer { onLocPermChange(it) })
+            if (viewModel.isLocationGranted) {
+                onLocPermGranted()
+            }
 
             // Observe location to update Live Measurement
             viewModel.fusedLocationData.observe(viewLifecycleOwner, Observer {
@@ -350,6 +350,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         if (locationData == null) {
             return
         }
+        binding.mapLocationButton.isEnabled = true
         val position = LatLng(locationData.latitude, locationData.longitude)
         if (myLocationMarker != null && myLocationCircle != null) {
             val latLngEvaluator =
@@ -431,26 +432,24 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     @SuppressLint("MissingPermission")
-    private fun onLocPermChange(isGranted: Boolean) {
+    private fun onLocPermGranted() {
 
-        binding.mapLocationButton.isEnabled = isGranted
+        binding.mapLocationButton.isEnabled = true
         // Observe my location once
-        if (isGranted) {
-            viewModel.fusedLocationData.observe(
-                viewLifecycleOwner,
-                object : Observer<FusedLocationLiveData.LocationData> {
-                    override fun onChanged(location: FusedLocationLiveData.LocationData) {
-                        val cameraPosition = CameraPosition.builder()
-                            .target(LatLng(location.latitude, location.longitude))
-                            .zoom(15f)
-                            .build()
-                        map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
-                        updateLatLong()
-                        drawMyLocation(location)
-                        viewModel.fusedLocationData.removeObserver(this)
-                    }
-                })
-        }
+        viewModel.fusedLocationData.observe(
+            viewLifecycleOwner,
+            object : Observer<FusedLocationLiveData.LocationData> {
+                override fun onChanged(location: FusedLocationLiveData.LocationData) {
+                    val cameraPosition = CameraPosition.builder()
+                        .target(LatLng(location.latitude, location.longitude))
+                        .zoom(15f)
+                        .build()
+                    map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+                    updateLatLong()
+                    drawMyLocation(location)
+                    viewModel.fusedLocationData.removeObserver(this)
+                }
+            })
     }
 
     @SuppressLint("SetTextI18n")
