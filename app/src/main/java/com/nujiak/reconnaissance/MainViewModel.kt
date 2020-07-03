@@ -278,29 +278,32 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
         }
     }
 
-    private val _lastMultiDeletedPins = MutableLiveData<List<Pin>>()
-    val lastMultipleDeletedPins: LiveData<List<Pin>>
-        get() = _lastMultiDeletedPins
+    private val _lastMultiDeletedItems = MutableLiveData<Pair<List<Pin>?, List<Chain>?>>()
+    val lastMultiDeletedItems: LiveData<Pair<List<Pin>?, List<Chain>?>>
+        get() = _lastMultiDeletedItems
 
     fun onDeleteSelectedPins() {
-        _lastMultiDeletedPins.value = allPins.value?.filter { it.pinId in selectedPinIds }
-        val idsToDelete = selectedPinIds.toList()
+        val lastMultiDeletedPins = allPins.value?.filter { it.pinId in selectedPinIds }
+        val pinIdsToDelete = selectedPinIds.toList()
+        val lastMultiDeletedChains = allChains.value?.filter { it.chainId in selectedChainIds }
+        val chainIdsToDelete = selectedChainIds.toList()
+
+        _lastMultiDeletedItems.value = Pair(lastMultiDeletedPins, lastMultiDeletedChains)
 
         exitSelectionMode()
 
         uiScope.launch {
-            for (pinId in idsToDelete) {
-                deletePin(pinId)
-            }
+            pinIdsToDelete.forEach { pinId -> deletePin(pinId) }
+            chainIdsToDelete.forEach { chainId -> deleteChain(chainId) }
         }
     }
 
     fun onRestoreLastDeletedPins() {
-        lastMultipleDeletedPins.value?.let{
+        lastMultiDeletedItems.value?.let{
             uiScope.launch {
-                for (pin in it) {
-                    addPin(pin)
-                }
+                val (pins, chains) = it
+                pins?.forEach { pin -> addPin(pin) }
+                chains?.forEach { chain -> addChain(chain)}
             }
         }
 

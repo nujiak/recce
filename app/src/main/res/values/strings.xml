@@ -29,8 +29,8 @@
         <item quantity="other">%d items selected</item>
     </plurals>
     <plurals name="number_deleted">
-        <item quantity="one">%d pin was deleted</item>
-        <item quantity="other">%d pins were deleted</item>
+        <item quantity="one">%d item was deleted</item>
+        <item quantity="other">%d items were deleted</item>
     </plurals>
     <string name="undo">Undo</string>
     <string name="checkpoints">Checkpoints</string>

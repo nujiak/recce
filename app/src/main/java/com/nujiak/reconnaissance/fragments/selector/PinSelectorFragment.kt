@@ -106,11 +106,12 @@ class PinSelectorFragment : Fragment() {
         })
 
         // Observe for recent multiple deletions made through action mode
-        viewModel.lastMultipleDeletedPins.observe(viewLifecycleOwner, Observer {
+        viewModel.lastMultiDeletedItems.observe(viewLifecycleOwner, Observer {
             if (it != null) {
+                val size = (it.first?.size ?: 0) + (it.second?.size ?: 0)
                 val snackBar = Snackbar.make(
                     binding.pinAppBar,
-                    resources.getQuantityString(R.plurals.number_deleted, it.size, it.size),
+                    resources.getQuantityString(R.plurals.number_deleted, size, size),
                     Snackbar.LENGTH_INDEFINITE
                 ).setAction(R.string.undo) { viewModel.onRestoreLastDeletedPins() }
                 snackBar.show()
