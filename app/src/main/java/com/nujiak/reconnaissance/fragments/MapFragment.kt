@@ -251,6 +251,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 drawChains(allChains)
             })
 
+            // Draw current polyline is available. This is needed
+            // to restore the polyline after a rotation change
+            drawCurrentPolyline(true)
+
             updateLatLong()
             drawMyLocation(viewModel.fusedLocationData.value)
         }
