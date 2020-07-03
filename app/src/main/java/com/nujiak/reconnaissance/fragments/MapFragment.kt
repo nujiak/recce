@@ -491,11 +491,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
         val directionMils = degToNatoMils(direction)
 
-        binding.mapCurrentDistance.text = if (distance < 1000000) {
-            numberFormat.format(distance) + " m"
-        } else {
-            numberFormat.format(distance / 1000) + " km"
-        }
+        binding.mapCurrentDistance.text = distance.formatAsDistanceString()
         binding.mapCurrentDirection.text =
             "${directionMils.roundToInt().toString().padStart(4, '0')} mils"
     }
