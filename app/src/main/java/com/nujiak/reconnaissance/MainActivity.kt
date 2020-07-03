@@ -259,7 +259,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         else if (isInPolylineMode) {
-            viewModel.exitPolylineMode()
+            viewModel.undoMapPolyline()
             return
         }
         else {

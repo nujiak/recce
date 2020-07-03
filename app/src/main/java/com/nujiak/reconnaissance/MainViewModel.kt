@@ -175,6 +175,15 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
         currentPolylinePoints.clear()
     }
 
+    private val _toUndoPolyline = MutableLiveData<Boolean>(false)
+    val toUndoPolyline : LiveData<Boolean>
+        get() = _toUndoPolyline
+
+    fun undoMapPolyline() {
+        _toUndoPolyline.value = true
+        _toUndoPolyline.value = false
+    }
+
     /**
      * Ruler variables
      */

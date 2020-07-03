@@ -155,6 +155,12 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             }
         })
 
+        viewModel.toUndoPolyline.observe(viewLifecycleOwner, Observer { toUndoPolyline ->
+            if (toUndoPolyline) {
+                undoPolyline()
+            }
+        })
+
         binding.mapPolylineSave.setOnClickListener { onSavePolyline() }
 
         // Set up Coordinate System
@@ -1035,8 +1041,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private fun undoPolyline() {
         viewModel.currentPolylinePoints.let {
-            Log.i(this::class.simpleName, "Undoing polyline...")
-            Log.i(this::class.simpleName, "$it")
             it.removeAt(it.size - 1)
             drawCurrentPolyline(true)
 
