@@ -251,6 +251,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        val isInPolylineMode = viewModel.isInPolylineMode.value!!
+        if (isInPolylineMode && viewPager.currentItem != MAP_INDEX) {
+            viewPager.currentItem = MAP_INDEX
+            bottomNavigation.selectedItemId = R.id.btm_nav_map
+            return
+        }
+        else if (isInPolylineMode) {
+            viewModel.exitPolylineMode()
+            return
+        }
+        else {
+            super.onBackPressed()
+        }
+    }
+
     private fun hideKeyboard(view: View) {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
