@@ -579,34 +579,50 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onMarkerClick(marker: Marker): Boolean {
+        // Marker is My Location custom marker
         if (marker == myLocationMarker) {
             onMyLocationPressed()
             return true
         }
 
-        if (marker in checkpointsMap.keys) {
-            val chain = checkpointsMap[marker]
-            chain?.let {
-                val position = marker.position
-                moveToPin(Pin(
-                    name = "${marker.title};${it.name}",
+        // Marker represents a save polyline checkpoint
+        checkpointsMap[marker]?.let { parentChain ->
+            val position = marker.position
+            moveToPin(
+                Pin(
+                    name = "${marker.title};${parentChain.name}",
                     latitude = position.latitude,
                     longitude = position.longitude,
-                    color = it.color,
-                    group = it.group
-                    ), true)
-            }
+                    color = parentChain.color,
+                    group = parentChain.group
+                ), true
+            )
             return true
         }
 
-        val pin = markersMap[marker]
-        return if (pin != null) {
+        // Marker represents a current polyline checkpoint
+        if (currentPolylineMarkers.contains(marker)) {
+            val position = marker.position
+            moveToPin(
+                Pin(
+                    name = "${marker.title};${getString(R.string.unnamed)}",
+                    latitude = position.latitude,
+                    longitude = position.longitude,
+                    color = currentPinColor,
+                    group = ""
+                ), true
+            )
+            return true
+        }
+
+        // Marker represents a saved Pin
+        markersMap[marker]?.let { pin ->
             viewModel.putPinInFocus(pin)
             toggleLiveMeasurement(true)
-            true
-        } else {
-            false
+            return true
         }
+
+        return true
     }
 
     private fun onCameraMoveStarted(reason: Int) {
