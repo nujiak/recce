@@ -104,11 +104,11 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         }
 
         // Check if this is an update and pre set data fields
-        if (!pin.name.isBlank()) {
-            // Populate name field if this is an update
-            binding.newPinNameEditText.setText(pin.name)
+        isUpdate = pin.pinId != 0L
+        // Populate name field if this is an update
+        binding.newPinNameEditText.setText(pin.name)
+        if (isUpdate) {
             binding.creatorSheetHeader.text = getString(R.string.edit_pin)
-            isUpdate = true
         }
         if (pin.latitude != 0.0 || pin.longitude != 0.0) {
             // Populate lat long fields if available

@@ -66,7 +66,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private var isShowingPin = false
     private var isShowingMyLocation = false
+    private var isShowingCheckpoint = false
 
+    private var isCheckpointInfobarVisible = false
     private var isLiveMeasurementVisible = false
     private var isMapCompassVisible = false
     private var compassImageDrawable: Drawable? = null
@@ -502,7 +504,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onAddPinFromMap(): Boolean {
-        if (isShowingPin) {
+        if (isShowingPin && !isShowingCheckpoint) {
             viewModel.openPinCreator(viewModel.pinInFocus.value)
         } else {
             val cameraPosition = map.cameraPosition
@@ -584,7 +586,18 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
 
         if (marker in checkpointsMap.keys) {
-            return false
+            val chain = checkpointsMap[marker]
+            chain?.let {
+                val position = marker.position
+                moveToPin(Pin(
+                    name = "${marker.title};${it.name}",
+                    latitude = position.latitude,
+                    longitude = position.longitude,
+                    color = it.color,
+                    group = it.group
+                    ), true)
+            }
+            return true
         }
 
         val pin = markersMap[marker]
@@ -607,9 +620,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
     }
 
-    private fun moveToPin(pin: Pin) {
+    private fun moveToPin(pin: Pin, isCheckpoint: Boolean = false) {
         if (this::map.isInitialized) {
-            showPinInCard(pin)
+            showPinInCard(pin, isCheckpoint)
             val currentZoom = map.cameraPosition.zoom
             val cameraPosition = CameraPosition.builder()
                 .target(LatLng(pin.latitude, pin.longitude))
@@ -619,15 +632,26 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
     }
 
-    private fun showPinInCard(pin: Pin?) {
+    private fun showPinInCard(pin: Pin?, isCheckpoint: Boolean = false) {
         if (pin != null) {
-            // Set name on card
-            binding.mapPinNameText.text = pin.name
 
             // Set card background color
             val color = ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[pin.color])
             binding.mapDetailsCardView.setCardBackgroundColor(color)
             currentPinColor = pin.color
+
+            if (!isCheckpoint) {
+                // Set name on card
+                binding.mapPinNameText.text = pin.name
+            } else {
+                val pinNameSplit = pin.name.split(';')
+                binding.mapPinNameText.text = resources.getString(R.string.add_pin_plus)
+                binding.mapCheckpointName.text = pinNameSplit[0]
+                binding.mapCheckpointChain.text = pinNameSplit.drop(1).joinToString(";")
+                val colorDark = ContextCompat.getColor(requireContext(), PIN_CARD_DARK_BACKGROUNDS[pin.color])
+                binding.mapCheckpointInfobar.setCardBackgroundColor(colorDark)
+            }
+            toggleCheckpointInfobar(isCheckpoint)
 
             if (pin.group.isNotEmpty()) {
                 binding.mapPinGroup.text = pin.group
@@ -641,10 +665,73 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             updateLatLong(pin)
 
             isShowingPin = true
+            isShowingCheckpoint = isCheckpoint
         } else {
             binding.mapPinNameText.text = resources.getString(R.string.add_pin_plus)
             binding.mapPinGroup.visibility = View.INVISIBLE
             isShowingPin = false
+            isShowingCheckpoint = false
+            toggleCheckpointInfobar(false)
+        }
+    }
+
+    private fun toggleCheckpointInfobar(makeVisible: Boolean = true) {
+        if (isCheckpointInfobarVisible == makeVisible) {
+            return
+        }
+
+        val checkpointInfobar = binding.mapCheckpointInfobar
+
+        val centreX = checkpointInfobar.width / 2
+        val centreY = checkpointInfobar.height / 2
+
+        // Get radius of circle covering entire element
+        val radius = hypot(centreX.toDouble(), centreY.toDouble()).toFloat()
+
+        if (makeVisible) {
+            try {
+                // Attempt to create and start the animation
+                val anim = ViewAnimationUtils.createCircularReveal(
+                    checkpointInfobar,
+                    centreX,
+                    centreY,
+                    0f,
+                    radius
+                )
+                checkpointInfobar.visibility = View.VISIBLE
+                anim.duration = 200
+                anim.start()
+            } catch (e: Exception) {
+                // If view is detached, just toggle visibility without animation
+                checkpointInfobar.visibility = View.VISIBLE
+            } finally {
+                isCheckpointInfobarVisible = true
+            }
+        } else {
+            try {
+                // Attempt to create and start the animation
+                val anim = ViewAnimationUtils.createCircularReveal(
+                    checkpointInfobar,
+                    centreX,
+                    centreY,
+                    radius,
+                    0f
+                )
+                anim.addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        checkpointInfobar.visibility = View.INVISIBLE
+                        isCheckpointInfobarVisible = false
+                    }
+
+                })
+                anim.duration = 200
+                anim.start()
+            } catch (e: Exception) {
+                // If view is detached, just toggle visibility without animation
+                checkpointInfobar.visibility = View.INVISIBLE
+                isCheckpointInfobarVisible = false
+            }
         }
     }
 
@@ -814,6 +901,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private fun onExitPolylineMode() {
         currentPolyline?.remove()
         currentPolyline = null
+        currentPolylineMarkers.map { it.remove() }
+        currentPolylineMarkers.clear()
         binding.mapPolylineUndo.isEnabled = false
         binding.mapPolylineSave.isEnabled = false
     }
@@ -915,6 +1004,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                         MarkerOptions()
                             .position(point.first)
                             .anchor(0.5f, 0.5f)
+                            .title(point.second)
                             .flat(true)
                             .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
                     )
