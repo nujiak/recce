@@ -244,7 +244,9 @@ class MainActivity : AppCompatActivity() {
     ) {
         when (requestCode) {
             0 -> if (grantResults.isNotEmpty()) {
-                viewModel.updateLocPerm(grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    this.recreate()
+                }
             }
         }
     }
