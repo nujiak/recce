@@ -1,10 +1,12 @@
 package com.nujiak.reconnaissance.fragments.selector
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.google.maps.android.SphericalUtil
 import com.nujiak.reconnaissance.PIN_CARD_BACKGROUNDS
 import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.Chain
@@ -13,6 +15,7 @@ import com.nujiak.reconnaissance.database.getParsedData
 import com.nujiak.reconnaissance.databinding.PinListChainItemBinding
 import com.nujiak.reconnaissance.databinding.PinListHeaderItemBinding
 import com.nujiak.reconnaissance.databinding.PinListItemBinding
+import com.nujiak.reconnaissance.formatAsDistanceString
 import com.nujiak.reconnaissance.getGridString
 
 class PinViewHolder private constructor(private val binding: PinListItemBinding) :
@@ -79,6 +82,7 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
         }
     }
 
+    @SuppressLint("SetTextI18n")
     fun bind(
         item: ChainWrapper,
         onItemClick: (Chain) -> Unit,
@@ -103,15 +107,21 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
 
         val chainData = chain.getParsedData()
         val checkpoints = mutableListOf<String>()
-        for (point in chainData) {
+        var distance = 0.0
+        for ((index, point) in chainData.withIndex()) {
             if (point.second.isNotBlank()) {
                 checkpoints.add(point.second)
+            }
+            if (index != chainData.size - 1) {
+                distance += SphericalUtil.computeDistanceBetween(point.first, chainData[index+1].first)
             }
         }
         binding.chainCheckpoints.text = when (checkpoints.isEmpty()) {
             true -> binding.root.resources.getString(R.string.none)
             false -> checkpoints.joinToString()
         }
+
+        binding.chainDistance.text = distance.formatAsDistanceString()
 
         if (item.isSelected) {
             binding.chainSelected.visibility = View.VISIBLE

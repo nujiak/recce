@@ -6,6 +6,8 @@ import com.nujiak.reconnaissance.mapping.getMgrsData
 import com.nujiak.reconnaissance.mapping.getUtmData
 import com.nujiak.reconnaissance.mapping.toSingleLine
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet
+import java.text.NumberFormat
+import java.util.*
 
 fun getGridString(latDeg: Double, lngDeg: Double, coordSysId: Int, resources: Resources): String {
     return when (coordSysId) {
@@ -26,4 +28,17 @@ fun getGridString(latDeg: Double, lngDeg: Double, coordSysId: Int, resources: Re
         }
         else -> throw IllegalArgumentException("Invalid coordinate system index: $coordSysId")
     } ?: resources.getString(R.string.not_available)
+}
+
+private val numberFormat = NumberFormat.getNumberInstance(Locale.US).apply {
+    minimumFractionDigits = 1
+    maximumFractionDigits = 1
+}
+
+fun Double.formatAsDistanceString(): String {
+    return if (this < 1000000) {
+        numberFormat.format(this) + " m"
+    } else {
+        numberFormat.format(this / 1000) + " km"
+    }
 }
