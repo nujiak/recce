@@ -10,8 +10,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.google.android.gms.maps.model.LatLng
 import com.nujiak.reconnaissance.database.Chain
+import com.nujiak.reconnaissance.database.ChainNode
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.ReconDatabaseDao
 import com.nujiak.reconnaissance.fragments.ruler.RulerItem
@@ -164,7 +164,7 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
     val isInPolylineMode: LiveData<Boolean>
         get() = _isInPolylineMode
 
-    val currentPolylinePoints = mutableListOf<Pair<LatLng, String>>()
+    val currentPolylinePoints = mutableListOf<ChainNode>()
 
     fun enterPolylineMode() {
         _isInPolylineMode.value = true
