@@ -54,7 +54,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private var currentPinColor = 0
     private var markersMap = HashMap<Marker, Pin>()
     private var chainsMap = HashMap<Polyline, Chain>()
-    private var checkpointsMap = HashMap<Marker, Chain>()
+    private var checkpointsMap = HashMap<Marker, ChainNode>()
 
     private var myLocationMarker: Marker? = null
     private var myLocationCircle: Circle? = null
@@ -295,8 +295,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
         val scale = resources.displayMetrics.density
         for (chain in allChains) {
-            val chainData = chain.getParsedData()
-            val points = chainData.map { it.first }
+            val chainNodes = chain.getNodes()
+            val points = chainNodes.map { it.position }
             val polyline = map.addPolyline(PolylineOptions())
             polyline.apply {
                 color = ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[chain.color])
@@ -309,17 +309,16 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             polyline.points = points
             chainsMap[polyline] = chain
 
-            for (point in chainData) {
-                if (point.second.isNotBlank()) {
+            for (node in chainNodes) {
+                if (node.isCheckpoint) {
                     val marker = map.addMarker(
                         MarkerOptions()
-                            .position(point.first)
+                            .position(node.position)
                             .anchor(0.5f, 0.5f)
                             .flat(true)
-                            .title(point.second)
                             .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
                     )
-                    checkpointsMap[marker] = chain
+                    checkpointsMap[marker] = node
                 }
             }
         }
@@ -595,11 +594,12 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
 
         // Marker represents a save polyline checkpoint
-        checkpointsMap[marker]?.let { parentChain ->
+        checkpointsMap[marker]?.let { node ->
             val position = marker.position
+            val parentChain = node.parentChain!!
             moveToPin(
                 Pin(
-                    name = "${marker.title};${parentChain.name}",
+                    name = "${node.name};${parentChain.name}",
                     latitude = position.latitude,
                     longitude = position.longitude,
                     color = parentChain.color,
@@ -933,7 +933,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private fun onAddPolylinePoint(name: String = "") {
         viewModel.currentPolylinePoints.let {
-            it.add(map.cameraPosition.target to name)
+            it.add(ChainNode(name, map.cameraPosition.target))
             if (it.size >= 2) {
                 binding.mapPolylineSave.isEnabled = true
             }
@@ -991,7 +991,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         if (currentPolyline == null) {
             val polylineOptions = PolylineOptions()
             for (point in viewModel.currentPolylinePoints) {
-                polylineOptions.add(point.first)
+                polylineOptions.add(point.position)
             }
             polylineOptions.add(map.cameraPosition.target)
             currentPolyline = map.addPolyline(polylineOptions)
@@ -1008,7 +1008,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             }
         } else {
             currentPolyline?.points = viewModel.currentPolylinePoints
-                .map { it.first }
+                .map { it.position }
                 .toMutableList().apply {
                     add(map.cameraPosition.target)
                 }
@@ -1020,13 +1020,13 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             }
             currentPolylineMarkers.clear()
 
-            for (point in viewModel.currentPolylinePoints) {
-                if (point.second.isNotBlank()) {
+            for (node in viewModel.currentPolylinePoints) {
+                if (node.isCheckpoint) {
                     val marker = map.addMarker(
                         MarkerOptions()
-                            .position(point.first)
+                            .position(node.position)
                             .anchor(0.5f, 0.5f)
-                            .title(point.second)
+                            .title(node.name)
                             .flat(true)
                             .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
                     )

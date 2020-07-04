@@ -11,7 +11,7 @@ import com.nujiak.reconnaissance.PIN_CARD_BACKGROUNDS
 import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
-import com.nujiak.reconnaissance.database.getParsedData
+import com.nujiak.reconnaissance.database.getNodes
 import com.nujiak.reconnaissance.databinding.PinListChainItemBinding
 import com.nujiak.reconnaissance.databinding.PinListHeaderItemBinding
 import com.nujiak.reconnaissance.databinding.PinListItemBinding
@@ -105,15 +105,15 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
         binding.pinListItemParent.setOnClickListener { onItemClick(chain) }
         binding.pinListItemParent.setOnLongClickListener { onItemLongClick(chain) }
 
-        val chainData = chain.getParsedData()
+        val chainNodes = chain.getNodes()
         val checkpoints = mutableListOf<String>()
         var distance = 0.0
-        for ((index, point) in chainData.withIndex()) {
-            if (point.second.isNotBlank()) {
-                checkpoints.add(point.second)
+        for ((index, node) in chainNodes.withIndex()) {
+            if (node.isCheckpoint) {
+                checkpoints.add(node.name)
             }
-            if (index != chainData.size - 1) {
-                distance += SphericalUtil.computeDistanceBetween(point.first, chainData[index+1].first)
+            if (index != chainNodes.size - 1) {
+                distance += SphericalUtil.computeDistanceBetween(node.position, chainNodes[index+1].position)
             }
         }
         binding.chainCheckpoints.text = when (checkpoints.isEmpty()) {

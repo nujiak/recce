@@ -2,30 +2,36 @@ package com.nujiak.reconnaissance.database
 
 import com.google.android.gms.maps.model.LatLng
 
-fun Chain.getParsedData(): List<Pair<LatLng, String>> {
+fun Chain.getNodes(): List<ChainNode> {
     val dataList = this.data.split(';')
-    val output = mutableListOf<Pair<LatLng, String>>()
+    val nodeList = mutableListOf<ChainNode>()
 
     for (item in dataList) {
         if (item.isNotBlank()) {
-            val itemSplit = item.split(',')
-            output.add(LatLng(itemSplit[0].toDouble(), itemSplit[1].toDouble()) to itemSplit[2])
+            val (lat, lng, name) = item.split(',')
+            val node = ChainNode(
+                name = name,
+                position = LatLng(lat.toDouble(), lng.toDouble()),
+                parentChain = this
+            )
+            nodeList.add(node)
         }
     }
-    return output.toList()
+    return nodeList.toList()
 }
 
-fun Chain.withData(data: List<Pair<LatLng, String>>): Chain = this.copy(data = data.toChainDataString())
+fun Chain.withNodes(data: List<ChainNode>): Chain =
+    this.copy(data = data.toChainDataString())
 
-fun List<Pair<LatLng, String>>.toChainDataString(): String {
+fun List<ChainNode>.toChainDataString(): String {
     val newDataBuilder = StringBuilder()
 
-    for (item in this) {
-        newDataBuilder.append(item.first.latitude)
+    for (node in this) {
+        newDataBuilder.append(node.position.latitude)
         newDataBuilder.append(',')
-        newDataBuilder.append(item.first.longitude)
+        newDataBuilder.append(node.position.longitude)
         newDataBuilder.append(',')
-        newDataBuilder.append(item.second.trim())
+        newDataBuilder.append(node.name.trim())
         newDataBuilder.append(';')
     }
 
