@@ -64,6 +64,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private var isShowingPin = false
     private var isShowingMyLocation = false
     private var isShowingCheckpoint = false
+    private var zoomStack = 0f
 
     private var isCheckpointInfobarVisible = false
     private var isLiveMeasurementVisible = false
@@ -526,19 +527,34 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onZoomIn() {
-        if (map.cameraPosition.zoom > 15) {
-            map.animateCamera(CameraUpdateFactory.zoomBy(1f))
+        if (zoomStack <= 0) {
+            zoomStack = 1f
         } else {
-            map.animateCamera(CameraUpdateFactory.zoomBy(2f))
+            zoomStack++
         }
+        map.animateCamera(CameraUpdateFactory.zoomBy(zoomStack), 300, object : GoogleMap.CancelableCallback {
+            override fun onFinish() {
+                zoomStack = 0f
+            }
+
+            override fun onCancel() {}
+
+        })
     }
 
     private fun onZoomOut() {
-        if (map.cameraPosition.zoom > 15) {
-            map.animateCamera(CameraUpdateFactory.zoomBy(-1f))
+        if (zoomStack >= 0) {
+            zoomStack = -1f
         } else {
-            map.animateCamera(CameraUpdateFactory.zoomBy(-2f))
+            zoomStack--
         }
+        map.animateCamera(CameraUpdateFactory.zoomBy(zoomStack), 300,  object : GoogleMap.CancelableCallback {
+            override fun onFinish() {
+                zoomStack = 0f
+            }
+
+            override fun onCancel() {}
+        })
     }
 
     private fun onMyLocationPressed() {
