@@ -20,6 +20,6 @@ data class Chain(
     val chainId: Long = 0L,
 
     @ColumnInfo(defaultValue = "")
-    var group: String = ""
+    val group: String = ""
 
 ) : Parcelable
