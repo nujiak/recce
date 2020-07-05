@@ -111,7 +111,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         // Set up custom map controls
         binding.mapZoomInButton.setOnClickListener { onZoomIn() }
         binding.mapZoomOutButton.setOnClickListener { onZoomOut() }
-        binding.mapLocationButton.setOnClickListener { onMyLocationPressed() }
+        binding.mapLocationButton.apply {
+            setOnClickListener { onMyLocationPressed(false) }
+            setOnLongClickListener { onMyLocationPressed(true); true }
+        }
         // Set card background to color of last added pin
         viewModel.lastPin.value.let { pin ->
             if (pin != null) {
@@ -553,7 +556,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         })
     }
 
-    private fun onMyLocationPressed() {
+    private fun onMyLocationPressed(resetRotation: Boolean) {
         isShowingMyLocation = true
         val currentCameraPosition = map.cameraPosition
         val currentZoom = currentCameraPosition.zoom
@@ -562,8 +565,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             val cameraPosition = CameraPosition.builder()
                 .target(LatLng(location.latitude, location.longitude))
                 .zoom(if (currentZoom < 10) 15f else currentZoom)
-                .tilt(currentCameraPosition.tilt)
-                .bearing(currentCameraPosition.bearing)
+                .tilt(if (resetRotation) 0f else currentCameraPosition.tilt)
+                .bearing(if (resetRotation) 0f else currentCameraPosition.bearing)
                 .build()
             map.animateCamera(
                 CameraUpdateFactory.newCameraPosition(cameraPosition),
@@ -601,7 +604,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private fun onMarkerClick(marker: Marker): Boolean {
         // Marker is My Location custom marker
         if (marker == myLocationMarker) {
-            onMyLocationPressed()
+            onMyLocationPressed(false)
             return true
         }
 
