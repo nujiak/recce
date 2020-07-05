@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Pin::class, Chain::class], version = 3, exportSchema = true)
+@Database(entities = [Pin::class, Chain::class], version = 4, exportSchema = true)
 abstract class ReconDatabase : RoomDatabase() {
 
     abstract val pinDatabaseDao: ReconDatabaseDao
@@ -39,6 +39,7 @@ abstract class ReconDatabase : RoomDatabase() {
                     )
                         .addMigrations(MIGRATION_1_2)
                         .addMigrations(MIGRATION_2_3)
+                        .addMigrations(MIGRATION_3_4)
                         .build()
                     // Assign INSTANCE to the newly created database.
                     INSTANCE = instance
