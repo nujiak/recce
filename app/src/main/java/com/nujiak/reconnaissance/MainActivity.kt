@@ -40,8 +40,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var display: Display
     private lateinit var imm: InputMethodManager
 
-    private var lastDeletedPins = listOf<Pin>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -127,8 +125,9 @@ class MainActivity : AppCompatActivity() {
         })
 
 
-        // Set up show-pin sequence
+        // Set up pin and checkpoint showing sequence
         viewModel.pinInFocus.observe(this, Observer { switchToMap() })
+        viewModel.checkpointInFocus.observe(this, Observer { switchToMap() })
 
         // Set up ruler adding sequence
         viewModel.switchToRuler.observe(this, Observer { switchToRuler ->
