@@ -105,8 +105,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         })
         binding.mapCardParent.setOnClickListener { onAddPinFromMap() }
 
-        // Set up pin-showing sequence
+        // Set up show pin and checkpoint sequence
         viewModel.pinInFocus.observe(viewLifecycleOwner, Observer { pin -> moveMapTo(pin) })
+        viewModel.checkpointInFocus.observe(viewLifecycleOwner, Observer { node -> moveMapTo(node)})
 
         // Set up custom map controls
         binding.mapZoomInButton.setOnClickListener { onZoomIn() }
