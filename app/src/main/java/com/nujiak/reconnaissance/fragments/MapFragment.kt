@@ -106,7 +106,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         binding.mapCardParent.setOnClickListener { onAddPinFromMap() }
 
         // Set up pin-showing sequence
-        viewModel.pinInFocus.observe(viewLifecycleOwner, Observer { pin -> moveToPin(pin) })
+        viewModel.pinInFocus.observe(viewLifecycleOwner, Observer { pin -> moveMapTo(pin) })
 
         // Set up custom map controls
         binding.mapZoomInButton.setOnClickListener { onZoomIn() }
@@ -462,20 +462,12 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     @SuppressLint("SetTextI18n")
-    private fun updateLatLong(pin: Pin? = null) {
-        val latitude: Double
-        val longitude: Double
-        if (pin != null) {
-            latitude = pin.latitude
-            longitude = pin.longitude
-        } else {
-            val cameraPosition = map.cameraPosition
-            val target = cameraPosition.target
-            latitude = target.latitude
-            longitude = target.longitude
-        }
-        binding.mapLatLngText.text = "%.6f %.6f".format(latitude, longitude)
-        binding.mapGridText.text = getGridString(latitude, longitude, coordSysId, resources)
+    private fun updateLatLong(latitude: Double? = null, longitude: Double? = null) {
+        val cameraTarget = map.cameraPosition.target
+        val lat = latitude ?: cameraTarget.latitude
+        val lng = longitude ?: cameraTarget.longitude
+        binding.mapLatLngText.text = "%.6f %.6f".format(lat, lng)
+        binding.mapGridText.text = getGridString(lat, lng, coordSysId, resources)
 
         updateLiveMeasurements(latitude, longitude)
     }
@@ -583,7 +575,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
                     override fun onCancel() {}
                 })
-            showPinInCard(null)
+            resetCard()
         }
     }
 
@@ -615,32 +607,15 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
         // Marker represents a save polyline checkpoint
         checkpointsMap[marker]?.let { node ->
-            val position = marker.position
-            val parentChain = node.parentChain!!
-            moveToPin(
-                Pin(
-                    name = "${node.name};${parentChain.name}",
-                    latitude = position.latitude,
-                    longitude = position.longitude,
-                    color = parentChain.color,
-                    group = parentChain.group
-                ), true
-            )
+            moveMapTo(node)
             return true
         }
 
         // Marker represents a current polyline checkpoint
         if (currentPolylineMarkers.contains(marker)) {
             val position = marker.position
-            moveToPin(
-                Pin(
-                    name = "${marker.title};${getString(R.string.unnamed)}",
-                    latitude = position.latitude,
-                    longitude = position.longitude,
-                    color = currentPinColor,
-                    group = ""
-                ), true
-            )
+            val checkpointNode = ChainNode(marker.title, position, null)
+            moveMapTo(checkpointNode)
             return true
         }
 
@@ -656,7 +631,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private fun onCameraMoveStarted(reason: Int) {
         if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-            showPinInCard(null)
+            resetCard()
         }
         if (reason != GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION || isShowingPin) {
             isShowingMyLocation = false
@@ -664,59 +639,107 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
     }
 
-    private fun moveToPin(pin: Pin, isCheckpoint: Boolean = false) {
-        if (this::map.isInitialized) {
-            showPinInCard(pin, isCheckpoint)
-            val currentZoom = map.cameraPosition.zoom
-            val cameraPosition = CameraPosition.builder()
-                .target(LatLng(pin.latitude, pin.longitude))
-                .zoom(if (currentZoom < 10f) 15f else currentZoom)
-                .build()
-            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 350, null)
-        }
+    private fun moveMapTo(pin: Pin) {
+        moveMapTo(pin.latitude, pin.longitude)
+        showInCard(pin)
     }
 
-    private fun showPinInCard(pin: Pin?, isCheckpoint: Boolean = false) {
-        if (pin != null) {
+    private fun moveMapTo(node: ChainNode) {
+        moveMapTo(node.position.latitude, node.position.longitude)
+        showInCard(node)
+    }
 
-            // Set card background color
-            val color = ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[pin.color])
-            binding.mapDetailsCardView.setCardBackgroundColor(color)
-            currentPinColor = pin.color
-
-            if (!isCheckpoint) {
-                // Set name on card
-                binding.mapPinNameText.text = pin.name
-            } else {
-                val pinNameSplit = pin.name.split(';')
-                binding.mapPinNameText.text = resources.getString(R.string.add_pin_plus)
-                binding.mapCheckpointName.text = pinNameSplit[0]
-                binding.mapCheckpointChain.text = pinNameSplit.drop(1).joinToString(";")
-                val colorDark = ContextCompat.getColor(requireContext(), PIN_CARD_DARK_BACKGROUNDS[pin.color])
-                binding.mapCheckpointInfobar.setCardBackgroundColor(colorDark)
-            }
-            toggleCheckpointInfobar(isCheckpoint)
-
-            if (pin.group.isNotEmpty()) {
-                binding.mapPinGroup.text = pin.group
-                binding.mapPinGroup.setTextColor(color)
-                binding.mapPinGroup.visibility = View.VISIBLE
-            } else {
-                binding.mapPinGroup.visibility = View.INVISIBLE
-            }
-
-            // Set card coordinates
-            updateLatLong(pin)
-
-            isShowingPin = true
-            isShowingCheckpoint = isCheckpoint
-        } else {
-            binding.mapPinNameText.text = resources.getString(R.string.add_pin_plus)
-            binding.mapPinGroup.visibility = View.INVISIBLE
-            isShowingPin = false
-            isShowingCheckpoint = false
-            toggleCheckpointInfobar(false)
+    private fun moveMapTo(lat: Double, lng: Double, bearing: Float? = null, tilt: Float? = null, zoom: Float? = null) {
+        if (!this::map.isInitialized) {
+            return
         }
+        val currentPosition = map.cameraPosition
+
+        val toBearing = bearing ?: currentPosition.bearing
+        val toTilt = tilt ?: currentPosition.tilt
+        val toZoom = zoom ?: if (map.cameraPosition.zoom < 10f) 15f else map.cameraPosition.zoom
+
+        val cameraPosition = CameraPosition.builder()
+            .target(LatLng(lat, lng))
+            .zoom(toZoom)
+            .bearing(toBearing)
+            .tilt(toTilt)
+            .build()
+        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 350, null)
+    }
+
+    private fun showInCard(lat: Double, lng: Double, group: String, color: Int, name: String?) {
+        // update currentPinColor
+        currentPinColor = color
+
+        // Set name on card
+        binding.mapPinNameText.text = name ?: resources.getString(R.string.add_pin_plus)
+
+        // Set card background color
+        val cardColor = ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[color])
+        binding.mapDetailsCardView.setCardBackgroundColor(cardColor)
+
+        // Set group
+        if (group.isNotEmpty()) {
+            binding.mapPinGroup.text = group
+            binding.mapPinGroup.setTextColor(cardColor)
+            binding.mapPinGroup.visibility = View.VISIBLE
+        } else {
+            binding.mapPinGroup.visibility = View.INVISIBLE
+        }
+
+        // Set card coordinates
+        updateLatLong(lat, lng)
+
+        isShowingPin = true
+    }
+
+    private fun showInCard(checkpoint: ChainNode) {
+        toggleCheckpointInfobar(true)
+        isShowingCheckpoint = true
+        isShowingPin = true
+        updateCheckpointInfobar(checkpoint)
+        val parentChain = checkpoint.parentChain
+        showInCard(checkpoint.position.latitude,
+            checkpoint.position.longitude,
+            parentChain?.group ?: "",
+            parentChain?.color ?: currentPinColor,
+            null
+        )
+
+    }
+
+    private fun showInCard(pin: Pin) {
+        toggleCheckpointInfobar(false)
+        isShowingCheckpoint = false
+        showInCard(pin.latitude, pin.longitude, pin.group, pin.color, pin.name)
+        isShowingPin = true
+    }
+
+    private fun resetCard() {
+        binding.mapPinNameText.text = resources.getString(R.string.add_pin_plus)
+        binding.mapPinGroup.visibility = View.INVISIBLE
+        isShowingPin = false
+        isShowingCheckpoint = false
+        toggleCheckpointInfobar(false)
+    }
+
+    private fun updateCheckpointInfobar(checkpoint: ChainNode) {
+        binding.mapCheckpointName.text = checkpoint.name
+        binding.mapCheckpointChain.text =
+            checkpoint.parentChain?.name ?: getString(R.string.unnamed)
+
+        val color =
+            if (checkpoint.parentChain != null) {
+                ContextCompat.getColor(
+                    requireContext(), PIN_CARD_DARK_BACKGROUNDS[checkpoint.parentChain.color]
+                )
+            } else {
+                ContextCompat.getColor(requireContext(), R.color.colorSurface)
+            }
+
+        binding.mapCheckpointInfobar.setCardBackgroundColor(color)
+
     }
 
     private fun toggleCheckpointInfobar(makeVisible: Boolean = true) {
