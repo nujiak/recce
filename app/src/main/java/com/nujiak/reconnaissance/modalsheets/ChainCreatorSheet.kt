@@ -53,7 +53,6 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
             ).get(MainViewModel::class.java)
         }!!
 
-        // Fetch coordinate system setting
         setUpTextFields()
 
         // Set up exposed dropdown menus
@@ -62,6 +61,13 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
                 // Unable to use NoFilterArrayAdapter as it only supports List (not Array)
                 ArrayAdapter(
                     it, R.layout.dropdown_menu_popup_item, COLORS
+                )
+            )
+            binding.newChainTypeDropdown.setAdapter(
+                ArrayAdapter(
+                    it,
+                    R.layout.dropdown_menu_popup_item,
+                    arrayOf(R.string.route, R.string.area).map { res -> getString(res) }
                 )
             )
             groupArrayAdapter = NoFilterArrayAdapter(
@@ -81,7 +87,7 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
             binding.newChainGroupDropdown.setAdapter(groupArrayAdapter)
         }
 
-        // Get pin passed in as argument
+        // Get chain passed in as argument
         val argChain = arguments?.getParcelable<Chain>("chain")
         chain = argChain!!
 
@@ -89,7 +95,7 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
         if (!chain.name.isBlank()) {
             // Populate name field if this is an update
             binding.newChainNameEditText.setText(chain.name)
-            binding.creatorSheetHeader.text = getString(R.string.edit_pin)
+            binding.creatorSheetHeader.text = getString(R.string.edit)
             isUpdate = true
         }
         binding.newChainColorDropdown.setText(COLORS[chain.color], false)
@@ -97,6 +103,9 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
             if (chain.group.isNotEmpty()) chain.group else getString(R.string.none),
             false
         )
+        binding.newChainTypeDropdown.setText(
+            getString(if (chain.cyclical) R.string.area else R.string.route),
+            false)
 
         // Set up buttons
         binding.newChainSave.setOnClickListener { onCompleted() }
@@ -126,7 +135,8 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
                 name = binding.newChainNameEditText.text.toString(),
                 data = chain.data,
                 color = COLORS.indexOf(binding.newChainColorDropdown.text.toString()),
-                group = group
+                group = group,
+                cyclical = binding.newChainTypeDropdown.text.toString() == getString(R.string.area)
             )
 
             when (isUpdate) {

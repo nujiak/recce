@@ -12,24 +12,49 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/small_padding"
-        android:gravity="start"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/creator_sheet_header"
             style="@style/TextAppearance.MaterialComponents.Headline5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="@string/add"
+            android:paddingEnd="@dimen/small_padding"
+            tools:ignore="RtlSymmetry" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/new_chain_type_input"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/tiny_padding"
+            android:paddingEnd="@dimen/small_padding"
+            tools:ignore="RtlSymmetry">
+
+            <AutoCompleteTextView
+                style="@style/TextAppearance.MaterialComponents.Headline6"
+                android:id="@+id/new_chain_type_dropdown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="6"
+                android:padding="0dp"
+                android:hint="@string/type"
+                android:inputType="none"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <View
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:text="@string/add_chain" />
-
+            android:layout_weight="1"/>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/new_chain_delete"
             style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start"
             android:visibility="gone"
             app:icon="@drawable/ic_delete_white_24dp"
             tools:visibility="visible" />
@@ -39,7 +64,6 @@
             android:id="@+id/new_chain_save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
             android:text="@string/save" />
 
     </LinearLayout>
@@ -49,7 +73,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/small_padding"
+        android:layout_marginTop="@dimen/large_padding"
         android:hint="@string/chain_name"
         app:counterEnabled="true"
         app:counterMaxLength="20"

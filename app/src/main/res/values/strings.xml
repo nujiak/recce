@@ -65,6 +65,10 @@
     <!-- Chain Creator -->
     <string name="add_chain">Add Chain</string>
     <string name="chain_name">Chain Name</string>
+    <string name="type">Type</string>
+    <string name="route">Route</string>
+    <string name="area">Area</string>
+    <string name="edit">Edit</string>
 
     <!-- Map -->
     <string name="map">Map</string>
