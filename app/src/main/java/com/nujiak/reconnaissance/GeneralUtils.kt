@@ -1,6 +1,7 @@
 package com.nujiak.reconnaissance
 
 import android.content.res.Resources
+import android.graphics.Color
 import com.nujiak.reconnaissance.mapping.getKertauGridsString
 import com.nujiak.reconnaissance.mapping.getMgrsData
 import com.nujiak.reconnaissance.mapping.getUtmData
@@ -41,4 +42,12 @@ fun Double.formatAsDistanceString(): String {
     } else {
         numberFormat.format(this / 1000) + " km"
     }
+}
+
+fun withAlpha(color: Int, alpha: Int): Int {
+    val r = Color.red(color)
+    val g = Color.green(color)
+    val b = Color.blue(color)
+
+    return Color.argb(alpha, r, g, b)
 }

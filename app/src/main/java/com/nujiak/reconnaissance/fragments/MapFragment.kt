@@ -53,7 +53,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private var currentPinColor = 0
     private var markersMap = HashMap<Marker, Pin>()
-    private var chainsMap = HashMap<Polyline, Chain>()
+    private var polylinesMap = HashMap<Polyline, Chain>()
+    private var polygonsMap = HashMap<Polygon, Chain>()
     private var checkpointsMap = HashMap<Marker, ChainNode>()
 
     private var myLocationMarker: Marker? = null
@@ -230,6 +231,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 setOnMarkerClickListener { onMarkerClick(it) }
                 setOnCameraMoveStartedListener { onCameraMoveStarted(it) }
                 setOnPolylineClickListener { onPolylineClick(it) }
+                setOnPolygonClickListener { onPolygonClick(it) }
             }
             val uiSetting = map.uiSettings
             uiSetting.isZoomControlsEnabled = true
@@ -288,31 +290,45 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun drawChains(allChains: List<Chain>) {
-        for (polyline in chainsMap.keys) {
-            polyline.remove()
-        }
-        chainsMap.clear()
+        polylinesMap.keys.forEach { it.remove() }
+        polylinesMap.clear()
 
-        for (marker in checkpointsMap.keys) {
-            marker.remove()
-        }
+        checkpointsMap.keys.forEach { it.remove() }
         checkpointsMap.clear()
+
+        polygonsMap.keys.forEach { it.remove() }
+        polygonsMap.clear()
 
         val scale = resources.displayMetrics.density
         for (chain in allChains) {
             val chainNodes = chain.getNodes()
             val points = chainNodes.map { it.position }
-            val polyline = map.addPolyline(PolylineOptions())
-            polyline.apply {
-                color = ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[chain.color])
-                width = 4 * scale
-                jointType = JointType.ROUND
-                startCap = ButtCap()
-                endCap = startCap
-                isClickable = true
+            if (chain.cyclical) {
+                val color = ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[chain.color])
+                val polygonOptions = PolygonOptions()
+                points.forEach { polygonOptions.add(it) }
+                polygonOptions.apply {
+                    strokeColor(color)
+                    strokeWidth(2 * scale)
+                    fillColor(withAlpha(color, 50))
+                    strokeJointType(JointType.ROUND)
+                    clickable(true)
+                }
+                val polygon = map.addPolygon(polygonOptions)
+                polygonsMap[polygon] = chain
+            } else {
+                val polyline = map.addPolyline(PolylineOptions())
+                polyline.apply {
+                    color = ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[chain.color])
+                    width = 4 * scale
+                    jointType = JointType.ROUND
+                    startCap = ButtCap()
+                    endCap = startCap
+                    isClickable = true
+                }
+                polyline.points = points
+                polylinesMap[polyline] = chain
             }
-            polyline.points = points
-            chainsMap[polyline] = chain
 
             for (node in chainNodes) {
                 if (node.isCheckpoint) {
@@ -1029,7 +1045,13 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onPolylineClick(polyline: Polyline) {
-        chainsMap[polyline]?.let {
+        polylinesMap[polyline]?.let {
+            viewModel.openChainCreator(it)
+        }
+    }
+
+    private fun onPolygonClick(polygon: Polygon) {
+        polygonsMap[polygon]?.let {
             viewModel.openChainCreator(it)
         }
     }
