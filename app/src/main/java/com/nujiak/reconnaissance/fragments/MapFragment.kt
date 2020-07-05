@@ -527,33 +527,37 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onZoomIn() {
-        if (zoomStack <= 0) {
-            zoomStack = 1f
-        } else {
-            zoomStack++
-        }
-        map.animateCamera(CameraUpdateFactory.zoomBy(zoomStack), 300, object : GoogleMap.CancelableCallback {
-            override fun onFinish() {
-                zoomStack = 0f
-            }
+        zoomStack = if (zoomStack < 0) 1f else zoomStack + 1
 
-            override fun onCancel() {}
+        val currentZoomStack = zoomStack
+
+        map.animateCamera(CameraUpdateFactory.zoomBy(zoomStack), 300, object : GoogleMap.CancelableCallback {
+            override fun onFinish() { zoomStack = 0f }
+
+            override fun onCancel() {
+                // Call onFinish() if animation is cancelled NOT due to another call to zoom.
+                if (zoomStack == currentZoomStack) {
+                    onFinish()
+                }
+            }
 
         })
     }
 
     private fun onZoomOut() {
-        if (zoomStack >= 0) {
-            zoomStack = -1f
-        } else {
-            zoomStack--
-        }
-        map.animateCamera(CameraUpdateFactory.zoomBy(zoomStack), 300,  object : GoogleMap.CancelableCallback {
-            override fun onFinish() {
-                zoomStack = 0f
-            }
+        zoomStack = if (zoomStack > 0) -1f else zoomStack - 1
 
-            override fun onCancel() {}
+        val currentZoomStack = zoomStack
+
+        map.animateCamera(CameraUpdateFactory.zoomBy(zoomStack), 300,  object : GoogleMap.CancelableCallback {
+            override fun onFinish() { zoomStack = 0f }
+
+            override fun onCancel() {
+                // Call onFinish() if animation is cancelled NOT due to another call to zoom.
+                if (zoomStack == currentZoomStack) {
+                    onFinish()
+                }
+            }
         })
     }
 
