@@ -63,7 +63,6 @@
     <string name="group_invalid_error">Group name invalid</string>
 
     <!-- Chain Creator -->
-    <string name="add_chain">Add Chain</string>
     <string name="chain_name">Chain Name</string>
     <string name="type">Type</string>
     <string name="route">Route</string>
@@ -75,7 +74,6 @@
     <string name="zone">Zone</string>
     <string name="add_pin_plus">+ Add pin</string>
     <string name="new_checkpoint">New Checkpoint</string>
-    <string name="checkpoint_name">Checkpoint Name</string>
     <string name="unnamed">Unnamed</string>
     <!-- Errors -->
     <string name="checkpoint_name_too_long_error">Checkpoint name cannot exceed 20 characters</string>
