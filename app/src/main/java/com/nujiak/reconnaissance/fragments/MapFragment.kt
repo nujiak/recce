@@ -232,6 +232,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 setOnCameraMoveStartedListener { onCameraMoveStarted(it) }
                 setOnPolylineClickListener { onPolylineClick(it) }
                 setOnPolygonClickListener { onPolygonClick(it) }
+                isIndoorEnabled = false
             }
             val uiSetting = map.uiSettings
             uiSetting.isZoomControlsEnabled = true
