@@ -313,6 +313,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     fillColor(withAlpha(color, 50))
                     strokeJointType(JointType.ROUND)
                     clickable(true)
+                    geodesic(true)
                 }
                 val polygon = map.addPolygon(polygonOptions)
                 polygonsMap[polygon] = chain
@@ -325,6 +326,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     startCap = ButtCap()
                     endCap = startCap
                     isClickable = true
+                    isGeodesic = true
                 }
                 polyline.points = points
                 polylinesMap[polyline] = chain
@@ -1074,6 +1076,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 color = ContextCompat.getColor(requireContext(), R.color.colorPrimaryLight)
                 jointType = JointType.ROUND
                 endCap = ButtCap()
+                isGeodesic = true
             }
         } else {
             currentPolyline?.points = viewModel.currentPolylinePoints
