@@ -30,6 +30,9 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
     lateinit var sharedPreference: SharedPreferences
     var screenRotation = 0
 
+    /* Shared preference trackers for showing guides */
+    var chainsGuideShown = false // Used in MapFragment
+
     val allPins = database.getAllPins()
     val allChains = database.getAllChains()
     val lastPin = Transformations.map(allPins) { it.firstOrNull() }

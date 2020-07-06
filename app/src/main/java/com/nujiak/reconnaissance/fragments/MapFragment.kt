@@ -74,8 +74,13 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private lateinit var numberFormat: NumberFormat
 
-    private val MAP_TYPE_KEY = "map_type"
     private var currentMapType = GoogleMap.MAP_TYPE_HYBRID
+
+    companion object {
+
+        const val MAP_TYPE_KEY = "map_type"
+        const val CHAINS_GUIDE_SHOWN_KEY = "chains_guide_shown"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -129,16 +134,22 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
         binding.mapPolylineAdd.apply {
             setOnClickListener {
+                onAddPolylinePoint()
                 if (!viewModel.isInPolylineMode.value!!) {
                     viewModel.enterPolylineMode()
+                    if (!viewModel.chainsGuideShown) {
+                        showChainsGuide()
+                    }
                 }
-                onAddPolylinePoint()
             }
             setOnLongClickListener {
+                onAddPolylineNamedPoint()
                 if (!viewModel.isInPolylineMode.value!!) {
                     viewModel.enterPolylineMode()
+                    if (!viewModel.chainsGuideShown) {
+                        showChainsGuide()
+                    }
                 }
-                onAddPolylineNamedPoint()
                 true
             }
         }
@@ -167,6 +178,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         })
 
         binding.mapPolylineSave.setOnClickListener { onSavePolyline() }
+
+        // Show chains guide if device was rotated mid-guide
+        if (viewModel.isInPolylineMode.value!! && !viewModel.chainsGuideShown) {
+            showChainsGuide()
+        }
 
         // Set up Coordinate System
         viewModel.coordinateSystem.observe(viewLifecycleOwner, Observer {
@@ -197,6 +213,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
         // Set up Map rotation reset
         binding.mapCompass.setOnClickListener { onResetMapRotation() }
+
+        viewModel.chainsGuideShown =
+            viewModel.sharedPreference.getBoolean(CHAINS_GUIDE_SHOWN_KEY, false)
 
         return binding.root
     }
@@ -1124,6 +1143,24 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private fun onSavePolyline() {
         viewModel.openChainCreator(Chain("", viewModel.currentPolylinePoints.toChainDataString()))
+    }
+
+    private fun showChainsGuide() {
+        val builder = AlertDialog.Builder(requireActivity())
+        builder.apply {
+            setView(R.layout.guide_chains)
+            setCancelable(false)
+        }
+        val alertDialog = builder.create()
+        alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        alertDialog.show()
+
+        val doneBtn = alertDialog.findViewById<Button>(R.id.guide_chain_done)
+        doneBtn.setOnClickListener {
+            alertDialog.dismiss()
+            viewModel.chainsGuideShown = true
+            viewModel.sharedPreference.edit().putBoolean(CHAINS_GUIDE_SHOWN_KEY, true).apply()
+        }
     }
 
     /**
