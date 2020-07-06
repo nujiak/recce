@@ -17,6 +17,7 @@
     <string name="kertau" translatable="false">Kertau (RSO)</string>
     <string name="mgrs" translatable="false">MGRS</string>
     <string name="name">Name</string>
+    <string name="done">Done</string>
 
     <!-- Pin Selector -->
     <string name="pins">Pins</string>
@@ -99,4 +100,22 @@
     <string name="tip">Tip:</string>
     <string name="ruler_empty">Ruler is empty</string>
     <string name="ruler_hint">Tap and hold items in\nthe Pins tab to select them</string>
+
+    <!--
+      Guides
+      -->
+
+    <string name="guide_show_only_once">This guide will appear only once</string>
+    <string name="reset_all_guides">Reset All Guides</string>
+
+    <!-- Chains Guide -->
+    <string name="guide_chains">Chains Guide</string>
+    <string name="guide_chain_overview">You have entered the Chain creation mode by pressing the + Add button.
+        \n\nIn this mode, you can plot a Route or demarcate an Area by sliding the map around and placing checkpoints. This mode involves the following 3 buttons:</string>
+    <string name="guide_chains_undo">Click to undo the last node or exit chain-editing mode.
+        \nClick and hold to discard all nodes and exit chain-editing mode.</string>
+    <string name="guide_chains_add">Click to add a node to the line.
+        \nClick and hold to add a named checkpoint.</string>
+    <string name="guide_chains_save">Click to save the plotted line as a Route or an Area.</string>
+
 </resources>

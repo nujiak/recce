@@ -12,6 +12,7 @@ import com.nujiak.reconnaissance.MainViewModelFactory
 import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.SheetSettingsBinding
+import com.nujiak.reconnaissance.fragments.MapFragment
 
 class SettingsSheet : BottomSheetDialogFragment() {
 
@@ -63,6 +64,13 @@ class SettingsSheet : BottomSheetDialogFragment() {
             viewModel.sharedPreference.edit().putInt(COORD_SYS_KEY, position).apply()
         }
 
+        // Set up reset guides
+        binding.settingsResetGuides.setOnClickListener {
+            viewModel.sharedPreference.edit().apply {
+                putBoolean(MapFragment.CHAINS_GUIDE_SHOWN_KEY, false)
+            }.apply()
+            viewModel.chainsGuideShown = false
+        }
 
         setUpPreferences()
 

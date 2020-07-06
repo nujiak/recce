@@ -53,4 +53,11 @@
         android:layout_height="1dp"
         android:background="@color/dividerGrey" />
 
+    <Button
+        android:id="@+id/settings_reset_guides"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/reset_all_guides"
+        android:layout_margin="@dimen/large_padding"/>
+
 </LinearLayout>
