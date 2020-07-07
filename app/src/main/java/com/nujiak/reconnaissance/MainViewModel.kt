@@ -153,19 +153,18 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
     val pinInFocus: LiveData<Pin>
         get() = _pinInFocus
 
-    private val _checkpointInFocus = MutableLiveData<ChainNode>()
-    val checkpointInFocus: LiveData<ChainNode>
-        get() = _checkpointInFocus
+    private val _chainInFocus = MutableLiveData<Chain>()
+    val chainInFocus: LiveData<Chain>
+        get() = _chainInFocus
 
     fun showPinOnMap(pin: Pin) {
         _pinInFocus.value = pin
     }
-    fun showCheckpointOnMap(checkpoint: ChainNode) {
-        _checkpointInFocus.value = checkpoint
+    fun showChainOnMap(chain: Chain) {
+        _chainInFocus.value = chain
     }
 
     fun putPinInFocus(pin: Pin) = showPinOnMap(pin)
-    fun putCheckPointInFocus(checkpoint: ChainNode) = showCheckpointOnMap(checkpoint)
 
     private val _toAddPinFromMap = MutableLiveData(false)
     val toAddPinFromMap: LiveData<Boolean>
