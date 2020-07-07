@@ -43,12 +43,10 @@ class GpsFragment : Fragment(), SensorEventListener {
     private val textViewUpdateInterval = 1000 / 10
     private var lastLocationData: FusedLocationLiveData.LocationData? = null
 
-    private var currentCompassAngleDeg = 0f
     private var coordSysId = 0
 
     private var screenRotation: Int = 0
     private lateinit var display: Display
-    private var sensorAccuracy: Int = 1
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -89,12 +87,7 @@ class GpsFragment : Fragment(), SensorEventListener {
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        sensorAccuracy = accuracy
-        if (accuracy <= SENSOR_STATUS_ACCURACY_MEDIUM) {
-            binding.gpsAccuracyWarning.visibility = View.VISIBLE
-        } else {
-            binding.gpsAccuracyWarning.visibility = View.INVISIBLE
-        }
+        // Do nothing
     }
 
     override fun onSensorChanged(event: SensorEvent) {
@@ -105,9 +98,7 @@ class GpsFragment : Fragment(), SensorEventListener {
         }
 
         val currentTime = System.currentTimeMillis()
-        if ((currentTime - lastCompassUpdateMillis) > textViewUpdateInterval
-            && sensorAccuracy >= SENSOR_STATUS_ACCURACY_LOW
-        ) {
+        if ((currentTime - lastCompassUpdateMillis) > textViewUpdateInterval) {
             updateOrientationAngles(updateTexts = true)
             lastCompassUpdateMillis = currentTime
         } else {
@@ -196,12 +187,14 @@ class GpsFragment : Fragment(), SensorEventListener {
         binding.gpsCompassArrow.imageMatrix = matrix
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateLocationUI(locationData: FusedLocationLiveData.LocationData? = lastLocationData) {
         if (locationData != null) {
-            val (latitude, longitude, altitude, _) = locationData
+            val (latitude, longitude, altitude, accuracy) = locationData
+            binding.gpsAccuracy.text = "±" + accuracy.formatAsDistanceString()
+            binding.gpsAltitude.text = altitude.formatAsDistanceString()
             binding.gpsLatLng.text =
-                getString(R.string.coordinates_format).format(latitude, longitude, altitude)
-
+                "%.6f, %.6f".format(latitude, longitude)
             binding.gpsGrids.text = getGridString(latitude, longitude, coordSysId, resources)
         }
 

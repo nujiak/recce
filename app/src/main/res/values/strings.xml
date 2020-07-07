@@ -86,8 +86,10 @@
     <string name="azimuth">Azimuth</string>
     <string name="pitch">Pitch</string>
     <string name="roll">Roll</string>
-    <string name="accuracy_warning">Your device\'s sensors are out of calibration\nand readings may be inaccurate</string>
-    <string name="coordinates_format">%.6f, %.6f, Altitude %.1f</string>
+    <string name="accuracy">Accuracy</string>
+    <string name="compass_calibration">Calibrate your device\'s geomagnetic sensors
+        \nby swinging your device in a figure 8 motion</string>
+    <string name="altitude">Altitude</string>
 
     <!-- Ruler -->
     <string name="ruler">Ruler</string>

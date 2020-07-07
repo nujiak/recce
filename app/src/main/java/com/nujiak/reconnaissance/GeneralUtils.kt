@@ -44,6 +44,10 @@ fun Double.formatAsDistanceString(): String {
     }
 }
 
+fun Float.formatAsDistanceString(): String {
+    return this.toDouble().formatAsDistanceString()
+}
+
 fun Double.formatAsAreaString(): String {
     return if (this < 1000000) {
         numberFormat.format(this) + " m²"

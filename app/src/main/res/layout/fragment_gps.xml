@@ -43,7 +43,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/large_padding">
+                    android:padding="@dimen/large_padding"
+                    android:gravity="center">
 
                     <TextView
                         style="@style/TextAppearance.MaterialComponents.Headline5"
@@ -51,6 +52,65 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text="@string/location" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="@dimen/small_padding"
+                        android:layout_marginBottom="@dimen/small_padding"
+                        android:background="@color/dividerGrey" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                style="@style/TextAppearance.Reconnaissance.GpsHeader"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/accuracy" />
+
+                            <TextView
+                                android:id="@+id/gps_accuracy"
+                                style="@style/TextAppearance.Reconnaissance.GpsNumber"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/not_available"
+                                tools:text="±5.6 m" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                style="@style/TextAppearance.Reconnaissance.GpsHeader"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/altitude" />
+
+                            <TextView
+                                android:id="@+id/gps_altitude"
+                                style="@style/TextAppearance.Reconnaissance.GpsNumber"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/not_available"
+                                tools:text="46.5 m" />
+                        </LinearLayout>
+                    </LinearLayout>
+
 
                     <View
                         android:layout_width="match_parent"
@@ -68,10 +128,10 @@
                     <TextView
                         android:id="@+id/gps_lat_lng"
                         style="@style/TextAppearance.Reconnaissance.GpsNumber"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/not_available"
-                        tools:text="1.23545, 103.124545, Altitude: 354.7" />
+                        tools:text="1.23545, 103.124545" />
 
                     <TextView
                         android:id="@+id/gps_grid_system"
@@ -84,10 +144,10 @@
                     <TextView
                         android:id="@+id/gps_grids"
                         style="@style/TextAppearance.Reconnaissance.GpsNumber"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/not_available"
-                        tools:text="1.23545, 103.124545, Altitude: 354.7" />
+                        tools:text="48N 291319 136628" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -224,6 +284,17 @@
 
                     </LinearLayout>
 
+                    <TextView
+                        android:id="@+id/gps_accuracy_warning"
+                        style="@style/TextAppearance.MaterialComponents.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="@dimen/large_padding"
+                        android:gravity="center_horizontal"
+                        android:text="@string/compass_calibration"
+                        android:textColor="@android:color/white" />
+
                     <FrameLayout
                         android:layout_width="240dp"
                         android:layout_height="240dp"
@@ -262,18 +333,6 @@
                             tools:ignore="ContentDescription" />
                     </FrameLayout>
 
-                    <TextView
-                        android:id="@+id/gps_accuracy_warning"
-                        style="@style/TextAppearance.MaterialComponents.Caption"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="@dimen/large_padding"
-                        android:gravity="center_horizontal"
-                        android:text="@string/accuracy_warning"
-                        android:textColor="@android:color/holo_red_dark"
-                        android:visibility="invisible"
-                        tools:visibility="visible" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
