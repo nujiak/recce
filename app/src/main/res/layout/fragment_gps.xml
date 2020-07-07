@@ -250,7 +250,6 @@
 
                     </LinearLayout>
                     <TextView
-                        android:id="@+id/gps_accuracy_warning"
                         style="@style/TextAppearance.MaterialComponents.Caption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -297,6 +296,15 @@
                             android:src="@drawable/compass_needle"
                             tools:ignore="ContentDescription" />
                     </FrameLayout>
+                    <TextView
+                        style="@style/TextAppearance.MaterialComponents.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="@dimen/large_padding"
+                        android:gravity="center_horizontal"
+                        android:text="@string/compass_note"
+                        android:textColor="@android:color/white" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
