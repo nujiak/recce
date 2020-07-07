@@ -113,7 +113,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
         // Set up show pin and checkpoint sequence
         viewModel.pinInFocus.observe(viewLifecycleOwner, Observer { pin -> moveMapTo(pin) })
-        viewModel.checkpointInFocus.observe(viewLifecycleOwner, Observer { node -> moveMapTo(node)})
+        viewModel.chainInFocus.observe(viewLifecycleOwner, Observer { node -> moveMapTo(node)})
 
         // Set up custom map controls
         binding.mapZoomInButton.setOnClickListener { onZoomIn() }
@@ -684,6 +684,24 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private fun moveMapTo(pin: Pin) {
         moveMapTo(pin.latitude, pin.longitude)
         showInCard(pin)
+    }
+
+    private fun moveMapTo(chain: Chain) {
+        val nodes = chain.getNodes()
+        if (chain.cyclical) {
+            // Area
+            val bounds = LatLngBounds.builder().apply {
+                for (node in nodes) {
+                    include(node.position)
+                }
+            }.build()
+            val padding = 64 * resources.displayMetrics.density
+            map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding.toInt()), 350, null)
+
+        } else {
+            // Route
+            moveMapTo(nodes[0])
+        }
     }
 
     private fun moveMapTo(node: ChainNode) {

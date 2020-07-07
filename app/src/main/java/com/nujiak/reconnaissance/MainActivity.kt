@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
 
         // Set up pin and checkpoint showing sequence
         viewModel.pinInFocus.observe(this, Observer { switchToMap() })
-        viewModel.checkpointInFocus.observe(this, Observer { switchToMap() })
+        viewModel.chainInFocus.observe(this, Observer { switchToMap() })
 
         // Set up ruler adding sequence
         viewModel.switchToRuler.observe(this, Observer { switchToRuler ->

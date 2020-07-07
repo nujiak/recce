@@ -15,7 +15,6 @@ import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.ReconDatabase
-import com.nujiak.reconnaissance.database.getNodes
 import com.nujiak.reconnaissance.databinding.FragmentPinSelectorBinding
 import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.ITEM_VIEW_TYPE_CHAIN
 import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.ITEM_VIEW_TYPE_HEADER
@@ -205,7 +204,7 @@ class PinSelectorFragment : Fragment() {
             viewModel.toggleChainSelection(chain.chainId)
             refreshList()
         } else {
-            viewModel.showCheckpointOnMap(chain.getNodes()[0])
+            viewModel.showChainOnMap(chain)
         }
     }
 
