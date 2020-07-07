@@ -124,7 +124,7 @@
             style="@style/TextAppearance.MaterialComponents.Caption"
             android:layout_width="64sp"
             android:layout_height="wrap_content"
-            android:gravity="start"
+            android:gravity="center"
             android:maxLines="1"
             android:textColor="@android:color/white"
             tools:text="0393.4 mils" />

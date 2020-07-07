@@ -9,6 +9,8 @@ import com.nujiak.reconnaissance.mapping.toSingleLine
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet
 import java.text.NumberFormat
 import java.util.*
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 fun getGridString(latDeg: Double, lngDeg: Double, coordSysId: Int, resources: Resources): String {
     return when (coordSysId) {
@@ -30,6 +32,26 @@ fun getGridString(latDeg: Double, lngDeg: Double, coordSysId: Int, resources: Re
         else -> throw IllegalArgumentException("Invalid coordinate system index: $coordSysId")
     } ?: resources.getString(R.string.not_available)
 }
+
+fun getAngleString(angleRad: Float, angleUnitId: Int, withSign: Boolean = true): String {
+    return when (angleUnitId) {
+        SettingsSheet.ANGLE_UNIT_ID_DEG -> {
+            "%.1f°".format(radToDeg(angleRad))
+        }
+        SettingsSheet.ANGLE_UNIT_ID_NATO_MILS -> {
+            if (withSign) {
+                "${if (angleRad > 0) '+' else '-'}${radToNatoMils(abs(angleRad)).roundToInt().toString()
+                    .padStart(4, '0')} mils"
+            } else {
+                "${radToNatoMils(abs(angleRad)).roundToInt().toString().padStart(4, '0')} mils"
+            }
+        }
+        else -> throw IllegalArgumentException("Invalid angle unit index: $angleUnitId")
+    }
+}
+
+fun getAngleString(angleRad: Double, angleUnitId: Int, withSign: Boolean = true) =
+    getAngleString(angleRad.toFloat(), angleUnitId, withSign)
 
 private val numberFormat = NumberFormat.getNumberInstance(Locale.US).apply {
     minimumFractionDigits = 1

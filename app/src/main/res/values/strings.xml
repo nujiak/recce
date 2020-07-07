@@ -13,9 +13,12 @@
     <string name="group">Group</string>
     <string name="settings">Settings</string>
     <string name="coordinate_system">Coordinate System</string>
+    <string name="angle_unit">Angle Unit</string>
     <string name="utm" translatable="false">UTM</string>
     <string name="kertau" translatable="false">Kertau (RSO)</string>
     <string name="mgrs" translatable="false">MGRS</string>
+    <string name="nato_mils" translatable="false">NATO mils</string>
+    <string name="degrees" translatable="false">Degrees</string>
     <string name="name">Name</string>
     <string name="done">Done</string>
 

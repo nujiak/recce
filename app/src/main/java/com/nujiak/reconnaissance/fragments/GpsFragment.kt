@@ -18,9 +18,7 @@ import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.FragmentGpsBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
 import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.cos
-import kotlin.math.roundToInt
 
 
 /**
@@ -44,6 +42,7 @@ class GpsFragment : Fragment(), SensorEventListener {
     private var lastLocationData: FusedLocationLiveData.LocationData? = null
 
     private var coordSysId = 0
+    private var angleUnitId = 0
 
     private var screenRotation: Int = 0
     private lateinit var display: Display
@@ -75,12 +74,16 @@ class GpsFragment : Fragment(), SensorEventListener {
         // Initialise sensor manager
         sensorManager = requireActivity().getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
-        // Observe for coordinate system preference change
+        // Observe for preferences changes
         viewModel.coordinateSystem.observe(viewLifecycleOwner, Observer {
             coordSysId = it
             binding.gpsGridSystem.text =
                 resources.getStringArray(R.array.coordinate_systems)[coordSysId]
             updateLocationUI()
+        })
+        viewModel.angleUnit.observe(viewLifecycleOwner, Observer {
+            angleUnitId = it
+            updateOrientationUI(true)
         })
 
         return binding.root
@@ -148,26 +151,11 @@ class GpsFragment : Fragment(), SensorEventListener {
             aziRad += 2 * PI.toFloat()
         }
         if (updateTexts) {
-            binding.gpsAzimuth.text = "%.2f°".format(radToDeg(aziRad))
-            val aziMilsStr =
-                "${radToNatoMils(aziRad).roundToInt().toString().padStart(4, '0')} mils"
-            binding.gpsAzimuthMils.text = aziMilsStr
-
-            pitRad = -pitRad
-            binding.gpsPitch.text = "%.2f°".format(radToDeg(pitRad))
-            val pitMilsStr =
-                "${if (pitRad > 0) '+' else '-'}${radToNatoMils(abs(pitRad)).roundToInt().toString()
-                    .padStart(4, '0')} mils"
-            binding.gpsPitchMils.text = pitMilsStr
-
-            binding.gpsRoll.text = "%.2f°".format(radToDeg(rolRad))
-            val rolMilsStr =
-                "${if (rolRad > 0) '+' else '-'}${radToNatoMils(abs(rolRad)).roundToInt().toString()
-                    .padStart(4, '0')} mils"
-            binding.gpsRollMils.text = rolMilsStr
+            binding.gpsAzimuth.text = getAngleString(aziRad, angleUnitId, false)
+            binding.gpsPitch.text = getAngleString(-pitRad, angleUnitId, true)
+            binding.gpsRoll.text = getAngleString(rolRad, angleUnitId, true)
         }
         updateCompass(aziRad, pitRad, rolRad)
-
     }
 
     private fun updateCompass(aziRad: Float, pitRad: Float, rolRad: Float) {
