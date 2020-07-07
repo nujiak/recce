@@ -164,8 +164,6 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
         _chainInFocus.value = chain
     }
 
-    fun putPinInFocus(pin: Pin) = showPinOnMap(pin)
-
     private val _toAddPinFromMap = MutableLiveData(false)
     val toAddPinFromMap: LiveData<Boolean>
         get() = _toAddPinFromMap

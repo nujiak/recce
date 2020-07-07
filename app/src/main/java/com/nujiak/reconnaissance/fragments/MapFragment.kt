@@ -663,7 +663,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
         // Marker represents a saved Pin
         markersMap[marker]?.let { pin ->
-            viewModel.putPinInFocus(pin)
+            viewModel.showPinOnMap(pin)
             toggleLiveMeasurement(true)
             return true
         }
