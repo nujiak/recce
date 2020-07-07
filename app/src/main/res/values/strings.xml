@@ -92,6 +92,7 @@
     <string name="accuracy">Accuracy</string>
     <string name="compass_calibration">Calibrate your device\'s geomagnetic sensors
         \nby swinging your device in a figure 8 motion</string>
+    <string name="compass_note">Note: The compass and azimuth reading is most accurate when the device is lying parallel to the ground with the screen facing up/down</string>
     <string name="altitude">Altitude</string>
 
     <!-- Ruler -->
