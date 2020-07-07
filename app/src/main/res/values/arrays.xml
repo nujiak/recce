@@ -5,4 +5,9 @@
         <item>@string/mgrs</item>
         <item>@string/kertau</item>
     </string-array>
+
+    <string-array name="angle_units">
+        <item>@string/degrees</item>
+        <item>@string/nato_mils</item>
+    </string-array>
 </resources>

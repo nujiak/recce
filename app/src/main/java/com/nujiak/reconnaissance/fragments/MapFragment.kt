@@ -40,7 +40,6 @@ import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.cos
 import kotlin.math.hypot
-import kotlin.math.roundToInt
 
 
 class MapFragment : Fragment(), OnMapReadyCallback,
@@ -50,6 +49,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     lateinit var viewModel: MainViewModel
     lateinit var map: GoogleMap
     private var coordSysId = 0
+    private var angleUnitId = 0
 
     private var currentPinColor = 0
     private var markersMap = HashMap<Marker, Pin>()
@@ -191,6 +191,13 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             if (this::map.isInitialized) {
                 // Force card update
                 updateLatLong()
+            }
+        })
+        viewModel.angleUnit.observe(viewLifecycleOwner, Observer {
+            angleUnitId = it
+            if (this::map.isInitialized) {
+                // Force Live Measurements update
+                updateLiveMeasurements()
             }
         })
 
@@ -533,11 +540,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         if (direction < 0) {
             direction += 360
         }
-        val directionMils = degToNatoMils(direction)
 
         binding.mapCurrentDistance.text = distance.formatAsDistanceString()
-        binding.mapCurrentDirection.text =
-            "${directionMils.roundToInt().toString().padStart(4, '0')} mils"
+        binding.mapCurrentDirection.text = getAngleString(degToRad(direction), angleUnitId, false)
     }
 
     private fun updateCardGridSystem(coordSysId: Int) {

@@ -19,12 +19,17 @@ class SettingsSheet : BottomSheetDialogFragment() {
     private lateinit var binding: SheetSettingsBinding
     private lateinit var viewModel: MainViewModel
     private lateinit var coordinateSystems: Array<String>
+    private lateinit var angleUnits: Array<String>
 
     companion object {
         const val COORD_SYS_KEY = "coordinate_system"
         const val COORD_SYS_ID_UTM = 0
         const val COORD_SYS_ID_MGRS = 1
         const val COORD_SYS_ID_KERTAU = 2
+
+        const val ANGLE_UNIT_KEY = "angle_unit"
+        const val ANGLE_UNIT_ID_DEG = 0
+        const val ANGLE_UNIT_ID_NATO_MILS = 1
     }
 
     override fun onCreateView(
@@ -47,21 +52,31 @@ class SettingsSheet : BottomSheetDialogFragment() {
             ).get(MainViewModel::class.java)
         }!!
 
-        // Set up exposed dropdown menu
+        // Set up exposed dropdown menus
         coordinateSystems = resources.getStringArray(R.array.coordinate_systems)
-        context?.let {
-            binding.settingsCoordsysDropdown.setAdapter(
-                ArrayAdapter(
-                    it,
-                    R.layout.dropdown_menu_popup_item,
-                    coordinateSystems
-                )
+        binding.settingsCoordsysDropdown.setAdapter(
+            ArrayAdapter(
+                requireContext(),
+                R.layout.dropdown_menu_popup_item,
+                coordinateSystems
             )
-        }
+        )
+        angleUnits = resources.getStringArray(R.array.angle_units)
+        binding.settingsAngleDropdown.setAdapter(
+            ArrayAdapter(
+                requireContext(),
+                R.layout.dropdown_menu_popup_item,
+                angleUnits
+            )
+        )
 
         binding.settingsCoordsysDropdown.setOnItemClickListener { _, _, position, _ ->
             viewModel.updateCoordinateSystem(position)
             viewModel.sharedPreference.edit().putInt(COORD_SYS_KEY, position).apply()
+        }
+        binding.settingsAngleDropdown.setOnItemClickListener { _, _, position, _ ->
+            viewModel.updateAngleUnit(position)
+            viewModel.sharedPreference.edit().putInt(ANGLE_UNIT_KEY, position).apply()
         }
 
         // Set up reset guides
@@ -81,5 +96,7 @@ class SettingsSheet : BottomSheetDialogFragment() {
         val sharedPreferences = viewModel.sharedPreference
         val coordSysId = sharedPreferences.getInt(COORD_SYS_KEY, 0)
         binding.settingsCoordsysDropdown.setText(coordinateSystems[coordSysId], false)
+        val angleUnitId = sharedPreferences.getInt(ANGLE_UNIT_KEY, 0)
+        binding.settingsAngleDropdown.setText(angleUnits[angleUnitId], false)
     }
 }

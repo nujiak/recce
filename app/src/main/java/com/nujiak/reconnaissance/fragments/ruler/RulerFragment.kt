@@ -42,7 +42,8 @@ class RulerFragment : Fragment() {
         }!!
 
         // Set up RecyclerView
-        val rulerAdapter = RulerAdapter(viewModel.coordinateSystem.value ?: 0)
+        val rulerAdapter = RulerAdapter(viewModel.coordinateSystem.value ?: 0,
+            viewModel.angleUnit.value ?: 0)
         binding.rulerList.adapter = rulerAdapter
         viewModel.rulerList.observe(viewLifecycleOwner, Observer {
             rulerAdapter.submitList(it)
@@ -51,10 +52,12 @@ class RulerFragment : Fragment() {
             binding.rulerList.smoothScrollToPosition(it.size)
         })
 
-        // Observe for changes to preferred GCS
+        // Observe for changes to preferences
         viewModel.coordinateSystem.observe(viewLifecycleOwner, Observer {
             rulerAdapter.updateCoordSys(it)
-            rulerAdapter.notifyDataSetChanged()
+        })
+        viewModel.angleUnit.observe(viewLifecycleOwner, Observer {
+            rulerAdapter.updateAngleUnit(it)
         })
 
         binding.rulerTopAppBar.setOnMenuItemClickListener {

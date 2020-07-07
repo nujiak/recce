@@ -7,12 +7,10 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.SphericalUtil
-import com.nujiak.reconnaissance.PIN_CARD_BACKGROUNDS
-import com.nujiak.reconnaissance.R
+import com.nujiak.reconnaissance.*
 import com.nujiak.reconnaissance.databinding.RulerEmptyItemBinding
 import com.nujiak.reconnaissance.databinding.RulerMeasurementItemBinding
 import com.nujiak.reconnaissance.databinding.RulerPinItemBinding
-import com.nujiak.reconnaissance.getGridString
 
 /**
  * ViewHolder for Pins in the Ruler fragment
@@ -62,7 +60,7 @@ class RulerMeasurementViewHolder private constructor(private val binding: RulerM
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(fromItem: RulerItem.RulerPinItem, toItem: RulerItem.RulerPinItem) {
+    fun bind(fromItem: RulerItem.RulerPinItem, toItem: RulerItem.RulerPinItem, angleUnitId: Int) {
         val fromPin = fromItem.pin
         val toPin = toItem.pin
         binding.rulerFrom.text = fromPin.name
@@ -72,10 +70,13 @@ class RulerMeasurementViewHolder private constructor(private val binding: RulerM
         val toLatLng = LatLng(toPin.latitude, toPin.longitude)
 
         val distance = SphericalUtil.computeDistanceBetween(fromLatLng, toLatLng)
-        val heading = SphericalUtil.computeHeading(fromLatLng, toLatLng)
+        var heading = SphericalUtil.computeHeading(fromLatLng, toLatLng)
+        if (heading < 0) {
+            heading += 360
+        }
 
         binding.rulerDist.text = "%.2fm".format(distance)
-        binding.rulerDir.text = "%.2f deg".format(heading)
+        binding.rulerDir.text = getAngleString(degToRad(heading), angleUnitId, false)
     }
 }
 

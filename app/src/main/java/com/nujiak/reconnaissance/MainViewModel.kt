@@ -16,6 +16,7 @@ import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.ReconDatabaseDao
 import com.nujiak.reconnaissance.fragments.ruler.RulerItem
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
+import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.ANGLE_UNIT_KEY
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_KEY
 import kotlinx.coroutines.*
 
@@ -141,8 +142,19 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
         }
     }
 
+    private val _angleUnit = MutableLiveData(0)
+    val angleUnit: LiveData<Int>
+        get() = _angleUnit
+
+    fun updateAngleUnit(angleUnitId: Int) {
+        if (angleUnitId != _angleUnit.value) {
+            _angleUnit.value = angleUnitId
+        }
+    }
+
     fun initializePrefs() {
         updateCoordinateSystem(sharedPreference.getInt(COORD_SYS_KEY, 0))
+        updateAngleUnit(sharedPreference.getInt(ANGLE_UNIT_KEY, 0))
     }
 
     /**
