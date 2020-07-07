@@ -85,6 +85,7 @@ class SettingsSheet : BottomSheetDialogFragment() {
                 putBoolean(MapFragment.CHAINS_GUIDE_SHOWN_KEY, false)
             }.apply()
             viewModel.chainsGuideShown = false
+            binding.settingsResetGuides.isEnabled = false
         }
 
         setUpPreferences()
