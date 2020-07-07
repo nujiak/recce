@@ -157,11 +157,11 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             when (isUpdate) {
                 true -> {
                     viewModel.updatePin(newPin)
-                    viewModel.putPinInFocus(newPin)
+                    viewModel.showPinOnMap(newPin)
                 }
                 false -> {
                     viewModel.addPin(newPin)
-                    viewModel.putPinInFocus(newPin.copy(pinId = viewModel.lastAddedId))
+                    viewModel.showPinOnMap(newPin.copy(pinId = viewModel.lastAddedId))
                 }
             }
             dismiss()
