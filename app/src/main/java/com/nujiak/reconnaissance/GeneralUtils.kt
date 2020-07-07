@@ -44,6 +44,14 @@ fun Double.formatAsDistanceString(): String {
     }
 }
 
+fun Double.formatAsAreaString(): String {
+    return if (this < 1000000) {
+        numberFormat.format(this) + " m²"
+    } else {
+        numberFormat.format(this / 1000000) + " km²"
+    }
+}
+
 fun withAlpha(color: Int, alpha: Int): Int {
     val r = Color.red(color)
     val g = Color.green(color)

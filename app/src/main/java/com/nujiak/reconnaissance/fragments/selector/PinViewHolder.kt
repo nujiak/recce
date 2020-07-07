@@ -7,16 +7,13 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.maps.android.SphericalUtil
-import com.nujiak.reconnaissance.PIN_CARD_BACKGROUNDS
-import com.nujiak.reconnaissance.R
+import com.nujiak.reconnaissance.*
 import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.getNodes
 import com.nujiak.reconnaissance.databinding.PinListChainItemBinding
 import com.nujiak.reconnaissance.databinding.PinListHeaderItemBinding
 import com.nujiak.reconnaissance.databinding.PinListItemBinding
-import com.nujiak.reconnaissance.formatAsDistanceString
-import com.nujiak.reconnaissance.getGridString
 
 class PinViewHolder private constructor(private val binding: PinListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
@@ -121,7 +118,15 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
             false -> checkpoints.joinToString()
         }
 
-        binding.chainDistance.text = distance.formatAsDistanceString()
+        if (chain.cyclical) {
+            // Area
+            binding.chainDistance.text = SphericalUtil.computeArea(chainNodes.map { it.position }).formatAsAreaString()
+            binding.chainDistanceDesc.text = binding.root.resources.getString(R.string.area)
+        } else {
+            // Route
+            binding.chainDistance.text = distance.formatAsDistanceString()
+            binding.chainDistanceDesc.text = binding.root.resources.getString(R.string.distance)
+        }
 
         if (item.isSelected) {
             binding.chainSelected.visibility = View.VISIBLE
