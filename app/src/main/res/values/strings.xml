@@ -38,6 +38,8 @@
     </plurals>
     <string name="undo">Undo</string>
     <string name="checkpoints">Checkpoints</string>
+    <string name="no_pins">Add a Pin from the map or
+        \nby clicking the button below.</string>
     <!-- Sorting -->
     <string name="sort">Sort</string>
     <string name="time_added">Time added</string>
