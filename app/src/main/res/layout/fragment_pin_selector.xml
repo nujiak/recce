@@ -31,7 +31,33 @@
         android:padding="@dimen/small_padding"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:listitem="@layout/pin_list_item" />
+        tools:listitem="@layout/pin_list_item"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:id="@+id/pin_empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/pin_empty_view_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="center"
+            android:src="@drawable/ic_no_pins"
+            android:visibility="visible" />
+
+        <TextView
+            style="@style/TextAppearance.MaterialComponents.Subtitle2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/large_padding"
+            android:gravity="center"
+            android:labelFor="@id/pin_empty_view_img"
+            android:text="@string/no_pins" />
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/pin_fab"

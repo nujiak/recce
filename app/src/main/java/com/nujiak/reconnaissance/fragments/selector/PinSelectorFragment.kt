@@ -87,11 +87,29 @@ class PinSelectorFragment : Fragment() {
 
 
         // Observe for changes to pins and chains
-        viewModel.allPins.observe(viewLifecycleOwner, Observer {
-            refreshList(newPins = it)
+        viewModel.allPins.observe(viewLifecycleOwner, Observer {allPins ->
+            refreshList(newPins = allPins)
+            viewModel.allChains.value?.let {allChains->
+                if (allChains.isEmpty() && allPins.isEmpty()) {
+                    binding.pinRecyclerview.visibility = View.GONE
+                    binding.pinEmptyView.visibility = View.VISIBLE
+                } else {
+                    binding.pinRecyclerview.visibility = View.VISIBLE
+                    binding.pinEmptyView.visibility = View.GONE
+                }
+            }
         })
         viewModel.allChains.observe(viewLifecycleOwner, Observer {
             refreshList(newChains = it)
+            viewModel.allChains.value?.let {allPins->
+                if (allPins.isEmpty() && allPins.isEmpty())  {
+                    binding.pinRecyclerview.visibility = View.GONE
+                    binding.pinEmptyView.visibility = View.VISIBLE
+                } else {
+                    binding.pinRecyclerview.visibility = View.VISIBLE
+                    binding.pinEmptyView.visibility = View.GONE
+                }
+            }
         })
 
         // Observe for changes to preferred GCS
