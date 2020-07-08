@@ -103,11 +103,16 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
         _pinToAdd.value = null
     }
 
-    fun getPinGroups(): MutableList<String> {
+    fun getGroupNames(): MutableList<String> {
         val groups = mutableListOf<String>()
         allPins.value?.let {
             for (pin in it) {
                 if (pin.group !in groups) { groups.add(pin.group) }
+            }
+        }
+        allChains.value?.let {
+            for (chain in it) {
+                if (chain.group !in groups) { groups.add(chain.group) }
             }
         }
         groups.apply {

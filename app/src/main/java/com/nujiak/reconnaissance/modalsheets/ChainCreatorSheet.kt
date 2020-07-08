@@ -73,7 +73,7 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
             groupArrayAdapter = NoFilterArrayAdapter(
                 it,
                 R.layout.dropdown_menu_popup_item,
-                viewModel.getPinGroups().apply {
+                viewModel.getGroupNames().apply {
                     add(0, getString(R.string.new_group_plus))
                     add(1, getString(R.string.none))
                 }
