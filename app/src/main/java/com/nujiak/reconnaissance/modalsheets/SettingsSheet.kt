@@ -13,6 +13,7 @@ import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.SheetSettingsBinding
 import com.nujiak.reconnaissance.fragments.MapFragment
+import com.nujiak.reconnaissance.onboarding.OnboardingActivity
 
 class SettingsSheet : BottomSheetDialogFragment() {
 
@@ -83,6 +84,7 @@ class SettingsSheet : BottomSheetDialogFragment() {
         binding.settingsResetGuides.setOnClickListener {
             viewModel.sharedPreference.edit().apply {
                 putBoolean(MapFragment.CHAINS_GUIDE_SHOWN_KEY, false)
+                putBoolean(OnboardingActivity.ONBOARDING_COMPLETED_KEY, false)
             }.apply()
             viewModel.chainsGuideShown = false
             binding.settingsResetGuides.isEnabled = false

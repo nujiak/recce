@@ -16,6 +16,7 @@
     <string name="angle_unit">Angle Unit</string>
     <string name="utm" translatable="false">UTM</string>
     <string name="kertau" translatable="false">Kertau (RSO)</string>
+    <string name="kertau_full" translatable="false">Kertau (RSO) / RSO Malaya (m)</string>
     <string name="mgrs" translatable="false">MGRS</string>
     <string name="nato_mils" translatable="false">NATO mils</string>
     <string name="degrees" translatable="false">Degrees</string>
@@ -47,7 +48,7 @@
     <string name="z_to_a">Z-A</string>
     <string name="newest_first">Newest First</string>
     <string name="oldest_first">Oldest First</string>
-    
+
     <!-- Pin Creator -->
     <string name="delete">Delete</string>
     <string name="save">Save</string>
@@ -108,6 +109,26 @@
     <string name="tip">Tip:</string>
     <string name="ruler_empty">Ruler is empty</string>
     <string name="ruler_hint">Tap and hold items in\nthe Pins tab to select them</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome">Welcome to Recce!</string>
+    <string name="onboarding_title">You will now go through a set-up guide to choose your preferences.</string>
+    <string name="coord_sys_description">Choose a preferred coordinate system for projected grids. These grids will be displayed alongside Latitude &amp; Longitude throughout the app.</string>
+    <string name="angle_unit_description">Choose a preferred unit for displaying angles. This will be used throughout the app.</string>
+    <string name="next">Next</string>
+    <string name="get_started">Get Started</string>
+    <string name="next_angle_unit">Next: Angle Unit</string>
+    <string name="next_all_set">Next: All Set</string>
+    <string name="previous">Previous</string>
+    <string name="back">Back</string>
+    <string name="all_set">All Set!</string>
+    <string name="onboarding_ready">You are now ready to start using Recce.
+        \nYou can change your preferences at any time by opening Settings in the Pins tab.</string>
+    <string name="start">Start</string>
+    <string name="nsf_nsmen">NSF / NSmen</string>
+    <string name="all_set_for_ns">All Set For NS!</string>
+    <string name="onboarding_ns"> Your preferences have been automatically set (Kertau RSO, NATO mils). Thank you for the support!
+        \n\nRemember: Do NOT input any sensitive/restricted information into the app.</string>
 
     <!--
       Guides
