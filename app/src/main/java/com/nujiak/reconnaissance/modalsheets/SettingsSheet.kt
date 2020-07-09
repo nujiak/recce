@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.nujiak.reconnaissance.MainViewModel
@@ -88,6 +89,7 @@ class SettingsSheet : BottomSheetDialogFragment() {
             }.apply()
             viewModel.chainsGuideShown = false
             binding.settingsResetGuides.isEnabled = false
+            binding.settingsResetGuides.backgroundTintList = ContextCompat.getColorStateList(requireContext(), android.R.color.holo_red_dark)
         }
 
         setUpPreferences()
