@@ -2,6 +2,7 @@ package com.nujiak.reconnaissance
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
@@ -18,6 +19,8 @@ import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.modalsheets.ChainCreatorSheet
 import com.nujiak.reconnaissance.modalsheets.PinCreatorSheet
+import com.nujiak.reconnaissance.onboarding.OnboardingActivity
+import com.nujiak.reconnaissance.onboarding.OnboardingActivity.Companion.ONBOARDING_COMPLETED_KEY
 
 
 class MainActivity : AppCompatActivity() {
@@ -43,6 +46,22 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Set up ViewModel
+        val application = requireNotNull(this).application
+        val dataSource = ReconDatabase.getInstance(application).pinDatabaseDao
+        val viewModelFactory = MainViewModelFactory(dataSource, application)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+
+        // Set up Shared Preference
+        viewModel.sharedPreference =
+            getSharedPreferences("com.nujiak.reconnaissance", Context.MODE_PRIVATE)
+        viewModel.initializePrefs()
+
+        if (!viewModel.sharedPreference.getBoolean(ONBOARDING_COMPLETED_KEY, false)) {
+            startActivity(Intent(this, OnboardingActivity::class.java))
+            finish()
+        }
 
         // Set up ViewPager2
         viewPager = findViewById(R.id.view_pager)
@@ -98,17 +117,6 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-
-        // Set up ViewModel
-        val application = requireNotNull(this).application
-        val dataSource = ReconDatabase.getInstance(application).pinDatabaseDao
-        val viewModelFactory = MainViewModelFactory(dataSource, application)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
-
-        // Set up Shared Preference
-        viewModel.sharedPreference =
-            getSharedPreferences("com.nujiak.reconnaissance", Context.MODE_PRIVATE)
-        viewModel.initializePrefs()
 
         // Set up pin-adding sequence
         viewModel.pinToAdd.observe(this, Observer { pin ->
