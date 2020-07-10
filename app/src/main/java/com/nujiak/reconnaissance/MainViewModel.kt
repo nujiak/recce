@@ -10,11 +10,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.nujiak.reconnaissance.database.Chain
-import com.nujiak.reconnaissance.database.ChainNode
-import com.nujiak.reconnaissance.database.Pin
-import com.nujiak.reconnaissance.database.ReconDatabaseDao
+import com.nujiak.reconnaissance.database.*
 import com.nujiak.reconnaissance.fragments.ruler.RulerItem
+import com.nujiak.reconnaissance.fragments.ruler.generateRulerList
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.ANGLE_UNIT_KEY
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_KEY
@@ -218,29 +216,16 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
         get() = _rulerList
 
     fun onAddSelectionToRuler() {
-        val lastSelectedPinIds = selectedIds.filter { it > 0 }
-        exitSelectionMode()
-        allPins.value?.let { allPins ->
-            val pinList = allPins.filter {
-                lastSelectedPinIds.contains(it.pinId)
-            }.toMutableList()
-
-            pinList.sortBy {
-                lastSelectedPinIds.indexOf(it.pinId)
+        val newRulerList = mutableListOf<ReconData>()
+        for (id in selectedIds) {
+            if (id > 0) {
+                newRulerList.add(allPins.value!!.first { it.pinId == id})
+            } else {
+                newRulerList.add(allChains.value!!.first { it.chainId == -id })
             }
-            val newList = _rulerList.value?.toMutableList()
-            if (newList != null) {
-                for (pin in pinList) {
-                    if (newList.size == 1 && newList[0] is RulerItem.RulerEmptyItem) {
-                        newList[0] = RulerItem.RulerPinItem(pin)
-                    } else {
-                        newList.add(RulerItem.RulerMeasurementItem)
-                        newList.add(RulerItem.RulerPinItem(pin))
-                    }
-                }
-            }
-            _rulerList.value = newList
         }
+        exitSelectionMode()
+        _rulerList.value = generateRulerList(_rulerList.value, newRulerList, getApplication<Application>().resources)
         // Prompt MainActivity to switch ViewPager to Ruler
         switchToRuler()
     }

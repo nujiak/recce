@@ -13,7 +13,7 @@ class RulerAdapter(private var coordSysId: Int, private var angleUnitId: Int) :
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
-            is RulerItem.RulerPinItem -> ITEM_VIEW_TYPE_PIN
+            is RulerItem.RulerPointItem -> ITEM_VIEW_TYPE_PIN
             is RulerItem.RulerMeasurementItem -> ITEM_VIEW_TYPE_MEASUREMENT
             is RulerItem.RulerEmptyItem -> ITEM_VIEW_TYPE_EMPTY
         }
@@ -31,11 +31,10 @@ class RulerAdapter(private var coordSysId: Int, private var angleUnitId: Int) :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is RulerPinViewHolder -> {
-                holder.bind(getItem(position) as RulerItem.RulerPinItem, coordSysId)
+                holder.bind(getItem(position) as RulerItem.RulerPointItem, coordSysId)
             }
             is RulerMeasurementViewHolder -> holder.bind(
-                getItem(position - 1) as RulerItem.RulerPinItem,
-                getItem(position + 1) as RulerItem.RulerPinItem,
+                getItem(position) as RulerItem.RulerMeasurementItem,
                 angleUnitId
             )
             is RulerEmptyViewHolder -> holder.bind()

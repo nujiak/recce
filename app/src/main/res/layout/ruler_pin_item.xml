@@ -32,7 +32,6 @@
             android:paddingTop="@dimen/small_padding"
             android:paddingEnd="@dimen/large_padding"
             android:paddingBottom="@dimen/small_padding"
-            android:singleLine="true"
             tools:text="Name" />
 
         <LinearLayout

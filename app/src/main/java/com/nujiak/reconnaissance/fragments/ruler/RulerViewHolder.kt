@@ -2,10 +2,10 @@ package com.nujiak.reconnaissance.fragments.ruler
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.SphericalUtil
 import com.nujiak.reconnaissance.*
 import com.nujiak.reconnaissance.databinding.RulerEmptyItemBinding
@@ -26,22 +26,22 @@ class RulerPinViewHolder private constructor(private val binding: RulerPinItemBi
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(rulerPinItem: RulerItem.RulerPinItem, coordSysId: Int) {
-        val pin = rulerPinItem.pin
+    fun bind(rulerPointItem: RulerItem.RulerPointItem, coordSysId: Int) {
+        val location = rulerPointItem.position
 
         // Pin name
-        binding.rulerPinName.text = pin.name
-        binding.rulerPinLatLng.text = "%.6f, %.6f".format(pin.latitude, pin.longitude)
+        binding.rulerPinName.text = rulerPointItem.name
+        binding.rulerPinLatLng.text = "%.6f, %.6f".format(location.latitude, location.longitude)
         binding.rulerPinName.isSelected = true
 
         // Grid System
         binding.rulerPinGridSystem.text =
             binding.root.resources.getStringArray(R.array.coordinate_systems)[coordSysId]
         binding.rulerPinGrid.text =
-            getGridString(pin.latitude, pin.longitude, coordSysId, binding.root.resources)
+            getGridString(location.latitude, location.longitude, coordSysId, binding.root.resources)
 
         val context = binding.root.context
-        val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[pin.color])
+        val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[rulerPointItem.colorId])
         binding.rulerPinItemCardView.setCardBackgroundColor(color)
     }
 }
@@ -60,23 +60,33 @@ class RulerMeasurementViewHolder private constructor(private val binding: RulerM
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(fromItem: RulerItem.RulerPinItem, toItem: RulerItem.RulerPinItem, angleUnitId: Int) {
-        val fromPin = fromItem.pin
-        val toPin = toItem.pin
-        binding.rulerFrom.text = fromPin.name
-        binding.rulerTo.text = toPin.name
+    fun bind(rulerMeasurementItem: RulerItem.RulerMeasurementItem, angleUnitId: Int) {
+        val points = rulerMeasurementItem.points
+        binding.rulerFrom.text = rulerMeasurementItem.startName
+        binding.rulerTo.text = rulerMeasurementItem.endName
 
-        val fromLatLng = LatLng(fromPin.latitude, fromPin.longitude)
-        val toLatLng = LatLng(toPin.latitude, toPin.longitude)
+        var distance = 0.0
+        for (index in 0 until (points.size - 1)) {
+            distance += SphericalUtil.computeDistanceBetween(points[index], points[index + 1])
+        }
 
-        val distance = SphericalUtil.computeDistanceBetween(fromLatLng, toLatLng)
-        var heading = SphericalUtil.computeHeading(fromLatLng, toLatLng)
+        var heading = SphericalUtil.computeHeading(points.first(), points.last())
         if (heading < 0) {
             heading += 360
         }
 
         binding.rulerDist.text = "%.2fm".format(distance)
         binding.rulerDir.text = getAngleString(degToRad(heading), angleUnitId, false)
+        if (points.size > 2) {
+            binding.rulerIntermediate.text = binding.root.resources.getQuantityString(
+                R.plurals.intermediate_nodes,
+                points.size - 2,
+                points.size - 2
+            )
+            binding.rulerIntermediate.visibility = View.VISIBLE
+        } else {
+            binding.rulerIntermediate.visibility = View.GONE
+        }
     }
 }
 
