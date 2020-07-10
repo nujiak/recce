@@ -10,7 +10,7 @@
             <item
                 android:id="@+id/sort_by_group"
                 android:title="@string/group" />
-            <item android:title="@string/pin_name">
+            <item android:title="@string/name">
                 <menu>
                     <item
                         android:id="@+id/sort_by_alphabetical_asc"
