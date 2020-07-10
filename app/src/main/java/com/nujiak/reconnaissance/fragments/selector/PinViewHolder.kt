@@ -132,12 +132,13 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
             binding.routeIcon.visibility = View.VISIBLE
         }
 
-        if (item.isSelected) {
-            binding.chainSelected.visibility = View.VISIBLE
-            binding.chainSelected.setTextColor(color)
+        if (item.selectionIndex >= 0) {
+            binding.chainSelectedIndex.visibility = View.VISIBLE
+            binding.chainSelectedIndex.setTextColor(color)
+            binding.chainSelectedIndex.text = (item.selectionIndex + 1).toString()
             binding.selectionShade.visibility = View.VISIBLE
         } else {
-            binding.chainSelected.visibility = View.INVISIBLE
+            binding.chainSelectedIndex.visibility = View.INVISIBLE
             binding.selectionShade.visibility = View.GONE
         }
     }

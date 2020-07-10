@@ -117,7 +117,7 @@
         android:visibility="gone" />
 
     <TextView
-        android:id="@+id/chain_selected"
+        android:id="@+id/chain_selected_index"
         style="@style/Theme.Reconnaissance.Badges"
         android:layout_width="24dp"
         android:layout_height="24dp"
@@ -127,8 +127,7 @@
         android:elevation="4dp"
         android:fontFamily="@font/roboto_black"
         android:gravity="center"
-        android:text="!"
         android:textColor="@android:color/black"
         android:textStyle="bold"
-        tools:ignore="HardcodedText" />
+        tools:text="11"/>
 </com.google.android.material.card.MaterialCardView>

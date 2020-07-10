@@ -12,8 +12,8 @@ data class PinWrapper(
 
 data class ChainWrapper(
     val chain: Chain,
-    val isSelected: Boolean = false
-): SelectorItem(-chain.chainId - 1)
+    val selectionIndex: Int = -1
+): SelectorItem(-chain.chainId)
 
 data class HeaderItem(
     val headerName: String
