@@ -95,8 +95,7 @@ class PinAdapter(
     fun sortAndSubmitList(
         allPins: List<Pin>?,
         allChains: List<Chain>?,
-        selectedPinIds: List<Long>,
-        selectedChainIds: List<Long>,
+        selectedIds: List<Long>,
         sortBy: Int,
         ascending: Boolean
     ) {
@@ -107,21 +106,18 @@ class PinAdapter(
                         SORT_BY_GROUP -> sortByGroup(
                             allPins,
                             allChains,
-                            selectedPinIds,
-                            selectedChainIds
+                            selectedIds
                         )
                         SORT_BY_NAME -> sortByName(
                             allPins,
                             allChains,
-                            selectedPinIds,
-                            selectedChainIds,
+                            selectedIds,
                             ascending
                         )
                         SORT_BY_TIME -> sortByTime(
                             allPins,
                             allChains,
-                            selectedPinIds,
-                            selectedChainIds,
+                            selectedIds,
                             ascending,
                             resources
                         )

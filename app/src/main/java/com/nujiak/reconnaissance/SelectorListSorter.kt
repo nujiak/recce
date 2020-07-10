@@ -13,15 +13,14 @@ import com.nujiak.reconnaissance.fragments.selector.SelectorItem
  *
  * @param pins List<Pin> to be processed with [chains] and submitted to adapter
  * @param chains List<Chain> to be processed with [pins] and submitted to adapter
- * @param selectedPinIds List<Long> containing IDs of currently selected pins
- * @param selectedChainIds List<Long> containing IDs of currently selected chains
+ * @param selectedIds List<Long> containing IDs of currently selected pins and chains, where
+ *                    negative ids represent Chain ids.
  * @param ascending Boolean, false to reverse the lexicographical order
  */
 fun sortByName(
     pins: List<Pin>,
     chains: List<Chain>,
-    selectedPinIds: List<Long>,
-    selectedChainIds: List<Long>,
+    selectedIds: List<Long>,
     ascending: Boolean
 ): List<SelectorItem> {
 
@@ -61,9 +60,9 @@ fun sortByName(
 
     val newList = sortedList.map {
         if (it.isChain) {
-            ChainWrapper(chainMap[it]!!, selectedChainIds.contains(it.id))
+            ChainWrapper(chainMap[it]!!, selectedIds.contains(-it.id))
         } else {
-            PinWrapper(pinMap[it]!!, selectedPinIds.indexOf(it.id))
+            PinWrapper(pinMap[it]!!, selectedIds.indexOf(it.id))
         }
     }
 
@@ -75,14 +74,13 @@ fun sortByName(
  *
  * @param pins List<Pin> to be processed with [chains] and submitted to adapter
  * @param chains List<Chain> to be processed with [pins] and submitted to adapter
- * @param selectedPinIds List<Long> containing IDs of currently selected pins
- * @param selectedChainIds List<Long> containing IDs of currently selected chains
+ * @param selectedIds List<Long> containing IDs of currently selected pins and chains, where
+ *                    negative ids represent Chain ids.
  */
 fun sortByGroup(
     pins: List<Pin>,
     chains: List<Chain>,
-    selectedPinIds: List<Long>,
-    selectedChainIds: List<Long>
+    selectedIds: List<Long>
 ): List<SelectorItem> {
 
     if (pins.isEmpty() && chains.isEmpty()) { return listOf() }
@@ -130,9 +128,9 @@ fun sortByGroup(
             newList.add(HeaderItem(currentGroup))
         }
         if (pinChain.isChain) {
-            newList.add(ChainWrapper(chainMap[pinChain]!!, selectedChainIds.contains(pinChain.id)))
+            newList.add(ChainWrapper(chainMap[pinChain]!!, selectedIds.contains(-pinChain.id)))
         } else {
-            newList.add(PinWrapper(pinMap[pinChain]!!, selectedPinIds.indexOf(pinChain.id)))
+            newList.add(PinWrapper(pinMap[pinChain]!!, selectedIds.indexOf(pinChain.id)))
         }
     }
     return newList
@@ -143,15 +141,14 @@ fun sortByGroup(
  *
  * @param pins List<Pin> to be processed with [chains] and submitted to adapter
  * @param chains List<Chain> to be processed with [pins] and submitted to adapter
- * @param selectedPinIds List<Long> containing IDs of currently selected pins
- * @param selectedChainIds List<Long> containing IDs of currently selected chains
+ * @param selectedIds List<Long> containing IDs of currently selected pins and chains, where
+ *                    negative ids represent Chain ids.
  * @param ascending Boolean, false to reverse the numerical order
  */
 fun sortByTime(
     pins: List<Pin>,
     chains: List<Chain>,
-    selectedPinIds: List<Long>,
-    selectedChainIds: List<Long>,
+    selectedIds: List<Long>,
     ascending: Boolean,
     resources: Resources
 ): List<SelectorItem> {
@@ -206,9 +203,9 @@ fun sortByTime(
         }
 
         if (pinChain.isChain) {
-            newList.add(ChainWrapper(chainMap[pinChain]!!, selectedChainIds.contains(pinChain.id)))
+            newList.add(ChainWrapper(chainMap[pinChain]!!, selectedIds.contains(-pinChain.id)))
         } else {
-            newList.add(PinWrapper(pinMap[pinChain]!!, selectedPinIds.indexOf(pinChain.id)))
+            newList.add(PinWrapper(pinMap[pinChain]!!, selectedIds.indexOf(pinChain.id)))
         }
     }
 
