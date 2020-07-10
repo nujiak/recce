@@ -201,7 +201,7 @@ class PinSelectorFragment : Fragment() {
 
     private fun onPinClick(pin: Pin) {
         if (viewModel.isInSelectionMode.value!!) {
-            viewModel.togglePinSelection(pin.pinId)
+            viewModel.toggleSelection(pin.pinId, isChain = false)
             refreshList()
         } else {
             viewModel.showPinOnMap(pin)
@@ -211,7 +211,7 @@ class PinSelectorFragment : Fragment() {
     private fun onPinLongClick(pin: Pin): Boolean {
         if (!viewModel.isInSelectionMode.value!!) {
             viewModel.enterSelectionMode()
-            viewModel.togglePinSelection(pin.pinId)
+            viewModel.toggleSelection(pin.pinId, isChain = false)
             refreshList()
         }
         return true
@@ -219,7 +219,7 @@ class PinSelectorFragment : Fragment() {
 
     private fun onChainClick(chain: Chain) {
         if (viewModel.isInSelectionMode.value!!) {
-            viewModel.toggleChainSelection(chain.chainId)
+            viewModel.toggleSelection(chain.chainId, true)
             refreshList()
         } else {
             viewModel.showChainOnMap(chain)
@@ -229,7 +229,7 @@ class PinSelectorFragment : Fragment() {
     private fun onChainLongClick(chain: Chain): Boolean {
         if (!viewModel.isInSelectionMode.value!!) {
             viewModel.enterSelectionMode()
-            viewModel.toggleChainSelection(chain.chainId)
+            viewModel.toggleSelection(chain.chainId, true)
             refreshList()
         }
         return true
@@ -249,6 +249,6 @@ class PinSelectorFragment : Fragment() {
     }
 
     private fun refreshList(newPins: List<Pin>? = viewModel.allPins.value, newChains: List<Chain>? = viewModel.allChains.value) {
-        pinAdapter.sortAndSubmitList(newPins, newChains, viewModel.selectedPinIds, viewModel.selectedChainIds, sortBy, sortAscending)
+        pinAdapter.sortAndSubmitList(newPins, newChains, viewModel.selectedIds, sortBy, sortAscending)
     }
 }
