@@ -31,7 +31,7 @@
 
             <TextView
                 android:id="@+id/ruler_from"
-                style="@style/TextAppearance.Reconnaissance.PinName"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/small_padding"
@@ -54,7 +54,7 @@
 
             <TextView
                 android:id="@+id/ruler_to"
-                style="@style/TextAppearance.Reconnaissance.PinName"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/small_padding"
@@ -64,6 +64,13 @@
                 tools:text="Pin that" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/ruler_intermediate"
+            style="@style/TextAppearance.MaterialComponents.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="4 Intermediate Nodes"
+            android:layout_marginTop="@dimen/small_padding"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
