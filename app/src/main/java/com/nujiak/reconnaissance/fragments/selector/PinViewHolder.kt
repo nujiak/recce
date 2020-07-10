@@ -122,10 +122,14 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
             // Area
             binding.chainDistance.text = SphericalUtil.computeArea(chainNodes.map { it.position }).formatAsAreaString()
             binding.chainDistanceDesc.text = binding.root.resources.getString(R.string.area)
+            binding.areaIcon.visibility = View.VISIBLE
+            binding.routeIcon.visibility = View.INVISIBLE
         } else {
             // Route
             binding.chainDistance.text = distance.formatAsDistanceString()
             binding.chainDistanceDesc.text = binding.root.resources.getString(R.string.distance)
+            binding.areaIcon.visibility = View.INVISIBLE
+            binding.routeIcon.visibility = View.VISIBLE
         }
 
         if (item.isSelected) {
