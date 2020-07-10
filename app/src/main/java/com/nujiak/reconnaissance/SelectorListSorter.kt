@@ -60,7 +60,7 @@ fun sortByName(
 
     val newList = sortedList.map {
         if (it.isChain) {
-            ChainWrapper(chainMap[it]!!, selectedIds.contains(-it.id))
+            ChainWrapper(chainMap[it]!!, selectedIds.indexOf(-it.id))
         } else {
             PinWrapper(pinMap[it]!!, selectedIds.indexOf(it.id))
         }
@@ -128,7 +128,7 @@ fun sortByGroup(
             newList.add(HeaderItem(currentGroup))
         }
         if (pinChain.isChain) {
-            newList.add(ChainWrapper(chainMap[pinChain]!!, selectedIds.contains(-pinChain.id)))
+            newList.add(ChainWrapper(chainMap[pinChain]!!, selectedIds.indexOf(-pinChain.id)))
         } else {
             newList.add(PinWrapper(pinMap[pinChain]!!, selectedIds.indexOf(pinChain.id)))
         }
@@ -203,7 +203,7 @@ fun sortByTime(
         }
 
         if (pinChain.isChain) {
-            newList.add(ChainWrapper(chainMap[pinChain]!!, selectedIds.contains(-pinChain.id)))
+            newList.add(ChainWrapper(chainMap[pinChain]!!, selectedIds.indexOf(-pinChain.id)))
         } else {
             newList.add(PinWrapper(pinMap[pinChain]!!, selectedIds.indexOf(pinChain.id)))
         }
