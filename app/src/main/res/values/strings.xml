@@ -108,7 +108,7 @@
     <string name="clear_ruler">Clear Ruler</string>
     <string name="tip">Tip:</string>
     <string name="ruler_empty">Ruler is empty</string>
-    <string name="ruler_hint">Tap and hold items in\nthe Pins tab to select them</string>
+    <string name="ruler_hint">Tap and hold Pins, Routes and Areas in the Pins tab to select them</string>
     <string name="end">End</string>
     <plurals name="intermediate_nodes">
         <item quantity="one">%d intermediate node</item>
