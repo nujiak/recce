@@ -26,8 +26,8 @@ fun generateRulerList(oldList: List<RulerItem>?, items: List<ReconData>, resourc
                             prevPointItem.position,
                             LatLng(item.latitude, item.longitude)
                         ),
-                        item.name,
-                        prevPointItem.name
+                        prevPointItem.name,
+                        item.name
                     )
                 )
             }
