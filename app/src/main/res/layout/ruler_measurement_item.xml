@@ -86,6 +86,7 @@
                 app:layout_constraintTop_toBottomOf="@id/ruler_to" />
 
             <TextView
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"
                 android:id="@+id/ruler_dist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -108,6 +109,7 @@
                 app:layout_constraintTop_toBottomOf="@id/ruler_dist_header" />
 
             <TextView
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"
                 android:id="@+id/ruler_dir"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
