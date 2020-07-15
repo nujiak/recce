@@ -18,6 +18,7 @@
             android:id="@+id/pins_top_app_bar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            app:titleTextColor="@color/textColorLight"
             app:title="@string/gps" />
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -256,8 +257,7 @@
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="@dimen/large_padding"
                         android:gravity="center_horizontal"
-                        android:text="@string/compass_calibration"
-                        android:textColor="@android:color/white" />
+                        android:text="@string/compass_calibration" />
 
                     <FrameLayout
                         android:layout_width="240dp"
@@ -293,6 +293,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:scaleType="matrix"
+                            android:tint="?attr/colorOnBackground"
                             android:src="@drawable/compass_needle"
                             tools:ignore="ContentDescription" />
                     </FrameLayout>
@@ -303,8 +304,7 @@
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="@dimen/large_padding"
                         android:gravity="center_horizontal"
-                        android:text="@string/compass_note"
-                        android:textColor="@android:color/white" />
+                        android:text="@string/compass_note" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

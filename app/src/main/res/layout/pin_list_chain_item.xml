@@ -9,7 +9,8 @@
     android:elevation="2dp"
     app:cardCornerRadius="16dp"
     app:cardElevation="4dp"
-    app:cardPreventCornerOverlap="true">
+    app:cardPreventCornerOverlap="true"
+    tools:cardBackgroundColor="@color/tagRed">
 
     <ImageView
         android:id="@+id/route_icon"
@@ -55,7 +56,7 @@
             android:textAllCaps="true"
             android:textStyle="bold"
             tools:text="Buildings"
-            tools:textColor="@color/colorSurface" />
+            tools:textColor="#000000" />
         <TextView
             android:id="@+id/chain_name"
             style="@style/TextAppearance.Reconnaissance.PinName"
@@ -84,7 +85,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/checkpoints"/>
+                android:text="@string/checkpoints"
+                android:textColor="@android:color/white"/>
 
             <TextView
                 android:id="@+id/chain_checkpoints"
@@ -98,7 +100,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/small_padding"
-                android:text="@string/distance"/>
+                android:text="@string/distance"
+                android:textColor="@android:color/white"/>
 
             <TextView
                 android:id="@+id/chain_distance"

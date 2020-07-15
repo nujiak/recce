@@ -2,8 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:background="@color/colorPrimaryDark">
 
 
     <ImageView
@@ -19,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:text="@string/angle_unit"
-        android:textColor="@color/primaryTextColor" />
+        android:textColor="@color/textColorLight" />
 
     <TextView
         style="@style/TextAppearance.MaterialComponents.Subtitle2"
@@ -28,6 +30,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="@dimen/large_padding"
+        android:textColor="@color/textColorLight"
         android:text="@string/angle_unit_description"/>
 
     <ScrollView
@@ -45,6 +48,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/colorPrimaryLight"
+                    android:textColor="@color/textColorLight"
                     android:text="@string/degrees" />
 
                 <RadioButton
@@ -52,6 +56,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/colorPrimaryLight"
+                    android:textColor="@color/textColorLight"
                     android:text="@string/nato_mils" />
             </RadioGroup>
     </ScrollView>
@@ -82,6 +87,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:text="@string/next_all_set"
-            android:textColor="@color/primaryTextColor" />
+            android:textColor="@color/textColorLight" />
     </LinearLayout>
 </LinearLayout>

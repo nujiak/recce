@@ -27,6 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:textColor="@color/textColorLight"
             android:text="@string/all_set_for_ns" />
         <TextView
             style="@style/TextAppearance.MaterialComponents.Subtitle1"
@@ -34,6 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/large_padding"
             android:gravity="center"
+            android:textColor="@color/textColorLight"
             android:text="@string/onboarding_ns" />
 
         <Button
@@ -51,6 +53,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/back"
-            android:textColor="@color/primaryTextColor"/>
+            android:textColor="@color/textColorLight"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

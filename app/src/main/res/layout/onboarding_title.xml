@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
+    tools:background="@color/colorPrimaryDark">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -26,13 +28,14 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/app_name"
-            android:textColor="@color/primaryTextColor"/>
+            android:textColor="@color/textColorLight"/>
         <TextView
             style="@style/TextAppearance.MaterialComponents.Subtitle1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/large_padding"
             android:gravity="center"
+            android:textColor="@color/textColorLight"
             android:text="@string/onboarding_title" />
 
         <Button
@@ -42,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/large_padding"
             android:text="@string/get_started"
-            android:textColor="@color/primaryTextColor"/>
+            android:textColor="@color/textColorLight"/>
     </LinearLayout>
     <Button
         android:id="@+id/onboarding_title_ns"
@@ -51,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/large_padding"
         android:text="@string/nsf_nsmen"
-        android:textColor="@color/primaryTextColor"
+        android:textColor="@color/textColorLight"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
