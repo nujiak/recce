@@ -81,6 +81,7 @@
             android:layout_height="wrap_content"
             android:scaleType="matrix"
             android:src="@drawable/compass_needle_24dp"
+            android:tint="?attr/colorOnSurface"
             tools:ignore="ContentDescription" />
     </FrameLayout>
 
@@ -109,7 +110,7 @@
             android:fadingEdge="horizontal"
             android:gravity="end"
             android:maxLines="1"
-            android:textColor="@android:color/white"
+            android:textColor="?android:attr/textColorPrimary"
             tools:text="100023.2 km" />
 
         <View
@@ -126,7 +127,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:maxLines="1"
-            android:textColor="@android:color/white"
+            android:textColor="?android:attr/textColorPrimary"
             tools:text="0393.4 mils" />
     </LinearLayout>
 
@@ -161,7 +162,7 @@
                 android:gravity="center"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@android:color/white"
+                android:textColor="?android:attr/textColorPrimary"
                 tools:text="Route" />
 
             <TextView
@@ -173,7 +174,7 @@
                 android:gravity="center"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@android:color/white"
+                android:textColor="?android:attr/textColorPrimary"
                 tools:text="Checkpoint" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -220,7 +221,7 @@
                 app:layout_constraintStart_toStartOf="@id/map_details_card_view"
                 app:layout_constraintTop_toTopOf="@id/map_details_card_view"
                 tools:text="Buildings"
-                tools:textColor="@color/colorSurface"
+                tools:textColor="#000000"
                 tools:visibility="visible" />
 
             <View
@@ -247,7 +248,8 @@
                     android:id="@+id/map_lat_long_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/lat_lng" />
+                    android:text="@string/lat_lng"
+                    android:textColor="@color/textColorLight"/>
 
                 <TextView
                     android:id="@+id/map_lat_lng_text"
@@ -264,7 +266,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/small_padding"
-                    android:text="@string/utm" />
+                    android:text="@string/utm"
+                    android:textColor="@color/textColorLight"/>
 
                 <TextView
                     android:id="@+id/map_grid_text"

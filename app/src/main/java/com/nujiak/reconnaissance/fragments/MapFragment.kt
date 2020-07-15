@@ -14,6 +14,7 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Property
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewAnimationUtils
@@ -794,16 +795,28 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         binding.mapCheckpointChain.text =
             checkpoint.parentChain?.name ?: getString(R.string.unnamed)
 
-        val color =
+        val bgColor =
             if (checkpoint.parentChain != null) {
                 ContextCompat.getColor(
                     requireContext(), PIN_CARD_DARK_BACKGROUNDS[checkpoint.parentChain.color]
                 )
             } else {
-                ContextCompat.getColor(requireContext(), R.color.colorSurface)
+                val typedValue = TypedValue()
+                requireContext().theme.resolveAttribute(R.attr.colorSurface, typedValue, true)
+                typedValue.data
+            }
+        val textColor =
+            if (checkpoint.parentChain != null) {
+                ContextCompat.getColor(requireContext(), R.color.textColorLight)
+            } else {
+                val typedValue = TypedValue()
+                requireContext().theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
+                typedValue.data
             }
 
-        binding.mapCheckpointInfobar.setCardBackgroundColor(color)
+        binding.mapCheckpointName.setTextColor(textColor)
+        binding.mapCheckpointChain.setTextColor(textColor)
+        binding.mapCheckpointInfobar.setCardBackgroundColor(bgColor)
 
     }
 

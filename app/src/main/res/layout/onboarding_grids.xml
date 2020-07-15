@@ -2,8 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:background="@color/colorPrimaryDark">
 
     <ImageView
         android:layout_width="wrap_content"
@@ -18,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:text="@string/coordinate_system"
-        android:textColor="@color/primaryTextColor" />
+        android:textColor="@color/textColorLight" />
 
     <TextView
         style="@style/TextAppearance.MaterialComponents.Subtitle2"
@@ -27,6 +29,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="@dimen/large_padding"
+        android:textColor="@color/textColorLight"
         android:text="@string/coord_sys_description"/>
 
     <ScrollView
@@ -44,6 +47,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/colorPrimaryLight"
+                    android:textColor="@color/textColorLight"
                     android:text="@string/utm" />
 
                 <RadioButton
@@ -51,6 +55,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/colorPrimaryLight"
+                    android:textColor="@color/textColorLight"
                     android:text="@string/mgrs" />
 
                 <RadioButton
@@ -58,6 +63,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/colorPrimaryLight"
+                    android:textColor="@color/textColorLight"
                     android:text="@string/kertau_full" />
             </RadioGroup>
     </ScrollView>
@@ -89,6 +95,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:text="@string/next_angle_unit"
-            android:textColor="@color/primaryTextColor"/>
+            android:textColor="@color/textColorLight"/>
     </LinearLayout>
 </LinearLayout>

@@ -9,5 +9,5 @@
         android:left="24dp"
         android:right="24dp"
         android:top="24dp" />
-    <solid android:color="@color/colorSurface" />
+    <solid android:color="?attr/colorSurface" />
 </shape>
