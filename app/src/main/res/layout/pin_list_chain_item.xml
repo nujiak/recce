@@ -5,10 +5,10 @@
     android:id="@+id/pin_list_item_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/small_padding"
+    android:layout_margin="@dimen/tiny_padding"
     android:elevation="2dp"
     app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
+    app:cardElevation="1dp"
     app:cardPreventCornerOverlap="true"
     tools:cardBackgroundColor="@color/tagRed">
 

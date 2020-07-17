@@ -69,7 +69,7 @@
         android:layout_marginBottom="@dimen/large_padding"
         android:backgroundTint="@color/colorPrimary"
         android:clickable="true"
-        android:elevation="1dp"
+        android:elevation="6dp"
         android:focusable="true"
         android:src="@drawable/ic_add_white_24dp"
         app:tint="?attr/colorSurface"
