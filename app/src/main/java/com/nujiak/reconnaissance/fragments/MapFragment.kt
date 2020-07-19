@@ -260,6 +260,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 setOnPolylineClickListener { onPolylineClick(it) }
                 setOnPolygonClickListener { onPolygonClick(it) }
                 isIndoorEnabled = false
+                setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style))
             }
             val uiSetting = map.uiSettings
             uiSetting.isZoomControlsEnabled = true
