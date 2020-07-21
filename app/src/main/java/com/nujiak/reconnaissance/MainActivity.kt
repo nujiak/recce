@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.appcompat.view.ActionMode
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
@@ -19,6 +20,10 @@ import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.modalsheets.ChainCreatorSheet
 import com.nujiak.reconnaissance.modalsheets.PinCreatorSheet
+import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.THEME_PREF_AUTO
+import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.THEME_PREF_DARK
+import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.THEME_PREF_KEY
+import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.THEME_PREF_LIGHT
 import com.nujiak.reconnaissance.onboarding.OnboardingActivity
 import com.nujiak.reconnaissance.onboarding.OnboardingActivity.Companion.ONBOARDING_COMPLETED_KEY
 
@@ -58,41 +63,55 @@ class MainActivity : AppCompatActivity() {
             getSharedPreferences("com.nujiak.reconnaissance", Context.MODE_PRIVATE)
         viewModel.initializePrefs()
 
+        // Run Onboarding
         if (!viewModel.sharedPreference.getBoolean(ONBOARDING_COMPLETED_KEY, false)) {
             startActivity(Intent(this, OnboardingActivity::class.java))
             finish()
         }
 
+        // Set app theme (auto/light/dark)
+        viewModel.sharedPreference.getInt(THEME_PREF_KEY, 0).let {
+            setDefaultNightMode(when (it) {
+                THEME_PREF_AUTO -> MODE_NIGHT_FOLLOW_SYSTEM
+                THEME_PREF_LIGHT -> MODE_NIGHT_NO
+                THEME_PREF_DARK -> MODE_NIGHT_YES
+                else -> throw IllegalArgumentException("Invalid theme pref index: $it")
+            })
+        }
+
         // Set up ViewPager2
         viewPager = findViewById(R.id.view_pager)
         viewPagerAdapter = MainViewPagerAdapter(this)
-        viewPager.adapter = viewPagerAdapter
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                when (position) {
-                    MAP_INDEX -> {
-                        bottomNavigation.selectedItemId = R.id.btm_nav_map
-                        viewPager.isUserInputEnabled = false
-                        title = getString(R.string.map)
-                    }
-                    PINS_INDEX -> {
-                        bottomNavigation.selectedItemId = R.id.btm_nav_pins
-                        viewPager.isUserInputEnabled = true
-                        title = getString(R.string.pins)
-                    }
-                    GPS_INDEX -> {
-                        bottomNavigation.selectedItemId = R.id.btm_nav_gps
-                        viewPager.isUserInputEnabled = true
-                        title = getString(R.string.pins)
-                    }
-                    RULER_INDEX -> {
-                        bottomNavigation.selectedItemId = R.id.btm_nav_ruler
-                        viewPager.isUserInputEnabled = true
-                        title = getString(R.string.pins)
+        viewPager.apply {
+            adapter = viewPagerAdapter
+            offscreenPageLimit = 3
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    when (position) {
+                        MAP_INDEX -> {
+                            bottomNavigation.selectedItemId = R.id.btm_nav_map
+                            viewPager.isUserInputEnabled = false
+                            title = getString(R.string.map)
+                        }
+                        PINS_INDEX -> {
+                            bottomNavigation.selectedItemId = R.id.btm_nav_pins
+                            viewPager.isUserInputEnabled = true
+                            title = getString(R.string.pins)
+                        }
+                        GPS_INDEX -> {
+                            bottomNavigation.selectedItemId = R.id.btm_nav_gps
+                            viewPager.isUserInputEnabled = true
+                            title = getString(R.string.pins)
+                        }
+                        RULER_INDEX -> {
+                            bottomNavigation.selectedItemId = R.id.btm_nav_ruler
+                            viewPager.isUserInputEnabled = true
+                            title = getString(R.string.pins)
+                        }
                     }
                 }
-            }
-        })
+            })
+        }
 
         // Set up Bottom Navigation
         bottomNavigation = findViewById(R.id.bottom_navigation_bar)

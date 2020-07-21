@@ -10,4 +10,10 @@
         <item>@string/degrees</item>
         <item>@string/nato_mils</item>
     </string-array>
+
+    <string-array name="theme_prefs">
+        <item>@string/auto</item>
+        <item>@string/light</item>
+        <item>@string/dark</item>
+    </string-array>
 </resources>
