@@ -22,6 +22,10 @@
     <string name="degrees" translatable="false">Degrees</string>
     <string name="name">Name</string>
     <string name="done">Done</string>
+    <string name="theme">Theme</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="auto">Auto</string>
 
     <!-- Pin Selector -->
     <string name="pins">Pins</string>

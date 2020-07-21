@@ -112,10 +112,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         })
         binding.mapCardParent.setOnClickListener { onAddPinFromMap() }
 
-        // Set up show pin and checkpoint sequence
-        viewModel.pinInFocus.observe(viewLifecycleOwner, Observer { pin -> moveMapTo(pin) })
-        viewModel.chainInFocus.observe(viewLifecycleOwner, Observer { node -> moveMapTo(node)})
-
         // Set up custom map controls
         binding.mapZoomInButton.setOnClickListener { onZoomIn() }
         binding.mapZoomOutButton.setOnClickListener { onZoomOut() }
@@ -261,9 +257,12 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 setOnPolygonClickListener { onPolygonClick(it) }
                 isIndoorEnabled = false
                 setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style))
+                uiSettings.isZoomControlsEnabled = true
             }
-            val uiSetting = map.uiSettings
-            uiSetting.isZoomControlsEnabled = true
+
+            // Set up show pin and checkpoint sequence
+            viewModel.pinInFocus.observe(viewLifecycleOwner, Observer { pin -> moveMapTo(pin) })
+            viewModel.chainInFocus.observe(viewLifecycleOwner, Observer { node -> moveMapTo(node)})
 
             if (viewModel.isLocationGranted) {
                 onLocPermGranted()
@@ -717,9 +716,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun moveMapTo(lat: Double, lng: Double, bearing: Float? = null, tilt: Float? = null, zoom: Float? = null) {
-        if (!this::map.isInitialized) {
-            return
-        }
         val currentPosition = map.cameraPosition
 
         val toBearing = bearing ?: currentPosition.bearing
