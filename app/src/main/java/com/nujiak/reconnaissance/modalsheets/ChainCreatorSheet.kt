@@ -14,6 +14,8 @@ import android.widget.Button
 import android.widget.Filter
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -117,6 +119,12 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
             }
         }
         updateSheetColor(chain.color)
+
+        // Expand bottom sheet fully
+        (dialog as BottomSheetDialog).behavior.apply {
+            state = BottomSheetBehavior.STATE_EXPANDED
+            peekHeight = (resources.displayMetrics.density * 168).toInt()
+        }
 
         return binding.root
     }

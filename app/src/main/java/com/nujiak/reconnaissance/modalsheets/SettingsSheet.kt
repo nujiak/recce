@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.nujiak.reconnaissance.MainViewModel
 import com.nujiak.reconnaissance.MainViewModelFactory
@@ -109,7 +111,13 @@ class SettingsSheet : BottomSheetDialogFragment() {
 
         setUpPreferences()
 
-        return binding.root
+        // Expand bottom sheet fully
+        (dialog as BottomSheetDialog).behavior.apply {
+            state = STATE_EXPANDED
+            skipCollapsed = true
+        }
+
+            return binding.root
     }
 
     private fun setUpPreferences() {
