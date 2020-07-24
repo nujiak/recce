@@ -14,6 +14,8 @@ import android.widget.Button
 import android.widget.Filter
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -133,7 +135,14 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         updateGrids()
         updateSheetColor(pin.color)
 
-        return binding.root
+        // Expand bottom sheet fully
+        (dialog as BottomSheetDialog).behavior.apply {
+            state = BottomSheetBehavior.STATE_EXPANDED
+            peekHeight = (resources.displayMetrics.density * 144).toInt()
+        }
+
+
+            return binding.root
     }
 
     private fun onCompleted() {
@@ -453,10 +462,9 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
 
     private fun updateSheetColor(colorIdx: Int = 0) {
         val color = ContextCompat.getColor(requireContext(), PIN_CARD_DARK_BACKGROUNDS[colorIdx])
-        // binding.creatorSheetRoot.setBackgroundColor(color)
         val bgDraw = ContextCompat.getDrawable(requireContext(), R.drawable.bottom_sheet)
         bgDraw?.setTint(color)
-        binding.creatorSheetRoot.background = bgDraw
+        binding.root.background = bgDraw
     }
 
     /**
