@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
@@ -27,8 +28,8 @@ class SettingsSheet : BottomSheetDialogFragment() {
     private lateinit var angleUnits: Array<String>
     private lateinit var themePrefs: Array<String>
 
-    private var currentThemePrefId = 0
-    private var themePrefChanged = false
+    private var currentThemePrefId = THEME_PREF_AUTO
+    private var newThemePrefId = THEME_PREF_AUTO
 
     companion object {
         const val COORD_SYS_KEY = "coordinate_system"
@@ -95,7 +96,7 @@ class SettingsSheet : BottomSheetDialogFragment() {
         }
         binding.settingsThemeDropdown.setOnItemClickListener { _, _, position, _ ->
             viewModel.sharedPreference.edit().putInt(THEME_PREF_KEY, position).apply()
-            themePrefChanged = (position != currentThemePrefId)
+            newThemePrefId = position
         }
 
         // Set up reset guides
@@ -129,12 +130,20 @@ class SettingsSheet : BottomSheetDialogFragment() {
         sharedPreferences.getInt(THEME_PREF_KEY, 0).let {
             binding.settingsThemeDropdown.setText(themePrefs[it], false)
             currentThemePrefId = it
+            newThemePrefId = it
         }
     }
 
     override fun onDismiss(dialog: DialogInterface) {
-        if (themePrefChanged) {
-            requireActivity().recreate()
+        if (newThemePrefId != currentThemePrefId) {
+            AppCompatDelegate.setDefaultNightMode(
+                when (newThemePrefId) {
+                    THEME_PREF_AUTO -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                    THEME_PREF_LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
+                    THEME_PREF_DARK -> AppCompatDelegate.MODE_NIGHT_YES
+                    else -> throw IllegalArgumentException("Invalid theme pref index: $newThemePrefId")
+                }
+            )
         }
         super.onDismiss(dialog)
     }
