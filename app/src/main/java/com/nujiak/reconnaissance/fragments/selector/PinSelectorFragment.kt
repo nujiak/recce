@@ -246,6 +246,7 @@ class PinSelectorFragment : Fragment() {
             .putBoolean(SORT_ASCENDING_KEY, sortAscending)
             .apply()
         refreshList()
+        binding.pinRecyclerview.smoothScrollToPosition(0)
     }
 
     private fun refreshList(newPins: List<Pin>? = viewModel.allPins.value, newChains: List<Chain>? = viewModel.allChains.value) {
