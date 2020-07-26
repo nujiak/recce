@@ -49,6 +49,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var imm: InputMethodManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        setTheme(R.style.Theme_Reconnaissance)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
