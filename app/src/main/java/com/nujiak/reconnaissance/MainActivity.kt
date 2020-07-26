@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val MAP_INDEX = 0
-        const val PINS_INDEX = 1
+        const val SAVED_INDEX = 1
         const val GPS_INDEX = 2
         const val RULER_INDEX = 3
     }
@@ -95,8 +95,8 @@ class MainActivity : AppCompatActivity() {
                             viewPager.isUserInputEnabled = false
                             title = getString(R.string.map)
                         }
-                        PINS_INDEX -> {
-                            bottomNavigation.selectedItemId = R.id.btm_nav_pins
+                        SAVED_INDEX -> {
+                            bottomNavigation.selectedItemId = R.id.btm_nav_saved
                             viewPager.isUserInputEnabled = true
                             title = getString(R.string.pins)
                         }
@@ -123,8 +123,8 @@ class MainActivity : AppCompatActivity() {
                     viewPager.currentItem = MAP_INDEX
                     true
                 }
-                R.id.btm_nav_pins -> {
-                    viewPager.currentItem = PINS_INDEX
+                R.id.btm_nav_saved -> {
+                    viewPager.currentItem = SAVED_INDEX
                     true
                 }
                 R.id.btm_nav_gps -> {

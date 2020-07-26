@@ -6,10 +6,10 @@
         android:icon="@drawable/ic_map_white_24dp"
         android:title="@string/map" />
     <item
-        android:id="@+id/btm_nav_pins"
+        android:id="@+id/btm_nav_saved"
         android:enabled="true"
         android:icon="@drawable/ic_map_pin_icon"
-        android:title="@string/pins" />
+        android:title="@string/saved" />
     <item
         android:id="@+id/btm_nav_gps"
         android:icon="@drawable/ic_gps_fixed_white_24dp"
