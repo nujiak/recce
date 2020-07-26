@@ -1,4 +1,4 @@
-package com.nujiak.reconnaissance.fragments.selector
+package com.nujiak.reconnaissance.fragments.saved
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,19 +15,19 @@ import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.ReconDatabase
-import com.nujiak.reconnaissance.databinding.FragmentPinSelectorBinding
-import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.ITEM_VIEW_TYPE_CHAIN
-import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.ITEM_VIEW_TYPE_HEADER
-import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.ITEM_VIEW_TYPE_PIN
-import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.SORT_BY_GROUP
-import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.SORT_BY_NAME
-import com.nujiak.reconnaissance.fragments.selector.PinAdapter.Companion.SORT_BY_TIME
+import com.nujiak.reconnaissance.databinding.FragmentSavedBinding
+import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.ITEM_VIEW_TYPE_CHAIN
+import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.ITEM_VIEW_TYPE_HEADER
+import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.ITEM_VIEW_TYPE_PIN
+import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.SORT_BY_GROUP
+import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.SORT_BY_NAME
+import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.SORT_BY_TIME
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet
 
 
-class PinSelectorFragment : Fragment() {
+class SavedFragment : Fragment() {
 
-    private lateinit var binding: FragmentPinSelectorBinding
+    private lateinit var binding: FragmentSavedBinding
     private lateinit var viewModel: MainViewModel
     private lateinit var pinAdapter: PinAdapter
 
@@ -44,7 +44,7 @@ class PinSelectorFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding = FragmentPinSelectorBinding.inflate(inflater, container, false)
+        binding = FragmentSavedBinding.inflate(inflater, container, false)
 
         // Set up ViewModel
         val application = requireNotNull(this.activity).application

@@ -3,10 +3,10 @@ package com.nujiak.reconnaissance
 import android.content.res.Resources
 import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
-import com.nujiak.reconnaissance.fragments.selector.ChainWrapper
-import com.nujiak.reconnaissance.fragments.selector.HeaderItem
-import com.nujiak.reconnaissance.fragments.selector.PinWrapper
-import com.nujiak.reconnaissance.fragments.selector.SelectorItem
+import com.nujiak.reconnaissance.fragments.saved.ChainWrapper
+import com.nujiak.reconnaissance.fragments.saved.HeaderItem
+import com.nujiak.reconnaissance.fragments.saved.PinWrapper
+import com.nujiak.reconnaissance.fragments.saved.SelectorItem
 
 /**
  * Sorts a List of Pin and Chain items by name

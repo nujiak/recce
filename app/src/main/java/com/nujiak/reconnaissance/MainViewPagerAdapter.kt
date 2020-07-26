@@ -6,7 +6,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.nujiak.reconnaissance.fragments.GpsFragment
 import com.nujiak.reconnaissance.fragments.MapFragment
 import com.nujiak.reconnaissance.fragments.ruler.RulerFragment
-import com.nujiak.reconnaissance.fragments.selector.PinSelectorFragment
+import com.nujiak.reconnaissance.fragments.saved.SavedFragment
 
 class MainViewPagerAdapter(activity: AppCompatActivity) :
     FragmentStateAdapter(activity) {
@@ -18,7 +18,7 @@ class MainViewPagerAdapter(activity: AppCompatActivity) :
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> mapFragment
-            1 -> PinSelectorFragment()
+            1 -> SavedFragment()
             2 -> GpsFragment()
             else -> RulerFragment()
         }

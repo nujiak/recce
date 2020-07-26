@@ -1,4 +1,4 @@
-package com.nujiak.reconnaissance.fragments.selector
+package com.nujiak.reconnaissance.fragments.saved
 
 import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin

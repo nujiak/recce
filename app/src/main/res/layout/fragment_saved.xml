@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".fragments.selector.PinSelectorFragment">
+    tools:context=".fragments.saved.SavedFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:menu="@menu/pin_selector_options"
-            app:title="@string/pins" />
+            app:title="@string/saved" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -48,7 +48,8 @@
             android:layout_height="wrap_content"
             android:scaleType="center"
             android:src="@drawable/ic_no_pins"
-            android:visibility="visible" />
+            android:visibility="visible"
+            android:tint="?attr/colorOnBackground"/>
 
         <TextView
             style="@style/TextAppearance.MaterialComponents.Subtitle2"
