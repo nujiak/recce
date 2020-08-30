@@ -191,6 +191,9 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                 binding.newPinNameInput.error = getString(R.string.name_too_long_error)
                 isInputValid = false
             }
+            name.contains(',', true) || name.contains(';', true) -> {
+                binding.newPinNameInput.error = getString(R.string.pin_invalid_error)
+            }
         }
 
         val lat = binding.newPinLatEditText.text

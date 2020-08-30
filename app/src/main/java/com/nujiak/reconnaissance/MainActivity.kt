@@ -1,12 +1,23 @@
 package com.nujiak.reconnaissance
 
 import android.Manifest
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.InputType
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.appcompat.view.ActionMode
@@ -73,12 +84,14 @@ class MainActivity : AppCompatActivity() {
 
         // Set app theme (auto/light/dark)
         viewModel.sharedPreference.getInt(THEME_PREF_KEY, 0).let {
-            setDefaultNightMode(when (it) {
-                THEME_PREF_AUTO -> MODE_NIGHT_FOLLOW_SYSTEM
-                THEME_PREF_LIGHT -> MODE_NIGHT_NO
-                THEME_PREF_DARK -> MODE_NIGHT_YES
-                else -> throw IllegalArgumentException("Invalid theme pref index: $it")
-            })
+            setDefaultNightMode(
+                when (it) {
+                    THEME_PREF_AUTO -> MODE_NIGHT_FOLLOW_SYSTEM
+                    THEME_PREF_LIGHT -> MODE_NIGHT_NO
+                    THEME_PREF_DARK -> MODE_NIGHT_YES
+                    else -> throw IllegalArgumentException("Invalid theme pref index: $it")
+                }
+            )
         }
 
         // Set up ViewPager2
@@ -172,6 +185,7 @@ class MainActivity : AppCompatActivity() {
                 when (item?.itemId) {
                     R.id.add_to_ruler -> viewModel.onAddSelectionToRuler()
                     R.id.delete_pins -> viewModel.onDeleteSelectedPins()
+                    R.id.share -> viewModel.onShareSelectedPins()
                 }
                 return true
             }
@@ -214,10 +228,67 @@ class MainActivity : AppCompatActivity() {
         viewModel.selectionChanged.observe(this, Observer {
             actionMode?.let {
                 val selectedSize = viewModel.selectedIds.size
-                it.title = resources.getQuantityString(R.plurals.number_selected, selectedSize, selectedSize)
+                it.title = resources.getQuantityString(
+                    R.plurals.number_selected,
+                    selectedSize,
+                    selectedSize
+                )
             }
         })
 
+        // Set up Sharing
+        viewModel.shareCode.observe(this, Observer { shareCode ->
+
+            if (shareCode == null) {
+                return@Observer
+            }
+
+            val alertDialog = AlertDialog.Builder(this)
+                .setView(R.layout.dialog_share)
+                .create()
+            alertDialog.show()
+
+            alertDialog.setOnDismissListener { viewModel.resetShareCode() }
+
+            val shareDescBuilder = StringBuilder()
+            viewModel.shareQuantity.let {
+                val (pinQty, chainQty) = it
+                if (pinQty != null && chainQty != null) {
+                    shareDescBuilder.apply {
+                        if (pinQty > 0) {
+                            append(resources.getQuantityString(R.plurals.pins, pinQty, pinQty))
+                            append(' ')
+                        }
+                        if (pinQty > 0 && chainQty > 0) {
+                            append('&')
+                            append(' ')
+                        }
+                        if (chainQty > 0) {
+                            append(resources.getQuantityString(R.plurals.chains, chainQty, chainQty))
+                        }
+                    }
+                }
+            }
+
+            alertDialog.findViewById<TextView>(R.id.share_description)?.text = shareDescBuilder.toString()
+
+            alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+            val shareCodeEditText = alertDialog.findViewById<EditText>(R.id.share_string)
+            shareCodeEditText?.apply {
+                setText(shareCode)
+                typeface = Typeface.MONOSPACE
+                inputType = InputType.TYPE_NULL
+                isSingleLine = false
+            }
+            alertDialog.findViewById<Button>(R.id.copy)?.setOnClickListener {
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("", shareCode)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(this, getString(R.string.copied), Toast.LENGTH_SHORT).show()
+                shareCodeEditText?.requestFocus()
+            }
+        })
 
         display = windowManager.defaultDisplay
         object : OrientationEventListener(baseContext) {
@@ -228,7 +299,9 @@ class MainActivity : AppCompatActivity() {
 
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         viewModel.hideKeyboardFromThisView.observe(this, Observer {
-            if (it != null) { hideKeyboard(it) }
+            if (it != null) {
+                hideKeyboard(it)
+            }
         })
 
         if (!viewModel.isLocationGranted) {
@@ -285,12 +358,10 @@ class MainActivity : AppCompatActivity() {
             viewPager.currentItem = MAP_INDEX
             bottomNavigation.selectedItemId = R.id.btm_nav_map
             return
-        }
-        else if (isInPolylineMode) {
+        } else if (isInPolylineMode) {
             viewModel.undoMapPolyline()
             return
-        }
-        else {
+        } else {
             super.onBackPressed()
         }
     }

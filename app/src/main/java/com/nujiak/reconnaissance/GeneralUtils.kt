@@ -10,6 +10,8 @@ import com.nujiak.reconnaissance.modalsheets.SettingsSheet
 import java.text.NumberFormat
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.pow
+import kotlin.math.round
 import kotlin.math.roundToInt
 
 fun getGridString(latDeg: Double, lngDeg: Double, coordSysId: Int, resources: Resources): String {
@@ -84,4 +86,13 @@ fun withAlpha(color: Int, alpha: Int): Int {
     val b = Color.blue(color)
 
     return Color.argb(alpha, r, g, b)
+}
+
+fun Float.round(decimals: Int): Float {
+    return round(this * 10f.pow(decimals.toFloat()))
+}
+
+fun Double.round(decimals: Int): Double {
+    val magnitude = 10.0.pow(decimals.toDouble())
+    return round(this * magnitude) / magnitude
 }

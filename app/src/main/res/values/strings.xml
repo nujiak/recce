@@ -46,6 +46,20 @@
     <string name="checkpoints">Checkpoints</string>
     <string name="no_pins">Add a Pin from the map or
         \nby clicking the button below.</string>
+    <string name="share">Share</string>
+    <string name="share_code">Share Code</string>
+    <string name="copy">Copy</string>
+    <string name="copied">Copied to clipboard</string>
+    <plurals name="pins">
+        <item quantity="one">%d Pin</item>
+        <item quantity="other">%d Pins</item>
+    </plurals>
+    <plurals name="chains">
+        <item quantity="one">%d Chain</item>
+        <item quantity="other">%d Chains</item>
+    </plurals>
+    <string name="sharing">Sharing</string>
+    <string name="and">and</string>
     <!-- Sorting -->
     <string name="sort">Sort</string>
     <string name="time_added">Time added</string>
@@ -73,6 +87,7 @@
     <string name="group_empty_error">Group cannot be blank</string>
     <string name="group_too_long_error">Group name cannot exceed 12 characters</string>
     <string name="group_invalid_error">Group name invalid</string>
+    <string name="pin_invalid_error">Pin name contains invalid characters</string>
 
     <!-- Chain Creator -->
     <string name="chain_name">Chain Name</string>

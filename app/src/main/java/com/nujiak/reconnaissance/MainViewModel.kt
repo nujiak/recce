@@ -325,6 +325,35 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
 
     }
 
+    private val _shareCode = MutableLiveData<String>()
+    val shareCode: LiveData<String>
+        get() = _shareCode
+    var shareQuantity = Pair<Int?, Int?>(0, 0)
+
+    fun resetShareCode() {
+        _shareCode.value = null
+    }
+
+    fun onShareSelectedPins() {
+
+        val pinIdsToShare = mutableListOf<Long>()
+        val chainIdsToShare = mutableListOf<Long>()
+
+        for (id in selectedIds) {
+            if (id > 0) {
+                pinIdsToShare.add(id)
+            } else {
+                chainIdsToShare.add(-id)
+            }
+        }
+
+        val pinsToShare = allPins.value?.filter { it.pinId in pinIdsToShare }
+        val chainsToShare = allChains.value?.filter { it.chainId in chainIdsToShare }
+
+        shareQuantity = Pair(pinsToShare?.size, chainsToShare?.size)
+        _shareCode.value = toShareCode(pinsToShare, chainsToShare)
+    }
+
     /**
      * Coroutine database functions
      */
