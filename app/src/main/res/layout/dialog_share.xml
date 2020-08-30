@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_background"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingTop="@dimen/large_padding"
+    android:paddingEnd="24dp"
+    android:paddingBottom="@dimen/large_padding">
+
+    <TextView
+        android:id="@+id/share_header"
+        style="@style/TextAppearance.MaterialComponents.Headline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/share_code"
+        android:labelFor="@id/share_string"/>
+
+    <TextView
+        android:id="@+id/share_description"
+        style="@style/TextAppearance.MaterialComponents.Subtitle2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="1 Pin and 2 Chains" />
+
+    <EditText
+        android:id="@+id/share_string"
+        style="@style/TextAppearance.AppCompat.Body2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/small_padding"
+        android:background="@drawable/text_view_border"
+        android:inputType="none"
+        android:maxLines="5"
+        android:padding="@dimen/small_padding"
+        android:scrollbars="vertical"
+        android:selectAllOnFocus="true"
+        tools:text="p|Test\nc|Test Again\nc|Another Test" />
+
+    <Button
+        android:id="@+id/copy"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="@dimen/small_padding"
+        android:text="@string/copy"
+        app:icon="@drawable/ic_content_copy_24px" />
+
+</LinearLayout>
