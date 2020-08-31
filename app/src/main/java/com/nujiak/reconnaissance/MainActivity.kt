@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         const val RULER_INDEX = 3
     }
 
-    private lateinit var display: Display
+    private val mDisplay: Display? by lazy { display }
     private lateinit var imm: InputMethodManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -290,10 +290,12 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        display = windowManager.defaultDisplay
         object : OrientationEventListener(baseContext) {
             override fun onOrientationChanged(orientation: Int) {
-                viewModel.screenRotation = display.rotation
+                mDisplay?.let {
+                    viewModel.screenRotation = it.rotation
+                }
+
             }
         }.enable()
 
