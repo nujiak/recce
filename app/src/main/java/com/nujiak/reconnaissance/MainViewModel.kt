@@ -92,13 +92,8 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
      * Pin Creator
      */
     fun openPinCreator(pin: Pin?) {
-        if (pin != null) {
-            _pinToAdd.value = pin
-        } else {
-            _pinToAdd.value = Pin("", 0.0, 0.0)
-        }
-        // Reset to null
-        _pinToAdd.value = null
+        _pinToAdd.value = pin ?: Pin("", 0.0, 0.0)
+        _pinToAdd.value = null // Reset to null
     }
 
     fun getGroupNames(): MutableList<String> {

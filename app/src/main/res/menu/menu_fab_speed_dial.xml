@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/fab_from_code"
+        android:icon="@drawable/ic_baseline_code_24"
+        android:title="@string/share_code" />
+    <item
+        android:id="@+id/fab_new_pin"
+        android:icon="@drawable/ic_baseline_edit_24"
+        android:title="@string/add_pin" />
+</menu>

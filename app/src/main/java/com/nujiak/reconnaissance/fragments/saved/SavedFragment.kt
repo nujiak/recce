@@ -2,6 +2,7 @@ package com.nujiak.reconnaissance.fragments.saved
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -23,6 +24,7 @@ import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.SORT_BY_GR
 import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.SORT_BY_NAME
 import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.SORT_BY_TIME
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet
+import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter
 
 
 class SavedFragment : Fragment() {
@@ -141,7 +143,17 @@ class SavedFragment : Fragment() {
         sortAscending = viewModel.sharedPreference.getBoolean(SORT_ASCENDING_KEY, sortAscending)
 
         // Set up FAB
-        binding.pinFab.setOnClickListener { viewModel.openPinCreator(null) }
+        binding.pinFab.setMenuListener(object : SimpleMenuListenerAdapter() {
+            override fun onMenuItemSelected(menuItem: MenuItem?): Boolean {
+                return when (menuItem?.itemId) {
+                    R.id.fab_new_pin -> {
+                        viewModel.openPinCreator(null)
+                        true
+                    }
+                    else -> false
+                }
+            }
+        })
 
         // Set up app bar
         binding.pinAppBar.setOnMenuItemClickListener {
