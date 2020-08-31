@@ -101,10 +101,10 @@ class SavedFragment : Fragment() {
                 }
             }
         })
-        viewModel.allChains.observe(viewLifecycleOwner, Observer {
-            refreshList(newChains = it)
-            viewModel.allChains.value?.let {allPins->
-                if (allPins.isEmpty() && allPins.isEmpty())  {
+        viewModel.allChains.observe(viewLifecycleOwner, Observer {allChains ->
+            refreshList(newChains = allChains)
+            viewModel.allPins.value?.let {allPins ->
+                if (allChains.isEmpty() && allPins.isEmpty())  {
                     binding.pinRecyclerview.visibility = View.GONE
                     binding.pinEmptyView.visibility = View.VISIBLE
                 } else {
