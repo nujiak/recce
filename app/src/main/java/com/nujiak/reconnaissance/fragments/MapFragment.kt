@@ -1082,7 +1082,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         posBtn.setOnClickListener {
             editText.text?.trim()?.let {
                 when {
-                    it.contains(',', true) || it.contains(';', true) -> {
+                    it.contains(Regex("[;,|]")) -> {
                         inputLayout.error = getString(R.string.checkpoint_invalid_error)
                     }
                     it.length > 20 -> {
