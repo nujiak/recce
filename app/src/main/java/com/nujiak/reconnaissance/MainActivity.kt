@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.text.InputType
 import android.view.*
@@ -56,8 +57,16 @@ class MainActivity : AppCompatActivity() {
         const val RULER_INDEX = 3
     }
 
-    private val mDisplay: Display? by lazy { display }
-    private lateinit var imm: InputMethodManager
+    private val mDisplay: Display? by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            display
+        } else {
+            windowManager.defaultDisplay
+        }
+    }
+    private val imm: InputMethodManager by lazy {
+        getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -280,6 +289,7 @@ class MainActivity : AppCompatActivity() {
                 typeface = Typeface.MONOSPACE
                 inputType = InputType.TYPE_NULL
                 isSingleLine = false
+                maxLines = 10
             }
             alertDialog.findViewById<Button>(R.id.copy)?.setOnClickListener {
                 val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -299,7 +309,6 @@ class MainActivity : AppCompatActivity() {
             }
         }.enable()
 
-        imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         viewModel.hideKeyboardFromThisView.observe(this, Observer {
             if (it != null) {
                 hideKeyboard(it)
