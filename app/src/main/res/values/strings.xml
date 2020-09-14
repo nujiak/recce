@@ -82,15 +82,15 @@
     <string name="mgrs_string">MGRS String</string>
     <string name="tap_enter_hint">Press \'Enter\' to update coordinates</string>
     <!-- Errors -->
-    <string name="name_blank_error">Pin name cannot be blank</string>
-    <string name="name_too_long_error"> Pin name cannot exceed 20 characters</string>
+    <string name="name_blank_error">Name cannot be blank</string>
+    <string name="name_too_long_error">Name cannot exceed 20 characters</string>
     <string name="lat_empty_error">Latitude cannot be blank</string>
     <string name="long_empty_error">Longitude cannot be blank</string>
     <string name="lat_out_of_range_error">Latitude is out of range</string>
     <string name="group_empty_error">Group cannot be blank</string>
     <string name="group_too_long_error">Group name cannot exceed 12 characters</string>
     <string name="group_invalid_error">Group name invalid</string>
-    <string name="pin_invalid_error">Pin name contains invalid characters</string>
+    <string name="name_invalid_error">Name contains invalid characters</string>
 
     <!-- Chain Creator -->
     <string name="chain_name">Chain Name</string>
