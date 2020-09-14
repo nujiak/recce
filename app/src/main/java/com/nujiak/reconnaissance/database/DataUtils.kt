@@ -2,7 +2,7 @@ package com.nujiak.reconnaissance.database
 
 import com.nujiak.reconnaissance.round
 
-fun toChainAndPins(shareCode: String): Pair<List<Pin>, List<Chain>> {
+fun toPinsAndChains(shareCode: String): Pair<List<Pin>, List<Chain>> {
     val pins = mutableListOf<Pin>()
     val chains = mutableListOf<Chain>()
 

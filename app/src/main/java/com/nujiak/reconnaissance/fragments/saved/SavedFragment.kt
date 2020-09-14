@@ -1,15 +1,24 @@
 package com.nujiak.reconnaissance.fragments.saved
 
+import android.app.AlertDialog
+import android.content.ClipboardManager
+import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.nujiak.reconnaissance.MainViewModel
 import com.nujiak.reconnaissance.MainViewModelFactory
 import com.nujiak.reconnaissance.R
@@ -63,8 +72,8 @@ class SavedFragment : Fragment() {
         pinAdapter = PinAdapter(
             { pin -> onPinClick(pin) },
             { pin -> onPinLongClick(pin) },
-            { chain -> onChainClick(chain)},
-            { chain -> onChainLongClick(chain)},
+            { chain -> onChainClick(chain) },
+            { chain -> onChainLongClick(chain) },
             viewModel.coordinateSystem.value ?: 0,
             resources
         )
@@ -77,9 +86,11 @@ class SavedFragment : Fragment() {
                     ITEM_VIEW_TYPE_CHAIN -> 2
                     ITEM_VIEW_TYPE_HEADER -> 2
                     else -> throw IllegalArgumentException(
-                        "Invalid viewType: ${pinAdapter.getItemViewType(
-                            position
-                        )}"
+                        "Invalid viewType: ${
+                            pinAdapter.getItemViewType(
+                                position
+                            )
+                        }"
                     )
                 }
             }
@@ -89,9 +100,9 @@ class SavedFragment : Fragment() {
 
 
         // Observe for changes to pins and chains
-        viewModel.allPins.observe(viewLifecycleOwner, Observer {allPins ->
+        viewModel.allPins.observe(viewLifecycleOwner, Observer { allPins ->
             refreshList(newPins = allPins)
-            viewModel.allChains.value?.let {allChains->
+            viewModel.allChains.value?.let { allChains ->
                 if (allChains.isEmpty() && allPins.isEmpty()) {
                     binding.pinRecyclerview.visibility = View.GONE
                     binding.pinEmptyView.visibility = View.VISIBLE
@@ -101,10 +112,10 @@ class SavedFragment : Fragment() {
                 }
             }
         })
-        viewModel.allChains.observe(viewLifecycleOwner, Observer {allChains ->
+        viewModel.allChains.observe(viewLifecycleOwner, Observer { allChains ->
             refreshList(newChains = allChains)
-            viewModel.allPins.value?.let {allPins ->
-                if (allChains.isEmpty() && allPins.isEmpty())  {
+            viewModel.allPins.value?.let { allPins ->
+                if (allChains.isEmpty() && allPins.isEmpty()) {
                     binding.pinRecyclerview.visibility = View.GONE
                     binding.pinEmptyView.visibility = View.VISIBLE
                 } else {
@@ -148,6 +159,10 @@ class SavedFragment : Fragment() {
                 return when (menuItem?.itemId) {
                     R.id.fab_new_pin -> {
                         viewModel.openPinCreator(null)
+                        true
+                    }
+                    R.id.fab_from_code -> {
+                        openShareCode()
                         true
                     }
                     else -> false
@@ -198,13 +213,9 @@ class SavedFragment : Fragment() {
         // Set up Selection Mode changes
         viewModel.isInSelectionMode.observe(viewLifecycleOwner, Observer { isInSelectionMode ->
             if (isInSelectionMode) {
-                context?.let {
-                    binding.pinFab.hide()
-                }
+                binding.pinFab.hide()
             } else {
-                context?.let {
-                    binding.pinFab.show()
-                }
+                binding.pinFab.show()
             }
         })
 
@@ -261,7 +272,52 @@ class SavedFragment : Fragment() {
         binding.pinRecyclerview.smoothScrollToPosition(0)
     }
 
-    private fun refreshList(newPins: List<Pin>? = viewModel.allPins.value, newChains: List<Chain>? = viewModel.allChains.value) {
-        pinAdapter.sortAndSubmitList(newPins, newChains, viewModel.selectedIds, sortBy, sortAscending)
+    private fun refreshList(
+        newPins: List<Pin>? = viewModel.allPins.value,
+        newChains: List<Chain>? = viewModel.allChains.value
+    ) {
+        pinAdapter.sortAndSubmitList(
+            newPins,
+            newChains,
+            viewModel.selectedIds,
+            sortBy,
+            sortAscending
+        )
+    }
+
+    private fun openShareCode() {
+        val alertDialog = AlertDialog.Builder(context)
+            .setView(R.layout.dialog_share_input)
+            .create()
+
+        alertDialog.show()
+
+        alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val shareCodeInput = alertDialog.findViewById<TextInputEditText>(R.id.share_code_edit)
+
+        alertDialog.findViewById<Button>(R.id.paste)?.setOnClickListener {
+            activity?.let { activity ->
+                val clipboard =
+                    activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val item = clipboard.primaryClip?.getItemAt(0)
+                val pasteData = item?.text
+                if (pasteData != null) {
+                    shareCodeInput.setText(pasteData)
+                } else {
+                    Toast.makeText(context, R.string.paste_error, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        alertDialog.findViewById<Button>(R.id.done).setOnClickListener {
+            val shareCode = shareCodeInput.text.toString()
+            val result = viewModel.processShareCode(shareCode)
+            if (result) {
+                alertDialog.dismiss()
+            } else {
+                alertDialog.findViewById<TextInputLayout>(R.id.share_code_layout).error =
+                    getString(R.string.share_code_error)
+            }
+        }
     }
 }

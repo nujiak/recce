@@ -48,6 +48,12 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
     fun addChain(chain: Chain) = uiScope.launch { insert(chain) }
     fun updateChain(chain: Chain) = uiScope.launch { update(chain) }
     fun deleteChain(chain: Chain) = uiScope.launch { deleteChain(chain.chainId) }
+    private fun addPinsAndChains(pins: List<Pin>, chains: List<Chain>) {
+        uiScope.launch {
+            pins.forEach { addPin(it) }
+            chains.forEach { addChain(it) }
+        }
+    }
 
     val isLocationGranted: Boolean
         get() = ContextCompat.checkSelfPermission(
@@ -347,6 +353,16 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
 
         shareQuantity = Pair(pinsToShare?.size, chainsToShare?.size)
         _shareCode.value = toShareCode(pinsToShare, chainsToShare)
+    }
+
+    fun processShareCode(shareCode: String): Boolean {
+        val (pins, chains) = toPinsAndChains(shareCode)
+        return if (pins.isEmpty() && chains.isEmpty()) {
+            false
+        } else {
+            addPinsAndChains(pins, chains)
+            true
+        }
     }
 
     /**
