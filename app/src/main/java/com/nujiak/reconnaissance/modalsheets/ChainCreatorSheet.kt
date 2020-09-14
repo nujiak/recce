@@ -188,6 +188,7 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
         binding.newChainColorDropdown.apply {
             setOnItemClickListener { _, _, position, _ ->
                 updateSheetColor(position)
+                viewModel.hideKeyboardFromView(binding.root)
             }
 
             setOnClickListener {
