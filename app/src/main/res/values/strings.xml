@@ -50,6 +50,9 @@
     <string name="share_code">Share Code</string>
     <string name="copy">Copy</string>
     <string name="copied">Copied to clipboard</string>
+    <string name="paste">Paste</string>
+    <string name="paste_error">Unable to fetch from clipboard</string>
+    <string name="share_code_error">Share Code is invalid</string>
     <plurals name="pins">
         <item quantity="one">%d Pin</item>
         <item quantity="other">%d Pins</item>
