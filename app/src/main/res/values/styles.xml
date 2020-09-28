@@ -9,7 +9,7 @@
         <item name="popupMenuStyle">@style/Widget.MaterialComponents.PopupMenu</item>
         <item name="actionOverflowMenuStyle">@style/Widget.MaterialComponents.PopupMenu.Overflow
         </item>
-        <item name="fontFamily">@font/roboto</item>
+        <item name="fontFamily">@font/open_sans_bold</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="shapeAppearanceLargeComponent">
             @style/ShapeAppearance.Reconnaissance.LargeComponent
@@ -29,11 +29,11 @@
     </style>
 
     <style name="Theme.Reconnaissance.Badges">
-        <item name="fontFamily">@font/roboto_black</item>
+        <item name="fontFamily">@font/open_sans_bold</item>
     </style>
 
     <style name="Theme.Reconnaissance.Tags" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="fontFamily">@font/roboto_black</item>
+        <item name="fontFamily">@font/open_sans_extrabold</item>
     </style>
 
     <style name="ThemeOverlay.Reconnaissance.ActionBar" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
@@ -65,12 +65,11 @@
 
     <style name="TextAppearance.Reconnaissance.PinName" parent="TextAppearance.MaterialComponents.Headline5">
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:textStyle">bold</item>
-        <item name="fontFamily">@font/roboto</item>
     </style>
 
     <style name="TextAppearance.Reconnaissance.Number" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textColor">@android:color/white</item>
+        <item name="fontFamily">@font/open_sans</item>
     </style>
 
     <style name="TextAppearance.Reconnaissance.GpsHeader" parent="TextAppearance.MaterialComponents.Subtitle1"/>
