@@ -27,7 +27,6 @@
             android:background="@drawable/tag_background"
             android:elevation="0dp"
             android:ellipsize="end"
-            android:fontFamily="@font/roboto_black"
             android:gravity="center"
             android:maxWidth="100sp"
             android:maxLines="1"
@@ -37,6 +36,7 @@
             android:textStyle="bold"
             tools:text="Buildings"
             tools:textColor="#000000" />
+
         <TextView
             android:id="@+id/pin_name"
             style="@style/TextAppearance.Reconnaissance.PinName"
@@ -107,7 +107,6 @@
         android:layout_margin="@dimen/small_padding"
         android:background="@drawable/pin_selection_badge"
         android:elevation="4dp"
-        android:fontFamily="@font/roboto_black"
         android:gravity="center"
         android:textColor="@android:color/black"
         android:textStyle="bold"

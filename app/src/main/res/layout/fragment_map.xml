@@ -217,7 +217,6 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/small_padding"
                 android:background="@drawable/tag_background"
-                android:fontFamily="@font/roboto_black"
                 android:gravity="center"
                 android:paddingStart="@dimen/tiny_padding"
                 android:paddingEnd="@dimen/tiny_padding"
