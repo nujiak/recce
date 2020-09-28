@@ -30,7 +30,7 @@
             android:text="@string/app_name"
             android:textColor="@color/textColorLight"/>
         <TextView
-            style="@style/TextAppearance.MaterialComponents.Subtitle1"
+            style="@style/TextAppearance.Reconnaissance.Onboarding.Description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/large_padding"

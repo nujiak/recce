@@ -61,8 +61,6 @@
         <item quantity="one">%d Chain</item>
         <item quantity="other">%d Chains</item>
     </plurals>
-    <string name="sharing">Sharing</string>
-    <string name="and">and</string>
     <!-- Sorting -->
     <string name="sort">Sort</string>
     <string name="time_added">Time added</string>
@@ -139,11 +137,9 @@
     </plurals>
 
     <!-- Onboarding -->
-    <string name="onboarding_welcome">Welcome to Recce!</string>
     <string name="onboarding_title">You will now go through a set-up guide to choose your preferences.</string>
     <string name="coord_sys_description">Choose a preferred coordinate system for projected grids. These grids will be displayed alongside Latitude &amp; Longitude throughout the app.</string>
     <string name="angle_unit_description">Choose a preferred unit for displaying angles. This will be used throughout the app.</string>
-    <string name="next">Next</string>
     <string name="get_started">Get Started</string>
     <string name="next_angle_unit">Next: Angle Unit</string>
     <string name="next_all_set">Next: All Set</string>
