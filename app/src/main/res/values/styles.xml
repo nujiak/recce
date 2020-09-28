@@ -10,6 +10,7 @@
         <item name="actionOverflowMenuStyle">@style/Widget.MaterialComponents.PopupMenu.Overflow
         </item>
         <item name="fontFamily">@font/open_sans_bold</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="shapeAppearanceLargeComponent">
             @style/ShapeAppearance.Reconnaissance.LargeComponent
@@ -75,6 +76,10 @@
     <style name="TextAppearance.Reconnaissance.GpsHeader" parent="TextAppearance.MaterialComponents.Subtitle1"/>
 
     <style name="TextAppearance.Reconnaissance.GpsNumber" parent="TextAppearance.MaterialComponents.Headline6"/>
+
+    <style name="TextAppearance.Reconnaissance.Onboarding.Description" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="fontFamily">@font/open_sans_semibold</item>
+    </style>
 
     <style name="ShapeAppearance.Reconnaissance.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
         <item name="cornerFamily">rounded</item>
