@@ -9,9 +9,11 @@
         <item name="popupMenuStyle">@style/Widget.MaterialComponents.PopupMenu</item>
         <item name="actionOverflowMenuStyle">@style/Widget.MaterialComponents.PopupMenu.Overflow
         </item>
+        <item name="android:colorEdgeEffect">@color/dividerGrey</item>
         <item name="fontFamily">@font/open_sans_bold</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="shapeAppearanceLargeComponent">
             @style/ShapeAppearance.Reconnaissance.LargeComponent
         </item>
@@ -19,6 +21,7 @@
         <item name="actionModeStyle">@style/Widget.AppCompat.ActionMode</item>
         <item name="actionModeCloseDrawable">@drawable/ic_close_white_24dp</item>
         <item name="actionBarTheme">@style/ThemeOverlay.Reconnaissance.ActionBar</item>
+        <item name="toolbarStyle">@style/Widget.Reconnaissance.Toolbar</item>
     </style>
 
     <style name="Theme.Reconnaissance" parent="BaseTheme.Reconnaissance" />
@@ -62,6 +65,19 @@
         <item name="android:minHeight">36dp</item>
         <item name="android:backgroundTint">?attr/colorSurface</item>
         <item name="iconSize">20dp</item>
+    </style>
+
+    <style name="Widget.Reconnaissance.Toolbar" parent="Widget.MaterialComponents.Toolbar.PrimarySurface">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Reconnaissance.Toolbar</item>
+    </style>
+    <style name="Widget.Reconnaissance.Toolbar.Title" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="fontFamily">@font/open_sans_bold</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+    <style name="ThemeOverlay.Reconnaissance.Toolbar" parent="">
+        <item name="colorPrimary">?attr/colorSurface</item>
+        <item name="colorPrimaryVariant">@color/colorPrimary</item>
+        <item name="colorOnPrimary">@color/colorPrimary</item>
     </style>
 
     <style name="TextAppearance.Reconnaissance.PinName" parent="TextAppearance.MaterialComponents.Headline5">

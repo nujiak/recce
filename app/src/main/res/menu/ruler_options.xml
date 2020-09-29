@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/ruler_clear"
-        android:icon="@drawable/ic_delete_white_24dp"
+        android:icon="@drawable/ic_delete_24dp"
         android:title="@string/clear_ruler"
         app:showAsAction="ifRoom" />
 </menu>
