@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context=".fragments.GpsFragment">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -15,7 +14,10 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:layout_scrollFlags="scroll|enterAlways|snap"
+            android:background="?attr/colorSurface"
+            android:paddingTop="24dp">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/ruler_top_app_bar"

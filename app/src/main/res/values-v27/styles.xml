@@ -4,8 +4,6 @@
     <style name="Theme.Reconnaissance" parent="BaseTheme.Reconnaissance">
         <!-- Customize your theme here. -->
         <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
-        <item name="android:contextPopupMenuStyle">
-            @style/Widget.MaterialComponents.PopupMenu.ContextMenu
-        </item>
+        <item name="android:windowLightNavigationBar">?attr/isLightTheme</item>
     </style>
 </resources>
