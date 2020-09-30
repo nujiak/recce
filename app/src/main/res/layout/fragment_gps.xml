@@ -15,14 +15,16 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingTop="24dp"
+            app:layout_scrollFlags="scroll|enterAlways|snap"
+            android:background="?attr/colorSurface">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/pins_top_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_scrollFlags="scroll|enterAlways|snap"
-                android:elevation="0dp"/>
+                android:elevation="0dp" />
 
             <TextView
                 style="@style/Widget.Reconnaissance.Toolbar.Title"
@@ -34,9 +36,9 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
-        android:overScrollMode="ifContentScrolls"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:overScrollMode="ifContentScrolls"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout

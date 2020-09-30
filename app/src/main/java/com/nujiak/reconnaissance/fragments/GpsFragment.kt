@@ -9,7 +9,10 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.hardware.SensorManager.*
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Surface
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -44,9 +47,6 @@ class GpsFragment : Fragment(), SensorEventListener {
     private var coordSysId = 0
     private var angleUnitId = 0
 
-    private var screenRotation: Int = 0
-    private lateinit var display: Display
-
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,6 +65,8 @@ class GpsFragment : Fragment(), SensorEventListener {
                 viewModelFactory
             ).get(MainViewModel::class.java)
         }!!
+
+        binding.root.fitsSystemWindows = false
 
         // Listen for fused location updates
         viewModel.fusedLocationData.observe(viewLifecycleOwner, Observer {
@@ -206,11 +208,6 @@ class GpsFragment : Fragment(), SensorEventListener {
                 SENSOR_DELAY_UI
             )
         }
-
-        // Get current screen rotation
-        display = requireActivity().windowManager.defaultDisplay
-        screenRotation = display.rotation
-
     }
 
     override fun onPause() {

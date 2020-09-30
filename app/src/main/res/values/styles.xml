@@ -12,16 +12,16 @@
         <item name="android:colorEdgeEffect">@color/dividerGrey</item>
         <item name="fontFamily">@font/open_sans_bold</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="android:windowTranslucentStatus">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="shapeAppearanceLargeComponent">
             @style/ShapeAppearance.Reconnaissance.LargeComponent
         </item>
         <item name="windowActionModeOverlay">true</item>
-        <item name="actionModeStyle">@style/Widget.AppCompat.ActionMode</item>
+        <item name="actionModeStyle">@style/Widget.Reconnaissance.ActionMode</item>
         <item name="actionModeCloseDrawable">@drawable/ic_close_white_24dp</item>
         <item name="actionBarTheme">@style/ThemeOverlay.Reconnaissance.ActionBar</item>
         <item name="toolbarStyle">@style/Widget.Reconnaissance.Toolbar</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
     </style>
 
     <style name="Theme.Reconnaissance" parent="BaseTheme.Reconnaissance" />
@@ -43,6 +43,10 @@
     <style name="ThemeOverlay.Reconnaissance.ActionBar" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
         <item name="android:colorBackground">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorPrimary</item>
+    </style>
+    <style name="Widget.Reconnaissance.ActionMode" parent="Widget.AppCompat.ActionMode">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="statusBarBackground">@android:color/transparent</item>
     </style>
 
     <style name="Widget.Reconnaissance.Button.TextButton.IconOnly" parent="Widget.MaterialComponents.Button.TextButton">
@@ -104,7 +108,8 @@
 
     <style name="SplashScreen" parent="Theme.MaterialComponents.NoActionBar">
         <item name="android:windowBackground">@drawable/splash_screen</item>
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
 </resources>
