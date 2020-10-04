@@ -43,14 +43,12 @@
         <item name="fontFamily">@font/open_sans_extrabold</item>
     </style>
 
-    <style name="ThemeOverlay.Reconnaissance.ActionBar" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
-        <item name="android:colorBackground">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorPrimary</item>
+    <style name="ThemeOverlay.Reconnaissance.ActionBar" parent="ThemeOverlay.MaterialComponents.ActionBar">
+        <item name="android:colorBackground">?attr/colorSurface</item>
+        <item name="colorAccent">@color/colorPrimaryDark</item>
+        <item name="tint">?android:attr/textColorPrimary</item>
     </style>
-    <style name="Widget.Reconnaissance.ActionMode" parent="Widget.AppCompat.ActionMode">
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="statusBarBackground">@android:color/transparent</item>
-    </style>
+    <style name="Widget.Reconnaissance.ActionMode" parent="Widget.AppCompat.ActionMode"/>
 
     <style name="Widget.Reconnaissance.Button.TextButton.IconOnly" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="iconPadding">0dp</item>
