@@ -335,6 +335,7 @@ class MainActivity : AppCompatActivity() {
         bundle.putParcelable("pin", pin)
         val pinCreatorSheet =
             PinCreatorSheet()
+        // pinCreatorSheet.setStyle(DialogFragment.STYLE_NORMAL, R.style.Theme_Reconnaissance_BottomSheetDialog_Creators)
         pinCreatorSheet.arguments = bundle
         pinCreatorSheet.show(supportFragmentManager, pinCreatorSheet.tag)
     }

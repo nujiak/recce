@@ -3,6 +3,7 @@ package com.nujiak.reconnaissance.modalsheets
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -465,10 +466,19 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
     }
 
     private fun updateSheetColor(colorIdx: Int = 0) {
-        val color = ContextCompat.getColor(requireContext(), PIN_CARD_DARK_BACKGROUNDS[colorIdx])
-        val bgDraw = ContextCompat.getDrawable(requireContext(), R.drawable.bottom_sheet)
-        bgDraw?.setTint(color)
-        binding.root.background = bgDraw
+        context?.let {
+            val color = ContextCompat.getColor(it, PIN_CARD_DARK_BACKGROUNDS[colorIdx])
+            activity?.window?.navigationBarColor = color // Set navigation bar color
+            binding.root.setBackgroundColor(color)
+        }
+
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+
+        // Reset navigation bar color
+        activity?.window?.navigationBarColor = ContextCompat.getColor(requireContext(), android.R.color.transparent)
     }
 
     /**

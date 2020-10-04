@@ -26,10 +26,13 @@
 
     <style name="Theme.Reconnaissance" parent="BaseTheme.Reconnaissance" />
 
-    <style name="Theme.Reconnaissance.BottomSheetDialog" parent="Theme.MaterialComponents.BottomSheetDialog">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+    <style name="Theme.Reconnaissance.BottomSheetDialog"/>
+    <style name="Theme.Reconnaissance.BottomSheetDialog.Creators">
+        <item name="colorOnSurface">@android:color/white</item>
+        <item name="colorOnBackground">@android:color/white</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="background">@android:color/transparent</item>
     </style>
 
     <style name="Theme.Reconnaissance.Badges">
