@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:theme="@style/Theme.Reconnaissance.BottomSheetDialog"
+    android:theme="@style/Theme.Reconnaissance.BottomSheetDialog.Creators"
     tools:background="@color/tagRedDark">
 
     <LinearLayout
