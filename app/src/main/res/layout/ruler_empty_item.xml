@@ -1,19 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="48dp"
     android:layout_marginEnd="48dp"
-    android:background="@drawable/empty_ruler_item_background"
-    android:elevation="2dp"
-    android:gravity="center_vertical"
-    android:orientation="vertical"
-    android:padding="24dp">
+    app:cardCornerRadius="@dimen/large_padding"
+    app:cardElevation="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="2dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:padding="20dp">
+
         <TextView
-            style="@style/TextAppearance.MaterialComponents.Headline6"
+            style="@style/TextAppearance.MaterialComponents.Subtitle1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ruler_empty" />
+            android:text="@string/ruler_empty"
+            android:textColor="@android:color/darker_gray"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -23,16 +31,21 @@
 
             <TextView
                 style="@style/TextAppearance.MaterialComponents.Caption"
+                app:fontFamily="@font/open_sans_semibold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/tip" />
+                android:text="@string/tip"
+                android:textColor="@android:color/darker_gray"/>
 
             <TextView
                 style="@style/TextAppearance.MaterialComponents.Caption"
+                app:fontFamily="@font/open_sans_semibold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/small_padding"
-                android:text="@string/ruler_hint" />
+                android:text="@string/ruler_hint"
+                android:textColor="@android:color/darker_gray" />
 
         </LinearLayout>
-</LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
