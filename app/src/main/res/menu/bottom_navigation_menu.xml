@@ -16,6 +16,6 @@
         android:title="@string/gps" />
     <item
         android:id="@+id/btm_nav_ruler"
-        android:icon="@drawable/ic_straighten_white_24dp"
+        android:icon="@drawable/ic_straighten_24dp"
         android:title="@string/ruler" />
 </menu>

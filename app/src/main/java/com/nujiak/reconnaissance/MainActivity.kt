@@ -11,7 +11,10 @@ import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.InputType
+import android.util.TypedValue
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -23,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.appcompat.view.ActionMode
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
@@ -206,6 +210,12 @@ class MainActivity : AppCompatActivity() {
                     bottomNavigation.menu.getItem(position).isEnabled = false
                 }
                 viewPager.isUserInputEnabled = false
+
+                // Change status bar color
+                TypedValue().let {
+                    theme.resolveAttribute(R.attr.colorSurface, it, true)
+                    window.statusBarColor = it.data
+                }
                 return true
             }
 
@@ -221,6 +231,11 @@ class MainActivity : AppCompatActivity() {
                 for (position in 0 until bottomNavigation.menu.size()) {
                     bottomNavigation.menu.getItem(position).isEnabled = true
                 }
+
+                // Delay switching navigation bar colour to prevent black bar showing.
+                Handler(Looper.getMainLooper()).postDelayed({
+                    window.statusBarColor = ContextCompat.getColor(baseContext, android.R.color.transparent)
+                }, 500)
                 viewPager.isUserInputEnabled = true
             }
         }
