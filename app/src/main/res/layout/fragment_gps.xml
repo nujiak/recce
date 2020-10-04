@@ -62,7 +62,7 @@
                     android:padding="@dimen/large_padding">
 
                     <TextView
-                        style="@style/TextAppearance.MaterialComponents.Headline5"
+                        style="@style/TextAppearance.Reconnaissance.GpsSectionHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -181,7 +181,7 @@
                     android:padding="@dimen/large_padding">
 
                     <TextView
-                        style="@style/TextAppearance.MaterialComponents.Headline5"
+                        style="@style/TextAppearance.Reconnaissance.GpsSectionHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -266,7 +266,7 @@
                     </LinearLayout>
 
                     <TextView
-                        style="@style/TextAppearance.MaterialComponents.Caption"
+                        style="@style/TextAppearance.Reconnaissance.GpsInfo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
@@ -314,7 +314,7 @@
                     </FrameLayout>
 
                     <TextView
-                        style="@style/TextAppearance.MaterialComponents.Caption"
+                        style="@style/TextAppearance.Reconnaissance.GpsInfo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"

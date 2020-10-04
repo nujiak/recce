@@ -96,9 +96,15 @@
         <item name="fontFamily">@font/open_sans</item>
     </style>
 
-    <style name="TextAppearance.Reconnaissance.GpsHeader" parent="TextAppearance.MaterialComponents.Subtitle1"/>
+    <style name="TextAppearance.Reconnaissance.GpsSectionHeader" parent="TextAppearance.MaterialComponents.Headline5"/>
+    <style name="TextAppearance.Reconnaissance.GpsHeader" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/open_sans_semibold</item>
+    </style>
 
     <style name="TextAppearance.Reconnaissance.GpsNumber" parent="TextAppearance.MaterialComponents.Headline6"/>
+    <style name="TextAppearance.Reconnaissance.GpsInfo" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="fontFamily">@font/open_sans_semibold</item>
+    </style>
 
     <style name="TextAppearance.Reconnaissance.Onboarding.Description" parent="TextAppearance.MaterialComponents.Subtitle2">
         <item name="fontFamily">@font/open_sans_semibold</item>
