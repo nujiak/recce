@@ -6,4 +6,9 @@
         <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
         <item name="android:windowLightNavigationBar">?attr/isLightTheme</item>
     </style>
+
+    <style name="Theme.Reconnaissance.Onboarding" parent="Theme.Reconnaissance.OnboardingBase">
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
 </resources>

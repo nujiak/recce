@@ -35,6 +35,14 @@
         <item name="background">@android:color/transparent</item>
     </style>
 
+    <style name="Theme.Reconnaissance.OnboardingBase">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+    </style>
+    <style name="Theme.Reconnaissance.Onboarding" parent="Theme.Reconnaissance.OnboardingBase"/>
+
     <style name="Theme.Reconnaissance.Badges">
         <item name="fontFamily">@font/open_sans_bold</item>
     </style>
@@ -116,6 +124,7 @@
     <style name="SplashScreen" parent="Theme.MaterialComponents.NoActionBar">
         <item name="android:windowBackground">@drawable/splash_screen</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
