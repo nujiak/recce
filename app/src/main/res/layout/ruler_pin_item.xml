@@ -9,7 +9,9 @@
     android:layout_marginEnd="48dp"
     app:cardBackgroundColor="@color/tagRed"
     app:cardCornerRadius="16dp"
-    app:cardElevation="1dp"
+    app:strokeWidth="2dp"
+    app:strokeColor="@color/pinDetailShade"
+    app:cardElevation="2dp"
     app:cardPreventCornerOverlap="true">
 
     <LinearLayout
