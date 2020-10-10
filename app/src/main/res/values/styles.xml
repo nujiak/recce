@@ -116,6 +116,10 @@
         <item name="fontFamily">@font/open_sans_semibold</item>
     </style>
 
+    <style name="TextAppearance.Reconnaissance.Ruler.Header" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="fontFamily">@font/open_sans_semibold</item>
+    </style>
+
     <style name="ShapeAppearance.Reconnaissance.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/large_padding</item>
