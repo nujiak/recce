@@ -879,7 +879,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private fun toggleLiveMeasurement(makeVisible: Boolean = true) {
 
-        if (isLiveMeasurementVisible == makeVisible) {
+        // Return with no changes if LiveMeasurement visibility is already equal to make_visible
+        // or if location is not granted.
+        if (isLiveMeasurementVisible == makeVisible
+            || (makeVisible && !viewModel.isLocationGranted)) {
             return
         }
 
