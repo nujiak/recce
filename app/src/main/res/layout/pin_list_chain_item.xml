@@ -82,10 +82,10 @@
             tools:ignore="RtlSymmetry">
 
             <TextView
+                style="@style/TextAppearance.Reconnaissance.NumberHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/checkpoints"
-                android:textColor="@android:color/white"/>
+                android:text="@string/checkpoints"/>
 
             <TextView
                 android:id="@+id/chain_checkpoints"
@@ -95,12 +95,12 @@
                 tools:text="Audi, Benz, Chevy" />
 
             <TextView
+                style="@style/TextAppearance.Reconnaissance.NumberHeader"
                 android:id="@+id/chain_distance_desc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/small_padding"
-                android:text="@string/distance"
-                android:textColor="@android:color/white"/>
+                android:text="@string/distance"/>
 
             <TextView
                 android:id="@+id/chain_distance"
