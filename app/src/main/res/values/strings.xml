@@ -159,7 +159,7 @@
       -->
 
     <string name="guide_show_only_once">This guide will appear only once</string>
-    <string name="reset_all_guides">Reset All Guides</string>
+    <string name="reset_preferences">Reset Preferences</string>
 
     <!-- Chains Guide -->
     <string name="guide_chains">Chains Guide</string>

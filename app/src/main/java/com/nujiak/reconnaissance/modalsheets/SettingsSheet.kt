@@ -1,17 +1,18 @@
 package com.nujiak.reconnaissance.modalsheets
 
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.nujiak.reconnaissance.MainActivity
 import com.nujiak.reconnaissance.MainViewModel
 import com.nujiak.reconnaissance.MainViewModelFactory
 import com.nujiak.reconnaissance.R
@@ -19,6 +20,7 @@ import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.SheetSettingsBinding
 import com.nujiak.reconnaissance.fragments.MapFragment
 import com.nujiak.reconnaissance.onboarding.OnboardingActivity
+
 
 class SettingsSheet : BottomSheetDialogFragment() {
 
@@ -101,13 +103,7 @@ class SettingsSheet : BottomSheetDialogFragment() {
 
         // Set up reset guides
         binding.settingsResetGuides.setOnClickListener {
-            viewModel.sharedPreference.edit().apply {
-                putBoolean(MapFragment.CHAINS_GUIDE_SHOWN_KEY, false)
-                putBoolean(OnboardingActivity.ONBOARDING_COMPLETED_KEY, false)
-            }.apply()
-            viewModel.chainsGuideShown = false
-            binding.settingsResetGuides.isEnabled = false
-            binding.settingsResetGuides.backgroundTintList = ContextCompat.getColorStateList(requireContext(), android.R.color.holo_red_dark)
+            onResetPreferences()
         }
 
         setUpPreferences()
@@ -132,6 +128,23 @@ class SettingsSheet : BottomSheetDialogFragment() {
             currentThemePrefId = it
             newThemePrefId = it
         }
+    }
+
+    private fun onResetPreferences() {
+        viewModel.sharedPreference.edit().apply {
+            putBoolean(MapFragment.CHAINS_GUIDE_SHOWN_KEY, false)
+            putBoolean(OnboardingActivity.ONBOARDING_COMPLETED_KEY, false)
+            remove(THEME_PREF_KEY)
+            remove(ANGLE_UNIT_KEY)
+            remove(COORD_SYS_KEY)
+        }.apply()
+        viewModel.chainsGuideShown = false
+
+        // Restart Activity
+        val intent = Intent(context, MainActivity::class.java)
+        startActivity(intent)
+        requireActivity().finish()
+
     }
 
     override fun onDismiss(dialog: DialogInterface) {
