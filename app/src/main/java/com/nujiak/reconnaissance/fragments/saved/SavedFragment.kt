@@ -143,7 +143,7 @@ class SavedFragment : Fragment() {
                 val snackBar = Snackbar.make(
                     binding.pinAppBar,
                     resources.getQuantityString(R.plurals.number_deleted, size, size),
-                    Snackbar.LENGTH_INDEFINITE
+                    Snackbar.LENGTH_LONG
                 ).setAction(R.string.undo) { viewModel.onRestoreLastDeletedPins() }
                 snackBar.show()
             }
