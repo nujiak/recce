@@ -470,6 +470,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             val color = ContextCompat.getColor(it, PIN_CARD_DARK_BACKGROUNDS[colorIdx])
             activity?.window?.navigationBarColor = color // Set navigation bar color
             binding.root.setBackgroundColor(color)
+            binding.newChainSave.setTextColor(color)
         }
 
     }
