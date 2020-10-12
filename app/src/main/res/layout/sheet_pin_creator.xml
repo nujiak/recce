@@ -35,6 +35,7 @@
             android:layout_gravity="start"
             android:visibility="gone"
             app:icon="@drawable/ic_delete_24dp"
+            app:iconTint="@android:color/white"
             tools:visibility="visible" />
 
 
@@ -43,7 +44,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:text="@string/save" />
+            android:text="@string/save"
+            app:backgroundTint="@android:color/white"
+            android:textColor="@android:color/black"/>
 
     </LinearLayout>
 
