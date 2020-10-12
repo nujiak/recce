@@ -54,10 +54,10 @@
                 android:orientation="vertical">
 
                 <TextView
+                    style="@style/TextAppearance.Reconnaissance.NumberHeader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/lat_lng"
-                    android:textColor="@color/textColorLight"/>
+                    android:text="@string/lat_lng"/>
 
                 <TextView
                     android:id="@+id/ruler_pin_lat_lng"
@@ -68,11 +68,11 @@
             </LinearLayout>
 
             <View
-                android:layout_width="1dp"
+                android:layout_width="0.5dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="@dimen/small_padding"
                 android:layout_marginEnd="@dimen/small_padding"
-                android:background="@color/dividerGrey" />
+                android:background="@android:color/white" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -81,10 +81,10 @@
                 android:orientation="vertical">
 
                 <TextView
+                    style="@style/TextAppearance.Reconnaissance.NumberHeader"
                     android:id="@+id/ruler_pin_grid_system"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/textColorLight"
                     tools:text="@string/utm" />
 
                 <TextView

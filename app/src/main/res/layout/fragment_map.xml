@@ -253,11 +253,11 @@
                 android:paddingBottom="@dimen/small_padding">
 
                 <TextView
+                    style="@style/TextAppearance.Reconnaissance.NumberHeader"
                     android:id="@+id/map_lat_long_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/lat_lng"
-                    android:textColor="@color/textColorLight" />
+                    android:text="@string/lat_lng" />
 
                 <TextView
                     android:id="@+id/map_lat_lng_text"
@@ -270,12 +270,12 @@
                     tools:text="20.203042 103.293040" />
 
                 <TextView
+                    style="@style/TextAppearance.Reconnaissance.NumberHeader"
                     android:id="@+id/map_grid_system"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/small_padding"
-                    android:text="@string/utm"
-                    android:textColor="@color/textColorLight" />
+                    android:text="@string/utm" />
 
                 <TextView
                     android:id="@+id/map_grid_text"

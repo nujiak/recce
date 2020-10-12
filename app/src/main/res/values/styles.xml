@@ -99,6 +99,11 @@
 
     <style name="TextAppearance.Reconnaissance.Number" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textColor">@android:color/white</item>
+        <item name="fontFamily">@font/open_sans_bold</item>
+    </style>
+
+    <style name="TextAppearance.Reconnaissance.NumberHeader" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">@android:color/white</item>
         <item name="fontFamily">@font/open_sans</item>
     </style>
 
