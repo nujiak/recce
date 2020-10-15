@@ -38,7 +38,7 @@
     <style name="Theme.Reconnaissance.OnboardingBase">
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowIsTranslucent">false</item>
         <item name="android:navigationBarColor">@android:color/black</item>
     </style>
     <style name="Theme.Reconnaissance.Onboarding" parent="Theme.Reconnaissance.OnboardingBase"/>
