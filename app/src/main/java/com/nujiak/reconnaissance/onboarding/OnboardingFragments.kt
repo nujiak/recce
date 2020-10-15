@@ -1,53 +1,48 @@
 package com.nujiak.reconnaissance.onboarding
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.RadioButton
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
-import androidx.viewpager2.widget.ViewPager2
 import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet
 
-class OnboardingTitleFragment(
-    private val sharedPrefs: SharedPreferences,
-    private val viewpager: ViewPager2
-) : Fragment() {
+class OnboardingTitleFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
+        val viewModel: OnboardingViewModel by requireActivity().viewModels()
         val view = inflater.inflate(R.layout.onboarding_title, container)
 
         view.findViewById<Button>(R.id.onboarding_title_next).setOnClickListener {
-            viewpager.currentItem += 1
+            viewModel.toPage(OnboardingViewModel.COORD_SYS_INDEX)
         }
+
         view.findViewById<Button>(R.id.onboarding_title_ns).setOnClickListener {
-            sharedPrefs.edit().apply {
-                putInt(SettingsSheet.COORD_SYS_KEY, SettingsSheet.COORD_SYS_ID_KERTAU)
-                putInt(SettingsSheet.ANGLE_UNIT_KEY, SettingsSheet.ANGLE_UNIT_ID_NATO_MILS)
-            }.apply()
-            viewpager.currentItem = 4
+            viewModel.coordSysId = SettingsSheet.COORD_SYS_ID_KERTAU
+            viewModel.angleUnitId = SettingsSheet.ANGLE_UNIT_ID_NATO_MILS
+            viewModel.toPage(OnboardingViewModel.NS_ALL_SET_INDEX)
         }
 
         return view
     }
 }
 
-class OnboardingGridsFragment(
-    private val sharedPrefs: SharedPreferences,
-    private val viewpager: ViewPager2
-) : Fragment() {
+class OnboardingGridsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        val viewModel: OnboardingViewModel by requireActivity().viewModels()
 
         val view = inflater.inflate(R.layout.onboarding_grids, container)
 
@@ -55,7 +50,7 @@ class OnboardingGridsFragment(
         val mgrsBtn = view.findViewById<RadioButton>(R.id.onboarding_radio_mgrs)
         val kertauBtn = view.findViewById<RadioButton>(R.id.onboarding_radio_kertau)
 
-        when (sharedPrefs.getInt(SettingsSheet.COORD_SYS_KEY, SettingsSheet.COORD_SYS_ID_UTM)) {
+        when (viewModel.coordSysId) {
             SettingsSheet.COORD_SYS_ID_UTM ->
                 utmBtn.isChecked = true
             SettingsSheet.COORD_SYS_ID_MGRS ->
@@ -65,113 +60,103 @@ class OnboardingGridsFragment(
         }
 
         view.findViewById<Button>(R.id.onboarding_grids_next).setOnClickListener {
-            sharedPrefs.edit().putInt(
-                SettingsSheet.COORD_SYS_KEY, when {
+            viewModel.coordSysId = when {
                     utmBtn.isChecked -> SettingsSheet.COORD_SYS_ID_UTM
                     mgrsBtn.isChecked -> SettingsSheet.COORD_SYS_ID_MGRS
                     kertauBtn.isChecked -> SettingsSheet.COORD_SYS_ID_KERTAU
                     else -> SettingsSheet.COORD_SYS_ID_UTM
-                }
-            ).apply()
-            viewpager.currentItem += 1
+            }
+            viewModel.toPage(OnboardingViewModel.ANGLE_INDEX)
         }
         view.findViewById<Button>(R.id.onboarding_grids_prev).setOnClickListener {
-            sharedPrefs.edit().putInt(
-                SettingsSheet.COORD_SYS_KEY, when {
-                    utmBtn.isChecked -> SettingsSheet.COORD_SYS_ID_UTM
-                    mgrsBtn.isChecked -> SettingsSheet.COORD_SYS_ID_MGRS
-                    kertauBtn.isChecked -> SettingsSheet.COORD_SYS_ID_KERTAU
-                    else -> SettingsSheet.COORD_SYS_ID_UTM
-                }
-            ).apply()
-            viewpager.currentItem -= 1
+            viewModel.coordSysId = when {
+                utmBtn.isChecked -> SettingsSheet.COORD_SYS_ID_UTM
+                mgrsBtn.isChecked -> SettingsSheet.COORD_SYS_ID_MGRS
+                kertauBtn.isChecked -> SettingsSheet.COORD_SYS_ID_KERTAU
+                else -> SettingsSheet.COORD_SYS_ID_UTM
+            }
+            viewModel.toPage(OnboardingViewModel.TITLE_INDEX)
         }
 
         return view
     }
 }
 
-class OnboardingAnglesFragment(
-    private val sharedPrefs: SharedPreferences,
-    private val viewpager: ViewPager2
-) : Fragment() {
+class OnboardingAnglesFragment() : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val viewModel: OnboardingViewModel by requireActivity().viewModels()
 
         val view = inflater.inflate(R.layout.onboarding_angles, container)
 
         val degBtn = view.findViewById<RadioButton>(R.id.onboarding_radio_deg)
         val milsBtn = view.findViewById<RadioButton>(R.id.onboarding_radio_mils)
 
-        when (sharedPrefs.getInt(SettingsSheet.ANGLE_UNIT_KEY, SettingsSheet.ANGLE_UNIT_ID_DEG)) {
+        when (viewModel.angleUnitId) {
             SettingsSheet.ANGLE_UNIT_ID_DEG -> degBtn.isChecked = true
             SettingsSheet.ANGLE_UNIT_ID_NATO_MILS -> milsBtn.isChecked = true
         }
 
         view.findViewById<Button>(R.id.onboarding_angles_next).setOnClickListener {
-            sharedPrefs.edit().putInt(
-                SettingsSheet.ANGLE_UNIT_KEY, when {
+            viewModel.angleUnitId = when {
                     degBtn.isChecked -> SettingsSheet.ANGLE_UNIT_ID_DEG
                     milsBtn.isChecked -> SettingsSheet.ANGLE_UNIT_ID_NATO_MILS
                     else -> SettingsSheet.ANGLE_UNIT_ID_DEG
-                }
-            ).apply()
-            viewpager.currentItem += 1
+            }
+            viewModel.toPage(OnboardingViewModel.ALL_SET_INDEX)
         }
         view.findViewById<Button>(R.id.onboarding_angles_prev).setOnClickListener {
-            sharedPrefs.edit().putInt(
-                SettingsSheet.ANGLE_UNIT_KEY, when {
-                    degBtn.isChecked -> SettingsSheet.ANGLE_UNIT_ID_DEG
-                    milsBtn.isChecked -> SettingsSheet.ANGLE_UNIT_ID_NATO_MILS
-                    else -> SettingsSheet.ANGLE_UNIT_ID_DEG
-                }
-            ).apply()
-            viewpager.currentItem -= 1
+            viewModel.angleUnitId = when {
+                degBtn.isChecked -> SettingsSheet.ANGLE_UNIT_ID_DEG
+                milsBtn.isChecked -> SettingsSheet.ANGLE_UNIT_ID_NATO_MILS
+                else -> SettingsSheet.ANGLE_UNIT_ID_DEG
+            }
+            viewModel.toPage(OnboardingViewModel.COORD_SYS_INDEX)
         }
 
         return view
     }
 }
 
-class OnboardingEndFragment(private val viewpager: ViewPager2, val endOnClick: (View) -> Unit) :
-    Fragment() {
+class OnboardingEndFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val viewModel: OnboardingViewModel by requireActivity().viewModels()
 
         val view = inflater.inflate(R.layout.onboarding_end, container)
 
         view.findViewById<Button>(R.id.onboarding_end_start).setOnClickListener {
-            endOnClick(it)
+            viewModel.endOnboarding()
         }
         view.findViewById<Button>(R.id.onboarding_end_back).setOnClickListener {
-            viewpager.currentItem -= 1
+            viewModel.toPage(OnboardingViewModel.ANGLE_INDEX)
         }
 
         return view
     }
 }
 
-class OnboardingNSFragment(private val viewpager: ViewPager2, val endOnClick: (View) -> Unit) :
-    Fragment() {
+class OnboardingNSFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val viewModel: OnboardingViewModel by requireActivity().viewModels()
 
         val view = inflater.inflate(R.layout.onboarding_ns, container)
 
         view.findViewById<Button>(R.id.onboarding_ns_start).setOnClickListener {
-            endOnClick(it)
+            viewModel.endOnboarding()
         }
         view.findViewById<Button>(R.id.onboarding_ns_back).setOnClickListener {
-            viewpager.currentItem = 0
+            viewModel.toPage(OnboardingViewModel.TITLE_INDEX)
         }
 
         return view
