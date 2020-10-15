@@ -182,6 +182,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
 
         isInputValid = true
 
+        // Validate pin name
         val name = binding.newPinNameEditText.text
         when {
             name.isNullOrBlank() -> {
@@ -198,23 +199,42 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             }
         }
 
+        // Validate latitude
         val lat = binding.newPinLatEditText.text
         if (lat.isNullOrBlank()) {
             binding.newPinLatInput.error = getString(R.string.lat_empty_error)
             isInputValid = false
         } else {
-            val latValue = lat.toString().toDouble()
-            if (latValue < -90 || latValue > 90) {
-                binding.newPinLatInput.error = getString(R.string.lat_out_of_range_error)
+            try {
+                // Test if lat is a valid number
+                val latValue = lat.toString().toDouble()
+
+                // Test if lat is within range
+                if (latValue < -90 || latValue > 90) {
+                    binding.newPinLatInput.error = getString(R.string.lat_out_of_range_error)
+                    isInputValid = false
+                }
+            } catch (e: Exception) {
+                // Lat is not in proper decimal format
+                binding.newPinLatInput.error = getString(R.string.lat_empty_error)
                 isInputValid = false
             }
+
         }
 
-        val long = binding.newPinLongEditText.text
-        when {
-            long.isNullOrBlank() -> {
+        // Validate longitude
+        val lng = binding.newPinLongEditText.text
+        if (lng.isNullOrBlank()) {
                 binding.newPinLongInput.error = getString(R.string.long_empty_error)
                 isInputValid = false
+        } else {
+            // Test if long is a valid number
+            try {
+                lng.toString().toDouble()
+            } catch (e: Exception) {
+                // long is not in proper decimal format
+                isInputValid = false
+                binding.newPinLongInput.error = getString(R.string.long_empty_error)
             }
         }
     }
@@ -375,52 +395,58 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
 
     @SuppressLint("SetTextI18n")
     private fun updateGrids() {
-        val lat = binding.newPinLatEditText.text.toString()
-        val lng = binding.newPinLongEditText.text.toString()
+        val lat: Double
+        val lng: Double
+        try {
+            lat = binding.newPinLatEditText.text.toString().toDouble()
+            lng = binding.newPinLongEditText.text.toString().toDouble()
+        } catch (e: Exception) {
+            clearGrids()
+            return
+        }
 
-        if (!lat.isBlank() && !lng.isBlank()) {
-            when (coordSys) {
-                COORD_SYS_ID_UTM -> {
-                    val utmData = getUtmData(lat.toDouble(), lng.toDouble())
-                    utmData?.let {
-                        // UTM data is valid, set texts then return
-                        binding.newPinEastingEditText.setText(floor(it.x).toInt().toString())
-                        binding.newPinNorthingEditText.setText(floor(it.y).toInt().toString())
-                        binding.newPinZoneDropdown.setText("${it.zone}${it.band}", false)
-                        return
-                    }
-                }
-                COORD_SYS_ID_MGRS -> {
-                    binding.newPinMgrsEditText.setText(
-                        getMgrsData(
-                            lat.toDouble(),
-                            lng.toDouble()
-                        )?.toSingleLine(includeWhitespace = true)
-                    )
+        when (coordSys) {
+            COORD_SYS_ID_UTM -> {
+                val utmData = getUtmData(lat, lng)
+                utmData?.let {
+                    // UTM data is valid, set texts then return
+                    binding.newPinEastingEditText.setText(floor(it.x).toInt().toString())
+                    binding.newPinNorthingEditText.setText(floor(it.y).toInt().toString())
+                    binding.newPinZoneDropdown.setText("${it.zone}${it.band}", false)
                     return
                 }
-                COORD_SYS_ID_KERTAU -> {
-                    val kertauData =
-                        getKertauGrids(
-                            lat.toDouble(),
-                            lng.toDouble()
-                        )
-                    if (kertauData != null) {
-                        // Kertau data is valid, set texts then return
-                        val (easting, northing) = kertauData
-                        binding.newPinEastingEditText.setText(floor(easting).toInt().toString())
-                        binding.newPinNorthingEditText.setText(floor(northing).toInt().toString())
-                        return
-                    }
-                }
-                else -> throw IllegalArgumentException("Invalid coordinate system id: $coordSys")
             }
-            // Grids are not valid for current coordinate system (out of bounds),
-            // wipe zone, easting and northing fields
-            binding.newPinEastingEditText.setText("")
-            binding.newPinNorthingEditText.setText("")
-            binding.newPinZoneDropdown.setText("", false)
+            COORD_SYS_ID_MGRS -> {
+                binding.newPinMgrsEditText.setText(
+                    getMgrsData(lat,lng)?.toSingleLine(includeWhitespace = true)
+                )
+                return
+            }
+            COORD_SYS_ID_KERTAU -> {
+                val kertauData =
+                    getKertauGrids(
+                        lat,
+                        lng
+                    )
+                if (kertauData != null) {
+                    // Kertau data is valid, set texts then return
+                    val (easting, northing) = kertauData
+                    binding.newPinEastingEditText.setText(floor(easting).toInt().toString())
+                    binding.newPinNorthingEditText.setText(floor(northing).toInt().toString())
+                    return
+                }
+            }
+            else -> throw IllegalArgumentException("Invalid coordinate system id: $coordSys")
         }
+        // Grids are not valid for current coordinate system (out of bounds),
+        // wipe zone, easting and northing fields
+        clearGrids()
+    }
+
+    private fun clearGrids() {
+        binding.newPinEastingEditText.setText("")
+        binding.newPinNorthingEditText.setText("")
+        binding.newPinZoneDropdown.setText("", false)
     }
 
     private fun onAddNewGroup() {
