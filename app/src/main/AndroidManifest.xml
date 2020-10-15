@@ -15,7 +15,6 @@
         android:theme="@style/Theme.Reconnaissance">
         <activity
             android:name=".onboarding.OnboardingActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.Reconnaissance.Onboarding"/>
         <activity
             android:name=".MainActivity"
