@@ -200,42 +200,20 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         }
 
         // Validate latitude
-        val lat = binding.newPinLatEditText.text
-        if (lat.isNullOrBlank()) {
+        val lat = binding.newPinLatEditText.text.toString().toDoubleOrNull()
+        if (lat == null) {
             binding.newPinLatInput.error = getString(R.string.lat_empty_error)
             isInputValid = false
-        } else {
-            try {
-                // Test if lat is a valid number
-                val latValue = lat.toString().toDouble()
-
-                // Test if lat is within range
-                if (latValue < -90 || latValue > 90) {
-                    binding.newPinLatInput.error = getString(R.string.lat_out_of_range_error)
-                    isInputValid = false
-                }
-            } catch (e: Exception) {
-                // Lat is not in proper decimal format
-                binding.newPinLatInput.error = getString(R.string.lat_empty_error)
+        } else if (lat < -90 || lat > 90) {
+                binding.newPinLatInput.error = getString(R.string.lat_out_of_range_error)
                 isInputValid = false
-            }
-
         }
 
         // Validate longitude
-        val lng = binding.newPinLongEditText.text
-        if (lng.isNullOrBlank()) {
+        val lng = binding.newPinLongEditText.text.toString().toDoubleOrNull()
+        if (lng == null) {
                 binding.newPinLongInput.error = getString(R.string.long_empty_error)
                 isInputValid = false
-        } else {
-            // Test if long is a valid number
-            try {
-                lng.toString().toDouble()
-            } catch (e: Exception) {
-                // long is not in proper decimal format
-                isInputValid = false
-                binding.newPinLongInput.error = getString(R.string.long_empty_error)
-            }
         }
     }
 
