@@ -311,12 +311,13 @@ class SavedFragment : Fragment() {
 
         alertDialog.findViewById<Button>(R.id.done).setOnClickListener {
             val shareCode = shareCodeInput.text.toString()
-            val result = viewModel.processShareCode(shareCode)
-            if (result) {
-                alertDialog.dismiss()
-            } else {
-                alertDialog.findViewById<TextInputLayout>(R.id.share_code_layout).error =
-                    getString(R.string.share_code_error)
+            when {
+                shareCode.isBlank() -> alertDialog.dismiss()
+                viewModel.processShareCode(shareCode) -> alertDialog.dismiss()
+                else -> {
+                    alertDialog.findViewById<TextInputLayout>(R.id.share_code_layout).error =
+                        getString(R.string.share_code_error)
+                }
             }
         }
     }

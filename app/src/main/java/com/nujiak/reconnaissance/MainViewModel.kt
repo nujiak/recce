@@ -357,12 +357,8 @@ class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
 
     fun processShareCode(shareCode: String): Boolean {
         val (pins, chains) = toPinsAndChains(shareCode)
-        return if (pins.isEmpty() && chains.isEmpty()) {
-            false
-        } else {
-            addPinsAndChains(pins, chains)
-            true
-        }
+        addPinsAndChains(pins, chains)
+        return !(pins.isEmpty() && chains.isEmpty())
     }
 
     /**

@@ -14,31 +14,59 @@ fun toPinsAndChains(shareCode: String): Pair<List<Pin>, List<Chain>> {
         }
         when (split[0]) {
             "p" -> {
-                pins.add(
-                    Pin(
-                        name = split[1],
-                        latitude = split[2].toDouble(),
-                        longitude = split[3].toDouble(),
-                        color = split[4].toInt(),
-                        group = split[5]
-                    )
-                )
+                toPin(split)?.let {
+                    pins.add(it)
+                }
             }
             "c" -> {
-                chains.add(
-                    Chain(
-                        name = split[1],
-                        data = split[2],
-                        color = split[3].toInt(),
-                        group = split[4],
-                        cyclical = split[5] == "1"
-                    )
-                )
+                toChain(split)?.let {
+                    chains.add(it)
+                }
             }
         }
     }
 
     return Pair(pins, chains)
+}
+
+fun toChain(shareCodeSplit: List<String>): Chain? {
+    val name = shareCodeSplit[1]
+    val data = shareCodeSplit[2]
+    val color = shareCodeSplit[3].toIntOrNull()
+    val group = shareCodeSplit[4]
+    val cyclical = shareCodeSplit[5] == "1"
+    return if (color == null || color < 0 || color > 4 || name.isBlank()) {
+        null
+    } else {
+        Chain(
+            name = name,
+            data = data,
+            color = color,
+            group = group,
+            cyclical = cyclical
+        )
+    }
+}
+
+fun toPin(shareCodeSplit: List<String>): Pin? {
+    val name = shareCodeSplit[1]
+    val lat = shareCodeSplit[2].toDoubleOrNull()
+    val lng = shareCodeSplit[3].toDoubleOrNull()
+    val color = shareCodeSplit[4].toIntOrNull()
+    val group = shareCodeSplit[5]
+    return if (lat == null || lng == null
+               || color == null || color < 0 || color > 4
+               || name.isBlank()) {
+        null
+    } else {
+        Pin(
+            name = name,
+            latitude = lat,
+            longitude = lng,
+            color = color,
+            group = group
+        )
+    }
 }
 
 fun toShareCode(pins: List<Pin>?, chains: List<Chain>?): String {
@@ -54,7 +82,12 @@ fun toShareCode(pins: List<Pin>?, chains: List<Chain>?): String {
     if (chains != null) {
         for (chain in chains) {
             shareCodeBuilder.append(
-                "c|${chain.name}|${withTruncatedCoordinates(chain.data, 6)}|${chain.color}|${chain.group}|${if (chain.cyclical) 1 else 0}\n"
+                "c|${chain.name}|${
+                    withTruncatedCoordinates(
+                        chain.data,
+                        6
+                    )
+                }|${chain.color}|${chain.group}|${if (chain.cyclical) 1 else 0}\n"
             )
         }
     }
