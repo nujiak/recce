@@ -29,7 +29,7 @@ fun toPinsAndChains(shareCode: String): Pair<List<Pin>, List<Chain>> {
     return Pair(pins, chains)
 }
 
-fun toChain(shareCodeSplit: List<String>): Chain? {
+private fun toChain(shareCodeSplit: List<String>): Chain? {
     val name = shareCodeSplit[1]
     val data = shareCodeSplit[2]
     val color = shareCodeSplit[3].toIntOrNull()
@@ -48,7 +48,7 @@ fun toChain(shareCodeSplit: List<String>): Chain? {
     }
 }
 
-fun toPin(shareCodeSplit: List<String>): Pin? {
+private fun toPin(shareCodeSplit: List<String>): Pin? {
     val name = shareCodeSplit[1]
     val lat = shareCodeSplit[2].toDoubleOrNull()
     val lng = shareCodeSplit[3].toDoubleOrNull()
