@@ -26,6 +26,7 @@ import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.FragmentSavedBinding
+import com.nujiak.reconnaissance.fragments.PinInfoFragment
 import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.ITEM_VIEW_TYPE_CHAIN
 import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.ITEM_VIEW_TYPE_HEADER
 import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.ITEM_VIEW_TYPE_PIN
@@ -227,7 +228,11 @@ class SavedFragment : Fragment() {
             viewModel.toggleSelection(pin.pinId, isChain = false)
             refreshList()
         } else {
-            viewModel.showPinOnMap(pin)
+            // viewModel.showPinOnMap(pin)
+            val pinInfoFragment = PinInfoFragment()
+            pinInfoFragment.viewModel = viewModel
+            pinInfoFragment.pinId = pin.pinId
+            pinInfoFragment.show(childFragmentManager, "pin_info")
         }
     }
 
