@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/pin_list_item_parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/tiny_padding"
+    android:elevation="2dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="1dp"
+    app:cardPreventCornerOverlap="true"
+    tools:cardBackgroundColor="@color/tagRed">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/tiny_padding"
+            android:layout_marginTop="@dimen/tiny_padding"
+            android:layout_marginEnd="@dimen/tiny_padding"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/pin_group"
+                    style="@style/Theme.Reconnaissance.Tags"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/tag_background"
+                    android:elevation="0dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxWidth="100sp"
+                    android:maxLines="1"
+                    android:paddingStart="@dimen/tiny_padding"
+                    android:paddingEnd="@dimen/tiny_padding"
+                    android:textAllCaps="true"
+                    android:textStyle="bold"
+                    tools:text="Buildings"
+                    tools:textColor="#000000" />
+            </FrameLayout>
+
+            <Button
+                android:id="@+id/pin_map"
+                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_map_white_24dp"
+                app:iconTint="@android:color/white" />
+
+            <Button
+                android:id="@+id/pin_edit"
+                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:icon="@drawable/ic_baseline_edit_24"
+                app:iconTint="@android:color/white" />
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/pin_name"
+            style="@style/TextAppearance.Reconnaissance.PinName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="bottom"
+            android:lines="2"
+            android:maxLines="2"
+            android:paddingStart="@dimen/large_padding"
+            android:paddingTop="@dimen/small_padding"
+            android:paddingEnd="@dimen/large_padding"
+            android:paddingBottom="@dimen/small_padding"
+            tools:text="Name" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/pin_background_lower"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/large_padding"
+            android:paddingTop="@dimen/small_padding"
+            android:paddingBottom="@dimen/small_padding"
+            tools:ignore="RtlSymmetry"
+            android:baselineAligned="false">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.Reconnaissance.NumberHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lat_lng"
+                    app:fontFamily="@font/open_sans" />
+
+                <TextView
+                    android:id="@+id/pin_lat_lng"
+                    style="@style/TextAppearance.Reconnaissance.Number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="1.363566 103.245243" />
+
+                <TextView
+                    style="@style/TextAppearance.Reconnaissance.NumberHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/small_padding"
+                    app:fontFamily="@font/open_sans"
+                    android:text="@string/mgrs" />
+
+                <TextView
+                    android:id="@+id/pin_mgrs_grid"
+                    style="@style/TextAppearance.Reconnaissance.Number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="395930 503850" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextAppearance.Reconnaissance.NumberHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:fontFamily="@font/open_sans"
+                    android:text="@string/utm" />
+
+                <TextView
+                    android:id="@+id/pin_utm_grid"
+                    style="@style/TextAppearance.Reconnaissance.Number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="395930 503850" />
+
+
+
+                <TextView
+                    style="@style/TextAppearance.Reconnaissance.NumberHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/small_padding"
+                    app:fontFamily="@font/open_sans"
+                    android:text="@string/kertau" />
+
+                <TextView
+                    android:id="@+id/pin_kertau_grid"
+                    style="@style/TextAppearance.Reconnaissance.Number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="395930 503850" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
