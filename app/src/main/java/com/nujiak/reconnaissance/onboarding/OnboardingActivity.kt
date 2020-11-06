@@ -7,7 +7,6 @@ import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.nujiak.reconnaissance.MainActivity
@@ -40,12 +39,12 @@ class OnboardingActivity : AppCompatActivity() {
 
 
         Log.i(this::class.simpleName, "Start observe")
-        viewModel.changePage.observe(this, Observer {
+        viewModel.changePage.observe(this, {
             Log.i(this::class.simpleName, "Changing page...")
             viewpager.currentItem = it
         })
 
-        viewModel.endOnboarding.observe(this, Observer { endOnboarding ->
+        viewModel.endOnboarding.observe(this, { endOnboarding ->
             if(endOnboarding) {
                 onCompleted()
             }

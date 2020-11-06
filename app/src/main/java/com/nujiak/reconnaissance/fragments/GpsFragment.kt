@@ -15,7 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import com.nujiak.reconnaissance.*
 import com.nujiak.reconnaissance.databinding.FragmentGpsBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
@@ -56,7 +55,7 @@ class GpsFragment : Fragment(), SensorEventListener {
         binding.root.fitsSystemWindows = false
 
         // Listen for fused location updates
-        viewModel.fusedLocationData.observe(viewLifecycleOwner, Observer {
+        viewModel.fusedLocationData.observe(viewLifecycleOwner, {
             updateLocationUI(it)
         })
 
@@ -64,13 +63,13 @@ class GpsFragment : Fragment(), SensorEventListener {
         sensorManager = requireActivity().getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
         // Observe for preferences changes
-        viewModel.coordinateSystem.observe(viewLifecycleOwner, Observer {
+        viewModel.coordinateSystem.observe(viewLifecycleOwner, {
             coordSysId = it
             binding.gpsGridSystem.text =
                 resources.getStringArray(R.array.coordinate_systems)[coordSysId]
             updateLocationUI()
         })
-        viewModel.angleUnit.observe(viewLifecycleOwner, Observer {
+        viewModel.angleUnit.observe(viewLifecycleOwner, {
             angleUnitId = it
             updateOrientationUI(true)
         })

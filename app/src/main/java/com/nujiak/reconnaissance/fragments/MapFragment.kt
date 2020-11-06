@@ -99,7 +99,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         mapView.getMapAsync(this)
 
         // Set up pin-adding sequence
-        viewModel.toAddPinFromMap.observe(viewLifecycleOwner, Observer {
+        viewModel.toAddPinFromMap.observe(viewLifecycleOwner, {
             if (it) onAddPinFromMap()
         })
         binding.mapCardParent.setOnClickListener { onAddPinFromMap() }
@@ -152,7 +152,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             }
         }
 
-        viewModel.isInPolylineMode.observe(viewLifecycleOwner, Observer { isInPolylineMode ->
+        viewModel.isInPolylineMode.observe(viewLifecycleOwner, { isInPolylineMode ->
             if (isInPolylineMode) {
                 onEnterPolylineMode()
             } else {
@@ -160,7 +160,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             }
         })
 
-        viewModel.toUndoPolyline.observe(viewLifecycleOwner, Observer { toUndoPolyline ->
+        viewModel.toUndoPolyline.observe(viewLifecycleOwner, { toUndoPolyline ->
             if (toUndoPolyline) {
                 undoPolyline()
             }
@@ -174,7 +174,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
 
         // Set up Coordinate System
-        viewModel.coordinateSystem.observe(viewLifecycleOwner, Observer {
+        viewModel.coordinateSystem.observe(viewLifecycleOwner, {
             coordSysId = it
             updateCardGridSystem(coordSysId)
             if (this::map.isInitialized) {
@@ -182,7 +182,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 updateLatLong()
             }
         })
-        viewModel.angleUnit.observe(viewLifecycleOwner, Observer {
+        viewModel.angleUnit.observe(viewLifecycleOwner, {
             angleUnitId = it
             if (this::map.isInitialized) {
                 // Force Live Measurements update
@@ -253,15 +253,15 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             }
 
             // Set up show pin and checkpoint sequence
-            viewModel.pinInFocus.observe(viewLifecycleOwner, Observer { pin -> moveMapTo(pin) })
-            viewModel.chainInFocus.observe(viewLifecycleOwner, Observer { node -> moveMapTo(node)})
+            viewModel.pinInFocus.observe(viewLifecycleOwner, { pin -> moveMapTo(pin) })
+            viewModel.chainInFocus.observe(viewLifecycleOwner, { node -> moveMapTo(node)})
 
             if (viewModel.isLocationGranted) {
                 onLocPermGranted()
             }
 
             // Observe location to update Live Measurement
-            viewModel.fusedLocationData.observe(viewLifecycleOwner, Observer {
+            viewModel.fusedLocationData.observe(viewLifecycleOwner, {
                 updateLiveMeasurements()
                 updateMyLocation(it)
             })
@@ -274,12 +274,12 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             }
 
             // Add markers
-            viewModel.allPins.observe(viewLifecycleOwner, Observer { allPins ->
+            viewModel.allPins.observe(viewLifecycleOwner, { allPins ->
                 drawMarkers(allPins)
             })
 
             // Add polylines
-            viewModel.allChains.observe(viewLifecycleOwner, Observer { allChains ->
+            viewModel.allChains.observe(viewLifecycleOwner, { allChains ->
                 drawChains(allChains)
             })
 

@@ -8,7 +8,6 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import com.nujiak.reconnaissance.MainViewModel
 import com.nujiak.reconnaissance.PIN_CARD_BACKGROUNDS
 import com.nujiak.reconnaissance.database.Pin
@@ -34,7 +33,7 @@ class PinInfoFragment : DialogFragment() {
 
         val dialog = builder.create()
 
-        viewModel.allPins.observe(this, Observer { allPins ->
+        viewModel.allPins.observe(this, { allPins ->
             allPins.find { pin -> pin.pinId == pinId }.let{
                 if (it != null) {
                     update(it)

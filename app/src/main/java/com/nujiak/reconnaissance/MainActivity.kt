@@ -155,14 +155,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Set up pin-adding sequence
-        viewModel.pinToAdd.observe(this, Observer { pin ->
+        viewModel.pinToAdd.observe(this, { pin ->
             if (pin != null) {
                 openPinCreator(pin)
             }
         })
 
         // Set up chain-adding sequence
-        viewModel.chainToAdd.observe(this, Observer { chain ->
+        viewModel.chainToAdd.observe(this, { chain ->
             if (chain != null) {
                 openChainCreator(chain)
             }
@@ -170,11 +170,11 @@ class MainActivity : AppCompatActivity() {
 
 
         // Set up pin and checkpoint showing sequence
-        viewModel.pinInFocus.observe(this, Observer { switchToMap() })
-        viewModel.chainInFocus.observe(this, Observer { switchToMap() })
+        viewModel.pinInFocus.observe(this, { switchToMap() })
+        viewModel.chainInFocus.observe(this, { switchToMap() })
 
         // Set up ruler adding sequence
-        viewModel.switchToRuler.observe(this, Observer { switchToRuler ->
+        viewModel.switchToRuler.observe(this, { switchToRuler ->
             if (switchToRuler) {
                 viewPager.currentItem = RULER_INDEX
                 bottomNavigation.selectedItemId = R.id.btm_nav_ruler
@@ -229,7 +229,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.isInSelectionMode.observe(this, Observer { isInSelectionMode ->
+        viewModel.isInSelectionMode.observe(this, { isInSelectionMode ->
             if (isInSelectionMode) {
                 actionMode = startSupportActionMode(callback)
             } else {
@@ -238,7 +238,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         // Observe for pin selection changes
-        viewModel.selectionChanged.observe(this, Observer {
+        viewModel.selectionChanged.observe(this, {
             actionMode?.let {
                 val selectedSize = viewModel.selectedIds.size
                 it.title = resources.getQuantityString(
@@ -313,7 +313,7 @@ class MainActivity : AppCompatActivity() {
             }
         }.enable()
 
-        viewModel.hideKeyboardFromThisView.observe(this, Observer {
+        viewModel.hideKeyboardFromThisView.observe(this, {
             if (it != null) {
                 hideKeyboard(it)
             }
