@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,15 +19,15 @@ import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.ANGLE_UNIT_
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_KEY
 import kotlinx.coroutines.*
 
-class MainViewModel(dataSource: ReconDatabaseDao, application: Application) :
+class MainViewModel @ViewModelInject constructor(
+    private val database: ReconDatabaseDao,
+    val sharedPreference: SharedPreferences,
+    application: Application) :
     AndroidViewModel(application) {
-
-    private val database = dataSource
 
     private val viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
-    lateinit var sharedPreference: SharedPreferences
     var screenRotation = 0
 
     /* Shared preference trackers for showing guides */

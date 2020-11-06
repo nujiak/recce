@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.nujiak.reconnaissance.MainViewModel
 import com.nujiak.reconnaissance.PIN_CARD_BACKGROUNDS
@@ -16,12 +17,13 @@ import com.nujiak.reconnaissance.getGridString
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_MGRS
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class PinInfoFragment : DialogFragment() {
 
-
-    lateinit var viewModel: MainViewModel // TODO: Implement dependency injection
-    lateinit var binding: DialogPinInfoBinding
+    private val viewModel : MainViewModel by activityViewModels()
+    private lateinit var binding: DialogPinInfoBinding
     var pinId = -1L
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

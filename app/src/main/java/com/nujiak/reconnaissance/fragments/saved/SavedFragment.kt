@@ -13,18 +13,16 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.nujiak.reconnaissance.MainViewModel
-import com.nujiak.reconnaissance.MainViewModelFactory
 import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
-import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.FragmentSavedBinding
 import com.nujiak.reconnaissance.fragments.PinInfoFragment
 import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.ITEM_VIEW_TYPE_CHAIN
@@ -34,13 +32,14 @@ import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.SORT_BY_GR
 import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.SORT_BY_NAME
 import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.SORT_BY_TIME
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet
+import dagger.hilt.android.AndroidEntryPoint
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter
 
-
+@AndroidEntryPoint
 class SavedFragment : Fragment() {
 
+    private val viewModel : MainViewModel by activityViewModels()
     private lateinit var binding: FragmentSavedBinding
-    private lateinit var viewModel: MainViewModel
     private lateinit var pinAdapter: PinAdapter
 
     private var sortBy = SORT_BY_GROUP
@@ -57,17 +56,6 @@ class SavedFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentSavedBinding.inflate(inflater, container, false)
-
-        // Set up ViewModel
-        val application = requireNotNull(this.activity).application
-        val dataSource = ReconDatabase.getInstance(application).pinDatabaseDao
-        val viewModelFactory = MainViewModelFactory(dataSource, application)
-        viewModel = activity?.let {
-            ViewModelProvider(
-                it,
-                viewModelFactory
-            ).get(MainViewModel::class.java)
-        }!!
 
         // Set up RecyclerView adapter
         pinAdapter = PinAdapter(
@@ -230,7 +218,6 @@ class SavedFragment : Fragment() {
         } else {
             // viewModel.showPinOnMap(pin)
             val pinInfoFragment = PinInfoFragment()
-            pinInfoFragment.viewModel = viewModel
             pinInfoFragment.pinId = pin.pinId
             pinInfoFragment.show(childFragmentManager, "pin_info")
         }

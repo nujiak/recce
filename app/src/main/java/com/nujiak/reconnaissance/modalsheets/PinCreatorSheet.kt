@@ -14,7 +14,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Filter
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -22,19 +22,20 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.nujiak.reconnaissance.*
 import com.nujiak.reconnaissance.database.Pin
-import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.SheetPinCreatorBinding
 import com.nujiak.reconnaissance.mapping.*
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_MGRS
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import kotlin.math.floor
 
+@AndroidEntryPoint
 class PinCreatorSheet : BottomSheetDialogFragment() {
 
+    private val viewModel : MainViewModel by activityViewModels()
     private lateinit var binding: SheetPinCreatorBinding
-    private lateinit var viewModel: MainViewModel
     private lateinit var pin: Pin
 
     private var isUpdate: Boolean = false
@@ -51,17 +52,6 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = SheetPinCreatorBinding.inflate(inflater, container, false)
-
-        // Set up ViewModel
-        val application = requireNotNull(this.activity).application
-        val dataSource = ReconDatabase.getInstance(application).pinDatabaseDao
-        val viewModelFactory = MainViewModelFactory(dataSource, application)
-        viewModel = activity?.let {
-            ViewModelProvider(
-                it,
-                viewModelFactory
-            ).get(MainViewModel::class.java)
-        }!!
 
         // Fetch coordinate system setting
         coordSys = viewModel.coordinateSystem.value ?: 0

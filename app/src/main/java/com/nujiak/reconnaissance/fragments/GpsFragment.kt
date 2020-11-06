@@ -14,22 +14,20 @@ import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.nujiak.reconnaissance.*
-import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.FragmentGpsBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
+import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.PI
 import kotlin.math.cos
 
 
-/**
- * A simple [Fragment] subclass.
- */
+@AndroidEntryPoint
 class GpsFragment : Fragment(), SensorEventListener {
 
-    private lateinit var viewModel: MainViewModel
+    private val viewModel : MainViewModel by activityViewModels()
     private lateinit var binding: FragmentGpsBinding
 
     // Variables for compass readings
@@ -54,17 +52,6 @@ class GpsFragment : Fragment(), SensorEventListener {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentGpsBinding.inflate(inflater, container, false)
-
-        // Set up ViewModel
-        val application = requireNotNull(this.activity).application
-        val dataSource = ReconDatabase.getInstance(application).pinDatabaseDao
-        val viewModelFactory = MainViewModelFactory(dataSource, application)
-        viewModel = activity?.let {
-            ViewModelProvider(
-                it,
-                viewModelFactory
-            ).get(MainViewModel::class.java)
-        }!!
 
         binding.root.fitsSystemWindows = false
 

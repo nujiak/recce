@@ -23,8 +23,8 @@ import android.widget.Button
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -36,18 +36,19 @@ import com.nujiak.reconnaissance.*
 import com.nujiak.reconnaissance.database.*
 import com.nujiak.reconnaissance.databinding.FragmentMapBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
+import dagger.hilt.android.AndroidEntryPoint
 import java.text.NumberFormat
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.cos
 import kotlin.math.hypot
 
-
+@AndroidEntryPoint
 class MapFragment : Fragment(), OnMapReadyCallback,
     ActivityCompat.OnRequestPermissionsResultCallback {
 
+    private val viewModel : MainViewModel by activityViewModels()
     private lateinit var binding: FragmentMapBinding
-    lateinit var viewModel: MainViewModel
     lateinit var map: GoogleMap
     private var coordSysId = 0
     private var angleUnitId = 0
@@ -88,16 +89,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Set up ViewModel
-        val application = requireNotNull(this.activity).application
-        val dataSource = ReconDatabase.getInstance(application).pinDatabaseDao
-        val viewModelFactory = MainViewModelFactory(dataSource, application)
-        viewModel = activity?.let {
-            ViewModelProvider(
-                it,
-                viewModelFactory
-            ).get(MainViewModel::class.java)
-        }!!
+
         // Set up data binding
         binding = FragmentMapBinding.inflate(inflater, container, false)
 
