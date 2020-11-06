@@ -8,24 +8,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.nujiak.reconnaissance.MainActivity
 import com.nujiak.reconnaissance.MainViewModel
-import com.nujiak.reconnaissance.MainViewModelFactory
 import com.nujiak.reconnaissance.R
-import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.SheetSettingsBinding
 import com.nujiak.reconnaissance.fragments.MapFragment
 import com.nujiak.reconnaissance.onboarding.OnboardingActivity
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class SettingsSheet : BottomSheetDialogFragment() {
 
+    private val viewModel : MainViewModel by activityViewModels()
     private lateinit var binding: SheetSettingsBinding
-    private lateinit var viewModel: MainViewModel
     private lateinit var coordinateSystems: Array<String>
     private lateinit var angleUnits: Array<String>
     private lateinit var themePrefs: Array<String>
@@ -57,17 +56,6 @@ class SettingsSheet : BottomSheetDialogFragment() {
 
         // Set up View Binding
         binding = SheetSettingsBinding.inflate(inflater, container, false)
-
-        // Set up ViewModel
-        val application = requireNotNull(this.activity).application
-        val dataSource = ReconDatabase.getInstance(application).pinDatabaseDao
-        val viewModelFactory = MainViewModelFactory(dataSource, application)
-        viewModel = activity?.let {
-            ViewModelProvider(
-                it,
-                viewModelFactory
-            ).get(MainViewModel::class.java)
-        }!!
 
         // Set up exposed dropdown menus content
         coordinateSystems = resources.getStringArray(R.array.coordinate_systems)

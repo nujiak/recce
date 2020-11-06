@@ -21,6 +21,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate.*
@@ -28,12 +29,10 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
-import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.modalsheets.ChainCreatorSheet
 import com.nujiak.reconnaissance.modalsheets.PinCreatorSheet
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.THEME_PREF_AUTO
@@ -42,13 +41,14 @@ import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.THEME_PREF_
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.THEME_PREF_LIGHT
 import com.nujiak.reconnaissance.onboarding.OnboardingActivity
 import com.nujiak.reconnaissance.onboarding.OnboardingActivity.Companion.ONBOARDING_COMPLETED_KEY
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewPager: ViewPager2
     private lateinit var bottomNavigation: BottomNavigationView
-    lateinit var viewModel: MainViewModel
+    private val viewModel : MainViewModel by viewModels()
 
     private lateinit var viewPagerAdapter: MainViewPagerAdapter
 
@@ -77,17 +77,6 @@ class MainActivity : AppCompatActivity() {
         setTheme(R.style.Theme_Reconnaissance)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        // Set up ViewModel
-        val application = requireNotNull(this).application
-        val dataSource = ReconDatabase.getInstance(application).pinDatabaseDao
-        val viewModelFactory = MainViewModelFactory(dataSource, application)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
-
-        // Set up Shared Preference
-        viewModel.sharedPreference =
-            getSharedPreferences("com.nujiak.reconnaissance", Context.MODE_PRIVATE)
-        viewModel.initializePrefs()
 
         // Run Onboarding
         if (!viewModel.sharedPreference.getBoolean(ONBOARDING_COMPLETED_KEY, false)) {

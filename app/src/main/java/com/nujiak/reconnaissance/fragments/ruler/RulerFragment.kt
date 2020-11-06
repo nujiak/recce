@@ -5,21 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.nujiak.reconnaissance.MainViewModel
-import com.nujiak.reconnaissance.MainViewModelFactory
 import com.nujiak.reconnaissance.R
-import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.FragmentRulerBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-/**
- * A simple [Fragment] subclass.
- */
+@AndroidEntryPoint
 class RulerFragment : Fragment() {
 
+    private val viewModel : MainViewModel by activityViewModels()
     lateinit var binding: FragmentRulerBinding
-    lateinit var viewModel: MainViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,18 +25,6 @@ class RulerFragment : Fragment() {
 
         // Set up view binding
         binding = FragmentRulerBinding.inflate(inflater, container, false)
-
-
-        // Set up ViewModel
-        val application = requireNotNull(this.activity).application
-        val dataSource = ReconDatabase.getInstance(application).pinDatabaseDao
-        val viewModelFactory = MainViewModelFactory(dataSource, application)
-        viewModel = activity?.let {
-            ViewModelProvider(
-                it,
-                viewModelFactory
-            ).get(MainViewModel::class.java)
-        }!!
 
         // Set up RecyclerView
         val rulerAdapter = RulerAdapter(viewModel.coordinateSystem.value ?: 0,

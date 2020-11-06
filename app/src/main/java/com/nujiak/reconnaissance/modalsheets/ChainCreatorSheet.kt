@@ -14,22 +14,26 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Filter
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.nujiak.reconnaissance.*
+import com.nujiak.reconnaissance.COLORS
+import com.nujiak.reconnaissance.MainViewModel
+import com.nujiak.reconnaissance.PIN_CARD_DARK_BACKGROUNDS
+import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.Chain
-import com.nujiak.reconnaissance.database.ReconDatabase
 import com.nujiak.reconnaissance.databinding.SheetChainCreatorBinding
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
+@AndroidEntryPoint
 class ChainCreatorSheet : BottomSheetDialogFragment() {
 
+    private val viewModel : MainViewModel by activityViewModels()
     private lateinit var binding: SheetChainCreatorBinding
-    private lateinit var viewModel: MainViewModel
     private lateinit var chain: Chain
 
     private var isUpdate: Boolean = false
@@ -44,17 +48,6 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = SheetChainCreatorBinding.inflate(inflater, container, false)
-
-        // Set up ViewModel
-        val application = requireNotNull(this.activity).application
-        val dataSource = ReconDatabase.getInstance(application).pinDatabaseDao
-        val viewModelFactory = MainViewModelFactory(dataSource, application)
-        viewModel = activity?.let {
-            ViewModelProvider(
-                it,
-                viewModelFactory
-            ).get(MainViewModel::class.java)
-        }!!
 
         setUpTextFields()
 
