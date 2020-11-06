@@ -62,7 +62,7 @@ class MainViewModel @ViewModelInject constructor(
             Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
 
-    private val _isLocPermGranted = MutableLiveData<Boolean>(isLocationGranted)
+    private val _isLocPermGranted = MutableLiveData(isLocationGranted)
     val isLocPermGranted: LiveData<Boolean>
         get() = _isLocPermGranted
 
@@ -185,7 +185,7 @@ class MainViewModel @ViewModelInject constructor(
     val toAddPinFromMap: LiveData<Boolean>
         get() = _toAddPinFromMap
 
-    private val _isInPolylineMode = MutableLiveData<Boolean>(false)
+    private val _isInPolylineMode = MutableLiveData(false)
     val isInPolylineMode: LiveData<Boolean>
         get() = _isInPolylineMode
 
@@ -200,7 +200,7 @@ class MainViewModel @ViewModelInject constructor(
         currentPolylinePoints.clear()
     }
 
-    private val _toUndoPolyline = MutableLiveData<Boolean>(false)
+    private val _toUndoPolyline = MutableLiveData(false)
     val toUndoPolyline : LiveData<Boolean>
         get() = _toUndoPolyline
 
@@ -232,7 +232,7 @@ class MainViewModel @ViewModelInject constructor(
         switchToRuler()
     }
 
-    private val _switchToRuler = MutableLiveData<Boolean>(false)
+    private val _switchToRuler = MutableLiveData(false)
     val switchToRuler: LiveData<Boolean>
         get() = _switchToRuler
 

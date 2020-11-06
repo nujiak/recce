@@ -21,7 +21,7 @@ class OnboardingViewModel : ViewModel() {
 
     lateinit var sharedPreference: SharedPreferences
 
-    private val _changePage = MutableLiveData<Int>(TITLE_INDEX)
+    private val _changePage = MutableLiveData(TITLE_INDEX)
     val changePage: LiveData<Int>
         get() = _changePage
     fun toPage(page: Int) {
@@ -38,7 +38,7 @@ class OnboardingViewModel : ViewModel() {
         get() = sharedPreference.getInt(ANGLE_UNIT_KEY, SettingsSheet.ANGLE_UNIT_ID_DEG)
         set(id) = sharedPreference.edit().putInt(ANGLE_UNIT_KEY, id).apply()
 
-    private val _endOnboarding = MutableLiveData<Boolean>(false)
+    private val _endOnboarding = MutableLiveData(false)
     val endOnboarding: LiveData<Boolean>
         get() = _endOnboarding
     fun endOnboarding() {

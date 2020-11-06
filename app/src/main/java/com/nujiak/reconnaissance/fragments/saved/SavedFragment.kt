@@ -14,7 +14,6 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -89,7 +88,7 @@ class SavedFragment : Fragment() {
 
 
         // Observe for changes to pins and chains
-        viewModel.allPins.observe(viewLifecycleOwner, Observer { allPins ->
+        viewModel.allPins.observe(viewLifecycleOwner, { allPins ->
             refreshList(newPins = allPins)
             viewModel.allChains.value?.let { allChains ->
                 if (allChains.isEmpty() && allPins.isEmpty()) {
@@ -101,7 +100,7 @@ class SavedFragment : Fragment() {
                 }
             }
         })
-        viewModel.allChains.observe(viewLifecycleOwner, Observer { allChains ->
+        viewModel.allChains.observe(viewLifecycleOwner, { allChains ->
             refreshList(newChains = allChains)
             viewModel.allPins.value?.let { allPins ->
                 if (allChains.isEmpty() && allPins.isEmpty()) {
@@ -115,18 +114,18 @@ class SavedFragment : Fragment() {
         })
 
         // Observe for changes to preferred GCS
-        viewModel.coordinateSystem.observe(viewLifecycleOwner, Observer {
+        viewModel.coordinateSystem.observe(viewLifecycleOwner, {
             pinAdapter.updateCoordSys(it)
             pinAdapter.notifyDataSetChanged()
         })
 
         // Observe for changes to action/selection mode
-        viewModel.isInSelectionMode.observe(viewLifecycleOwner, Observer {
+        viewModel.isInSelectionMode.observe(viewLifecycleOwner, {
             refreshList()
         })
 
         // Observe for recent multiple deletions made through action mode
-        viewModel.lastMultiDeletedItems.observe(viewLifecycleOwner, Observer {
+        viewModel.lastMultiDeletedItems.observe(viewLifecycleOwner, {
             if (it != null) {
                 val size = (it.first?.size ?: 0) + (it.second?.size ?: 0)
                 val snackBar = Snackbar.make(
@@ -200,7 +199,7 @@ class SavedFragment : Fragment() {
         }
 
         // Set up Selection Mode changes
-        viewModel.isInSelectionMode.observe(viewLifecycleOwner, Observer { isInSelectionMode ->
+        viewModel.isInSelectionMode.observe(viewLifecycleOwner, { isInSelectionMode ->
             if (isInSelectionMode) {
                 binding.pinFab.hide()
             } else {

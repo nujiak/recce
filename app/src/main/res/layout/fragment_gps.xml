@@ -309,7 +309,7 @@
                             android:layout_gravity="center"
                             android:scaleType="matrix"
                             android:src="@drawable/compass_needle"
-                            android:tint="?attr/colorOnBackground"
+                            app:tint="?attr/colorOnBackground"
                             tools:ignore="ContentDescription" />
                     </FrameLayout>
 

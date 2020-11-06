@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import com.nujiak.reconnaissance.MainViewModel
 import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.databinding.FragmentRulerBinding
@@ -30,7 +29,7 @@ class RulerFragment : Fragment() {
         val rulerAdapter = RulerAdapter(viewModel.coordinateSystem.value ?: 0,
             viewModel.angleUnit.value ?: 0)
         binding.rulerList.adapter = rulerAdapter
-        viewModel.rulerList.observe(viewLifecycleOwner, Observer {
+        viewModel.rulerList.observe(viewLifecycleOwner, {
             rulerAdapter.submitList(it)
 
             // Scroll to bottom of ruler
@@ -38,10 +37,10 @@ class RulerFragment : Fragment() {
         })
 
         // Observe for changes to preferences
-        viewModel.coordinateSystem.observe(viewLifecycleOwner, Observer {
+        viewModel.coordinateSystem.observe(viewLifecycleOwner, {
             rulerAdapter.updateCoordSys(it)
         })
-        viewModel.angleUnit.observe(viewLifecycleOwner, Observer {
+        viewModel.angleUnit.observe(viewLifecycleOwner, {
             rulerAdapter.updateAngleUnit(it)
         })
 

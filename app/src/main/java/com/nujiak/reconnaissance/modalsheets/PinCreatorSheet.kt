@@ -90,10 +90,10 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
 
         // Get pin passed in as argument
         val argPin = arguments?.getParcelable<Pin>("pin")
-        if (argPin != null) {
-            pin = argPin
+        pin = if (argPin != null) {
+            argPin
         } else {
-            pin = Pin("", 0.0, 0.0)
+            Pin("", 0.0, 0.0)
         }
 
         // Check if this is an update and pre set data fields

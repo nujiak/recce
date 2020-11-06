@@ -82,7 +82,7 @@ class OnboardingGridsFragment : Fragment() {
     }
 }
 
-class OnboardingAnglesFragment() : Fragment() {
+class OnboardingAnglesFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

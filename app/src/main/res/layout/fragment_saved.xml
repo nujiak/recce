@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:scaleType="center"
             android:src="@drawable/ic_no_pins"
-            android:tint="?attr/colorOnBackground"
+            app:tint="?attr/colorOnBackground"
             android:visibility="visible" />
 
         <TextView
