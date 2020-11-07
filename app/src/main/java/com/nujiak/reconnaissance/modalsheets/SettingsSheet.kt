@@ -25,9 +25,10 @@ class SettingsSheet : BottomSheetDialogFragment() {
 
     private val viewModel : MainViewModel by activityViewModels()
     private lateinit var binding: SheetSettingsBinding
-    private lateinit var coordinateSystems: Array<String>
-    private lateinit var angleUnits: Array<String>
-    private lateinit var themePrefs: Array<String>
+    private val coordinateSystems: Array<String>
+            by lazy { resources.getStringArray(R.array.coordinate_systems) }
+    private val angleUnits: Array<String> by lazy { resources.getStringArray(R.array.angle_units) }
+    private val themePrefs: Array<String> by lazy { resources.getStringArray(R.array.theme_prefs) }
 
     private var currentThemePrefId = THEME_PREF_AUTO
     private var newThemePrefId = THEME_PREF_AUTO
@@ -37,6 +38,7 @@ class SettingsSheet : BottomSheetDialogFragment() {
         const val COORD_SYS_ID_UTM = 0
         const val COORD_SYS_ID_MGRS = 1
         const val COORD_SYS_ID_KERTAU = 2
+        const val COORD_SYS_ID_LATLNG = 3
 
         const val ANGLE_UNIT_KEY = "angle_unit"
         const val ANGLE_UNIT_ID_DEG = 0
@@ -58,19 +60,16 @@ class SettingsSheet : BottomSheetDialogFragment() {
         binding = SheetSettingsBinding.inflate(inflater, container, false)
 
         // Set up exposed dropdown menus content
-        coordinateSystems = resources.getStringArray(R.array.coordinate_systems)
         binding.settingsCoordsysDropdown.setAdapter(
             ArrayAdapter(
                 requireContext(), R.layout.dropdown_menu_popup_item, coordinateSystems
             )
         )
-        angleUnits = resources.getStringArray(R.array.angle_units)
         binding.settingsAngleDropdown.setAdapter(
             ArrayAdapter(
                 requireContext(), R.layout.dropdown_menu_popup_item, angleUnits
             )
         )
-        themePrefs = resources.getStringArray(R.array.theme_prefs)
         binding.settingsThemeDropdown.setAdapter(
             ArrayAdapter(requireContext(), R.layout.dropdown_menu_popup_item, themePrefs)
         )

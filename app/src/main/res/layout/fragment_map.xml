@@ -272,7 +272,7 @@
 
             <LinearLayout
                 android:id="@+id/map_live_grids"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
                 android:gravity="center"
@@ -296,7 +296,7 @@
                     android:layout_marginStart="@dimen/small_padding"
                     android:layout_marginEnd="@dimen/small_padding"
                     android:fadingEdge="horizontal"
-                    android:gravity="end"
+                    android:gravity="center"
                     android:maxLines="1"
                     android:textColor="?android:attr/textColorPrimary"
                     tools:text="100023.2 km" />
