@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.RadioButton
-import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet
 
@@ -18,7 +18,7 @@ class OnboardingTitleFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        val viewModel: OnboardingViewModel by requireActivity().viewModels()
+        val viewModel: OnboardingViewModel by activityViewModels()
         val view = inflater.inflate(R.layout.onboarding_title, container)
 
         view.findViewById<Button>(R.id.onboarding_title_next).setOnClickListener {
@@ -42,7 +42,7 @@ class OnboardingGridsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        val viewModel: OnboardingViewModel by requireActivity().viewModels()
+        val viewModel: OnboardingViewModel by activityViewModels()
 
         val view = inflater.inflate(R.layout.onboarding_grids, container)
 
@@ -88,7 +88,7 @@ class OnboardingAnglesFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val viewModel: OnboardingViewModel by requireActivity().viewModels()
+        val viewModel: OnboardingViewModel by activityViewModels()
 
         val view = inflater.inflate(R.layout.onboarding_angles, container)
 
@@ -127,7 +127,7 @@ class OnboardingEndFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val viewModel: OnboardingViewModel by requireActivity().viewModels()
+        val viewModel: OnboardingViewModel by activityViewModels()
 
         val view = inflater.inflate(R.layout.onboarding_end, container)
 
@@ -148,7 +148,7 @@ class OnboardingNSFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val viewModel: OnboardingViewModel by requireActivity().viewModels()
+        val viewModel: OnboardingViewModel by activityViewModels()
 
         val view = inflater.inflate(R.layout.onboarding_ns, container)
 
