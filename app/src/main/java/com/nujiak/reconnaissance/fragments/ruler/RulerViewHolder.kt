@@ -35,7 +35,6 @@ class RulerPinViewHolder private constructor(private val binding: RulerPinItemBi
 
         // Pin name
         binding.rulerPinName.text = rulerPointItem.name
-        binding.rulerPinLatLng.text = "%.6f, %.6f".format(location.latitude, location.longitude)
         binding.rulerPinName.isSelected = true
 
         // Grid System
