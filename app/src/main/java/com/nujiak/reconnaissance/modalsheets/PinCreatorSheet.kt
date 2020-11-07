@@ -63,6 +63,11 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         coordSys = viewModel.coordinateSystem.value ?: 0
         setUpTextFields()
 
+        binding.newPinCustomGridsGroup.visibility = when (coordSys) {
+            COORD_SYS_ID_LATLNG -> View.GONE
+            else -> View.VISIBLE
+        }
+
         // Set up exposed dropdown menus
         requireContext().let {
             binding.newPinColorDropdown.setAdapter(
@@ -355,8 +360,8 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                         binding.newPinLongEditText.setText("")
                     }
                 }
-
             }
+            COORD_SYS_ID_LATLNG -> {}
             else -> throw IllegalArgumentException("Invalid coordinate system id: $coordSys")
         }
 
