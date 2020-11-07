@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
-import com.nujiak.reconnaissance.sortByGroup
-import com.nujiak.reconnaissance.sortByName
-import com.nujiak.reconnaissance.sortByTime
+import com.nujiak.reconnaissance.utils.sortByGroup
+import com.nujiak.reconnaissance.utils.sortByName
+import com.nujiak.reconnaissance.utils.sortByTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

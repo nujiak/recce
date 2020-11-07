@@ -20,12 +20,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.nujiak.reconnaissance.COLORS
 import com.nujiak.reconnaissance.MainViewModel
-import com.nujiak.reconnaissance.PIN_CARD_DARK_BACKGROUNDS
 import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.databinding.SheetChainCreatorBinding
+import com.nujiak.reconnaissance.utils.COLORS
+import com.nujiak.reconnaissance.utils.PIN_CARD_DARK_BACKGROUNDS
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 

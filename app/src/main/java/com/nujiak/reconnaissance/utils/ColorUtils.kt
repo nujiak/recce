@@ -1,6 +1,7 @@
-package com.nujiak.reconnaissance
+package com.nujiak.reconnaissance.utils
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.nujiak.reconnaissance.R
 
 /**
  * Array of color strings in order of Hue starting from 0 deg
