@@ -749,10 +749,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun focusOn(checkpoint: ChainNode) {
-        toggleCheckpointInfobar(true)
         isShowingCheckpoint = true
         isShowingPin = true
         updateCheckpointInfobar(checkpoint)
+        toggleCheckpointInfobar(true)
         val parentChain = checkpoint.parentChain
         focusOn(checkpoint.position.latitude,
             checkpoint.position.longitude,
