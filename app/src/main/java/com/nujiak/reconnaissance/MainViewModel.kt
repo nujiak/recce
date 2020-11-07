@@ -163,7 +163,7 @@ class MainViewModel @ViewModelInject constructor(
     /**
      * Preferences variables and functions
      */
-    private val _coordinateSystem = MutableLiveData(0)
+    private val _coordinateSystem = MutableLiveData(sharedPreference.getInt(COORD_SYS_KEY, 0))
     val coordinateSystem: LiveData<Int>
         get() = _coordinateSystem
 
@@ -173,7 +173,7 @@ class MainViewModel @ViewModelInject constructor(
         }
     }
 
-    private val _angleUnit = MutableLiveData(0)
+    private val _angleUnit = MutableLiveData(sharedPreference.getInt(ANGLE_UNIT_KEY, 0))
     val angleUnit: LiveData<Int>
         get() = _angleUnit
 
@@ -181,11 +181,6 @@ class MainViewModel @ViewModelInject constructor(
         if (angleUnitId != _angleUnit.value) {
             _angleUnit.value = angleUnitId
         }
-    }
-
-    fun initializePrefs() {
-        updateCoordinateSystem(sharedPreference.getInt(COORD_SYS_KEY, 0))
-        updateAngleUnit(sharedPreference.getInt(ANGLE_UNIT_KEY, 0))
     }
 
     /**
