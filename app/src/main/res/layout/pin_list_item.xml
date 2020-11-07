@@ -61,27 +61,11 @@
             android:paddingTop="@dimen/small_padding"
             android:paddingBottom="@dimen/small_padding"
             tools:ignore="RtlSymmetry">
-
-            <TextView
-                style="@style/TextAppearance.Reconnaissance.NumberHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/lat_lng"
-                app:fontFamily="@font/open_sans" />
-
-            <TextView
-                android:id="@+id/pin_lat_lng"
-                style="@style/TextAppearance.Reconnaissance.Number"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="1.363566 103.245243" />
-
             <TextView
                 style="@style/TextAppearance.Reconnaissance.NumberHeader"
                 android:id="@+id/pin_grid_system"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/small_padding"
                 app:fontFamily="@font/open_sans"
                 tools:text="@string/utm" />
 
