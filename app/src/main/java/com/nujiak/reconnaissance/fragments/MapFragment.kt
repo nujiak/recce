@@ -496,6 +496,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                         .build()
                     map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
                     updateGrids()
+                    removeFocus()
                     drawMyLocation(location)
                     viewModel.fusedLocationData.removeObserver(this)
                 }
