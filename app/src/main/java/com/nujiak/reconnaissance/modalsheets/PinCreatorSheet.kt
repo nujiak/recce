@@ -26,6 +26,7 @@ import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.databinding.SheetPinCreatorBinding
 import com.nujiak.reconnaissance.mapping.*
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
+import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_LATLNG
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_MGRS
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
 import com.nujiak.reconnaissance.utils.COLORS
@@ -273,6 +274,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                 COORD_SYS_ID_UTM -> R.string.utm
                 COORD_SYS_ID_MGRS -> R.string.mgrs
                 COORD_SYS_ID_KERTAU -> R.string.kertau
+                COORD_SYS_ID_LATLNG -> R.string.lat_lng
                 else -> throw IllegalArgumentException("Invalid coordinate system id: $coordSys")
             }
         )
@@ -403,6 +405,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                     return
                 }
             }
+            COORD_SYS_ID_LATLNG -> {}
             else -> throw IllegalArgumentException("Invalid coordinate system id: $coordSys")
         }
         // Grids are not valid for current coordinate system (out of bounds),

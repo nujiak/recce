@@ -49,14 +49,13 @@ class OnboardingGridsFragment : Fragment() {
         val utmBtn = view.findViewById<RadioButton>(R.id.onboarding_radio_utm)
         val mgrsBtn = view.findViewById<RadioButton>(R.id.onboarding_radio_mgrs)
         val kertauBtn = view.findViewById<RadioButton>(R.id.onboarding_radio_kertau)
+        val latlngBtn = view.findViewById<RadioButton>(R.id.onboarding_radio_latlng)
 
         when (viewModel.coordSysId) {
-            SettingsSheet.COORD_SYS_ID_UTM ->
-                utmBtn.isChecked = true
-            SettingsSheet.COORD_SYS_ID_MGRS ->
-                mgrsBtn.isChecked = true
-            SettingsSheet.COORD_SYS_ID_KERTAU ->
-                kertauBtn.isChecked = true
+            SettingsSheet.COORD_SYS_ID_UTM -> utmBtn.isChecked = true
+            SettingsSheet.COORD_SYS_ID_MGRS -> mgrsBtn.isChecked = true
+            SettingsSheet.COORD_SYS_ID_KERTAU -> kertauBtn.isChecked = true
+            SettingsSheet.COORD_SYS_ID_LATLNG -> latlngBtn.isChecked = true
         }
 
         view.findViewById<Button>(R.id.onboarding_grids_next).setOnClickListener {
@@ -64,6 +63,7 @@ class OnboardingGridsFragment : Fragment() {
                     utmBtn.isChecked -> SettingsSheet.COORD_SYS_ID_UTM
                     mgrsBtn.isChecked -> SettingsSheet.COORD_SYS_ID_MGRS
                     kertauBtn.isChecked -> SettingsSheet.COORD_SYS_ID_KERTAU
+                    latlngBtn.isChecked -> SettingsSheet.COORD_SYS_ID_LATLNG
                     else -> SettingsSheet.COORD_SYS_ID_UTM
             }
             viewModel.toPage(OnboardingViewModel.ANGLE_INDEX)
@@ -73,6 +73,7 @@ class OnboardingGridsFragment : Fragment() {
                 utmBtn.isChecked -> SettingsSheet.COORD_SYS_ID_UTM
                 mgrsBtn.isChecked -> SettingsSheet.COORD_SYS_ID_MGRS
                 kertauBtn.isChecked -> SettingsSheet.COORD_SYS_ID_KERTAU
+                latlngBtn.isChecked -> SettingsSheet.COORD_SYS_ID_LATLNG
                 else -> SettingsSheet.COORD_SYS_ID_UTM
             }
             viewModel.toPage(OnboardingViewModel.TITLE_INDEX)

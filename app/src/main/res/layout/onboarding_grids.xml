@@ -64,6 +64,14 @@
                     android:buttonTint="@color/colorPrimaryLight"
                     android:textColor="@color/textColorLight"
                     android:text="@string/kertau_full" />
+
+                <RadioButton
+                    android:id="@+id/onboarding_radio_latlng"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/colorPrimaryLight"
+                    android:textColor="@color/textColorLight"
+                    android:text="@string/lat_lng_full" />
             </RadioGroup>
     </ScrollView>
 
