@@ -9,6 +9,7 @@
     <string name="easting">Easting</string>
     <string name="northing">Northing</string>
     <string name="lat_lng">LatLng (WGS 84)</string>
+    <string name="lat_lng_full">Latitude / Longitude (WGS 84)</string>
     <string name="color">Color</string>
     <string name="group">Group</string>
     <string name="settings">Settings</string>
