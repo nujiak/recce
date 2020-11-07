@@ -1,7 +1,6 @@
 package com.nujiak.reconnaissance.onboarding
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -25,9 +24,7 @@ class OnboardingViewModel : ViewModel() {
     val changePage: LiveData<Int>
         get() = _changePage
     fun toPage(page: Int) {
-        Log.i(this::class.simpleName, "Changing page... ${changePage.value}")
         _changePage.value = page
-        Log.i(this::class.simpleName, "Changing page... ${changePage.value}")
     }
     
     var coordSysId: Int

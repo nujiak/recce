@@ -3,7 +3,6 @@ package com.nujiak.reconnaissance.onboarding
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -35,12 +34,7 @@ class OnboardingActivity : AppCompatActivity() {
             isUserInputEnabled = false
         }
 
-        Log.i(this::class.simpleName, "Setting sharedPreferences")
-
-
-        Log.i(this::class.simpleName, "Start observe")
         viewModel.changePage.observe(this, {
-            Log.i(this::class.simpleName, "Changing page...")
             viewpager.currentItem = it
         })
 
