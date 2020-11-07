@@ -159,10 +159,10 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:paddingStart="@dimen/small_padding"
-            android:paddingTop="@dimen/tiny_padding"
-            android:paddingEnd="@dimen/small_padding"
-            android:paddingBottom="@dimen/tiny_padding">
+            android:paddingStart="@dimen/large_padding"
+            android:paddingEnd="@dimen/large_padding"
+            android:paddingTop="@dimen/small_padding"
+            android:paddingBottom="@dimen/small_padding">
 
             <TextView
                 android:id="@+id/map_checkpoint_chain"
@@ -170,7 +170,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:ems="18"
                 android:gravity="center"
                 android:maxLines="1"
                 android:textColor="?android:attr/textColorPrimary"
@@ -182,7 +181,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:ems="16"
                 android:gravity="center"
                 android:maxLines="1"
                 android:textColor="?android:attr/textColorPrimary"
