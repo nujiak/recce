@@ -41,6 +41,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
     private val viewModel : MainViewModel by activityViewModels()
     private lateinit var binding: SheetPinCreatorBinding
     private lateinit var pin: Pin
+    private var updatedPin: Pin? = null
 
     private var isUpdate: Boolean = false
     private var isInputValid: Boolean = false
@@ -150,7 +151,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             }
 
             // Create new pin instead of modifying old pin
-            val newPin = pin.copy(
+            updatedPin = pin.copy(
                 name = binding.newPinNameEditText.text.toString(),
                 latitude = binding.newPinLatEditText.text.toString().toDouble(),
                 longitude = wrapLngDeg(binding.newPinLongEditText.text.toString().toDouble()),
@@ -159,17 +160,10 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             )
 
             when (isUpdate) {
-                true -> {
-                    viewModel.updatePin(newPin)
-                    viewModel.showPinOnMap(newPin)
-                }
-                false -> {
-                    viewModel.addPin(newPin)
-                    viewModel.showPinOnMap(newPin.copy(pinId = viewModel.lastAddedId))
-                }
+                true -> viewModel.updatePin(updatedPin!!)
+                false -> viewModel.addPin(updatedPin!!)
             }
             dismiss()
-            viewModel.showPinInfo(pin.pinId)
         }
     }
 
@@ -479,6 +473,11 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
 
         // Reset navigation bar color
         activity?.window?.navigationBarColor = ContextCompat.getColor(requireContext(), android.R.color.transparent)
+
+        when {
+            isUpdate -> viewModel.showPinInfo(pin.pinId)
+            updatedPin != null -> viewModel.showPinOnMap(updatedPin!!.copy(pinId = viewModel.lastAddedId))
+        }
     }
 
     /**
