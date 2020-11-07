@@ -169,6 +169,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                 }
             }
             dismiss()
+            viewModel.showPinInfo(pin.pinId)
         }
     }
 

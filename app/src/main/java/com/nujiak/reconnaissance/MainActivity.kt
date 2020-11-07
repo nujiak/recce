@@ -33,8 +33,10 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
+import com.nujiak.reconnaissance.fragments.PinInfoFragment
 import com.nujiak.reconnaissance.modalsheets.ChainCreatorSheet
 import com.nujiak.reconnaissance.modalsheets.PinCreatorSheet
+import com.nujiak.reconnaissance.modalsheets.SettingsSheet
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.THEME_PREF_AUTO
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.THEME_PREF_DARK
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.THEME_PREF_KEY
@@ -173,6 +175,9 @@ class MainActivity : AppCompatActivity() {
         viewModel.pinInFocus.observe(this, { switchToMap() })
         viewModel.chainInFocus.observe(this, { switchToMap() })
 
+        // Set up pin info showing sequence
+        viewModel.pinToShowInfo.observe(this) { openPinInfo(it) }
+
         // Set up ruler adding sequence
         viewModel.switchToRuler.observe(this, { switchToRuler ->
             if (switchToRuler) {
@@ -304,6 +309,13 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        // Set up Settings sequence
+        viewModel.toOpenSettings.observe (this) { toOpenSettings ->
+            if (toOpenSettings) {
+                openSettings()
+            }
+        }
+
         object : OrientationEventListener(baseContext) {
             override fun onOrientationChanged(orientation: Int) {
                 mDisplay?.let {
@@ -352,6 +364,20 @@ class MainActivity : AppCompatActivity() {
         chainCreatorSheet.arguments = bundle
         chainCreatorSheet.show(supportFragmentManager, chainCreatorSheet.tag)
 
+    }
+
+    private fun openPinInfo(pinId: Long?) {
+        pinId?.let {
+            val pinInfoFragment = PinInfoFragment()
+            pinInfoFragment.pinId = pinId
+            pinInfoFragment.show(supportFragmentManager, "pin_info")
+        }
+    }
+
+    private fun openSettings() {
+        val settingsSheet = SettingsSheet()
+        settingsSheet.show(supportFragmentManager, settingsSheet.tag)
+        viewModel.finishedOpenSettings()
     }
 
     override fun onRequestPermissionsResult(
