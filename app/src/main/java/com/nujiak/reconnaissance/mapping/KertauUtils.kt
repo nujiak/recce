@@ -1,7 +1,7 @@
 package com.nujiak.reconnaissance.mapping
 
-import com.nujiak.reconnaissance.degToRad
-import com.nujiak.reconnaissance.radToDeg
+import com.nujiak.reconnaissance.utils.degToRad
+import com.nujiak.reconnaissance.utils.radToDeg
 import kotlin.math.*
 
 /*

@@ -9,13 +9,13 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.nujiak.reconnaissance.MainViewModel
-import com.nujiak.reconnaissance.PIN_CARD_BACKGROUNDS
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.databinding.DialogPinInfoBinding
-import com.nujiak.reconnaissance.getGridString
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_MGRS
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
+import com.nujiak.reconnaissance.utils.PIN_CARD_BACKGROUNDS
+import com.nujiak.reconnaissance.utils.getGridString
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

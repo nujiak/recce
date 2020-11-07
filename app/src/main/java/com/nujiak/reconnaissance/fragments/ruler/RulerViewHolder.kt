@@ -7,10 +7,14 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.maps.android.SphericalUtil
-import com.nujiak.reconnaissance.*
+import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.databinding.RulerEmptyItemBinding
 import com.nujiak.reconnaissance.databinding.RulerMeasurementItemBinding
 import com.nujiak.reconnaissance.databinding.RulerPinItemBinding
+import com.nujiak.reconnaissance.utils.PIN_CARD_BACKGROUNDS
+import com.nujiak.reconnaissance.utils.degToRad
+import com.nujiak.reconnaissance.utils.getAngleString
+import com.nujiak.reconnaissance.utils.getGridString
 
 /**
  * ViewHolder for Pins in the Ruler fragment

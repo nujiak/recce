@@ -1,7 +1,8 @@
-package com.nujiak.reconnaissance
+package com.nujiak.reconnaissance.utils
 
 import android.content.res.Resources
 import android.graphics.Color
+import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.mapping.getKertauGridsString
 import com.nujiak.reconnaissance.mapping.getMgrsData
 import com.nujiak.reconnaissance.mapping.getUtmData
@@ -42,7 +43,8 @@ fun getAngleString(angleRad: Float, angleUnitId: Int, withSign: Boolean = true):
         }
         SettingsSheet.ANGLE_UNIT_ID_NATO_MILS -> {
             if (withSign) {
-                "${if (angleRad > 0) '+' else '-'}${radToNatoMils(abs(angleRad)).roundToInt().toString()
+                "${if (angleRad > 0) '+' else '-'}${
+                    radToNatoMils(abs(angleRad)).roundToInt().toString()
                     .padStart(4, '0')} mils"
             } else {
                 "${radToNatoMils(abs(angleRad)).roundToInt().toString().padStart(4, '0')} mils"

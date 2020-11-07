@@ -1,7 +1,7 @@
 package com.nujiak.reconnaissance.database
 
 import com.google.android.gms.maps.model.LatLng
-import com.nujiak.reconnaissance.round
+import com.nujiak.reconnaissance.utils.round
 
 fun Chain.getNodes(): List<ChainNode> {
     val dataList = this.data.split(';')

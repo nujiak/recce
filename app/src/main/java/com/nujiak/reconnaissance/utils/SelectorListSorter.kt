@@ -1,6 +1,7 @@
-package com.nujiak.reconnaissance
+package com.nujiak.reconnaissance.utils
 
 import android.content.res.Resources
+import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.fragments.saved.ChainWrapper

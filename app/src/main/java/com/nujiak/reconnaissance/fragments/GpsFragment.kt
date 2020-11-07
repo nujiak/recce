@@ -15,9 +15,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.nujiak.reconnaissance.*
+import com.nujiak.reconnaissance.MainViewModel
+import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.databinding.FragmentGpsBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
+import com.nujiak.reconnaissance.utils.formatAsDistanceString
+import com.nujiak.reconnaissance.utils.getAngleString
+import com.nujiak.reconnaissance.utils.getGridString
+import com.nujiak.reconnaissance.utils.radToDeg
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.PI
 import kotlin.math.cos

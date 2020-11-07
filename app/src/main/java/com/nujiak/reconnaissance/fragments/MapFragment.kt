@@ -32,10 +32,12 @@ import com.google.android.gms.maps.model.*
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.maps.android.SphericalUtil
-import com.nujiak.reconnaissance.*
+import com.nujiak.reconnaissance.MainViewModel
+import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.*
 import com.nujiak.reconnaissance.databinding.FragmentMapBinding
 import com.nujiak.reconnaissance.location.FusedLocationLiveData
+import com.nujiak.reconnaissance.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.NumberFormat
 import java.util.*
