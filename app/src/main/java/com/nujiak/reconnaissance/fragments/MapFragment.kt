@@ -6,6 +6,7 @@ import android.animation.ObjectAnimator
 import android.animation.TypeEvaluator
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -55,7 +56,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private var coordSysId = 0
     private var angleUnitId = 0
 
-    private var currentPinColor = 0
+    private var currentPinColor = 2
     private var markersMap = HashMap<Marker, Pin>()
     private var polylinesMap = HashMap<Polyline, Chain>()
     private var polygonsMap = HashMap<Polygon, Chain>()
@@ -75,6 +76,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private var isLiveMeasurementVisible = false
     private var isMapCompassVisible = false
     private var compassImageDrawable: Drawable? = null
+
+    private var isChainControlsVisible = false
 
     private lateinit var numberFormat: NumberFormat
 
@@ -104,7 +107,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         viewModel.toAddPinFromMap.observe(viewLifecycleOwner, {
             if (it) onAddPinFromMap()
         })
-        binding.mapCardParent.setOnClickListener { onAddPinFromMap() }
+        binding.mapFab.setOnClickListener { onAddPinFromMap() }
 
         // Set up custom map controls
         binding.mapZoomInButton.setOnClickListener { onZoomIn() }
@@ -120,31 +123,25 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             }
             val color =
                 ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[currentPinColor])
-            binding.mapDetailsCardView.setCardBackgroundColor(color)
+            updateFab(false, color)
         }
 
+        binding.mapLiveGrids.setOnClickListener { viewModel.openSettings() }
+
         binding.mapPolylineAdd.apply {
-            setOnClickListener {
-                onAddPolylinePoint()
-                if (!viewModel.isInPolylineMode.value!!) {
-                    viewModel.enterPolylineMode()
-                    if (!viewModel.chainsGuideShown) {
-                        showChainsGuide()
-                    }
-                }
-            }
+            setOnClickListener { onAddPolylinePoint() }
             setOnLongClickListener {
                 onAddPolylineNamedPoint()
-                if (!viewModel.isInPolylineMode.value!!) {
-                    viewModel.enterPolylineMode()
-                    if (!viewModel.chainsGuideShown) {
-                        showChainsGuide()
-                    }
-                }
                 true
             }
         }
-
+        binding.mapChainFab.apply {
+            setOnClickListener { onAddPolylinePoint() }
+            setOnLongClickListener {
+                onAddPolylineNamedPoint()
+                true
+            }
+        }
 
         binding.mapPolylineUndo.apply {
             setOnClickListener { undoPolyline() }
@@ -181,7 +178,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             updateCardGridSystem(coordSysId)
             if (this::map.isInitialized) {
                 // Force card update
-                updateLatLong()
+                updateGrids()
             }
         })
         viewModel.angleUnit.observe(viewLifecycleOwner, {
@@ -289,7 +286,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             // to restore the polyline after a rotation change
             drawCurrentPolyline(true)
 
-            updateLatLong()
+            updateGrids()
             drawMyLocation(viewModel.fusedLocationData.value)
         }
     }
@@ -498,7 +495,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                         .zoom(15f)
                         .build()
                     map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
-                    updateLatLong()
+                    updateGrids()
                     drawMyLocation(location)
                     viewModel.fusedLocationData.removeObserver(this)
                 }
@@ -506,14 +503,24 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     @SuppressLint("SetTextI18n")
-    private fun updateLatLong(latitude: Double? = null, longitude: Double? = null) {
+    private fun updateGrids(latitude: Double? = null, longitude: Double? = null) {
         val cameraTarget = map.cameraPosition.target
         val lat = latitude ?: cameraTarget.latitude
         val lng = longitude ?: cameraTarget.longitude
-        binding.mapLatLngText.text = "%.6f %.6f".format(lat, lng)
-        binding.mapGridText.text = getGridString(lat, lng, coordSysId, resources)
+        binding.mapCurrentGrids.text = getGridString(lat, lng, coordSysId, resources)
 
         updateLiveMeasurements(latitude, longitude)
+    }
+
+    private fun updateFab(showingPin: Boolean, color: Int? = null) {
+        color?.let {
+            binding.mapFab.backgroundTintList = ColorStateList.valueOf(color)
+        }
+        if (showingPin) {
+            binding.mapFab.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_pin_icon))
+        } else {
+            binding.mapFab.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_round_add_24))
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -547,7 +554,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private fun onAddPinFromMap(): Boolean {
         if (isShowingPin && !isShowingCheckpoint) {
-            viewModel.openPinCreator(viewModel.pinInFocus.value)
+            viewModel.showPinInfo(viewModel.pinInFocus.value?.pinId)
         } else {
             val cameraPosition = map.cameraPosition
             val target = cameraPosition.target
@@ -617,13 +624,13 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
                     override fun onCancel() {}
                 })
-            resetCard()
+            removeFocus()
         }
     }
 
     private fun onCameraMove() {
         if (!isShowingPin) {
-            updateLatLong()
+            updateGrids()
         }
 
         val bearing = map.cameraPosition.bearing
@@ -673,7 +680,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private fun onCameraMoveStarted(reason: Int) {
         if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-            resetCard()
+            removeFocus()
+            updateFab(false)
         }
         if (reason != GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION || isShowingPin) {
             isShowingMyLocation = false
@@ -683,7 +691,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private fun moveMapTo(pin: Pin) {
         moveMapTo(pin.latitude, pin.longitude)
-        showInCard(pin)
+        focusOn(pin)
     }
 
     private fun moveMapTo(chain: Chain) {
@@ -706,7 +714,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private fun moveMapTo(node: ChainNode) {
         moveMapTo(node.position.latitude, node.position.longitude)
-        showInCard(node)
+        focusOn(node)
     }
 
     private fun moveMapTo(lat: Double, lng: Double, bearing: Float? = null, tilt: Float? = null, zoom: Float? = null) {
@@ -725,57 +733,42 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 350, null)
     }
 
-    private fun showInCard(lat: Double, lng: Double, group: String, color: Int, name: String?) {
+    private fun focusOn(lat: Double, lng: Double,color: Int) {
         // update currentPinColor
         currentPinColor = color
 
-        // Set name on card
-        binding.mapPinNameText.text = name ?: resources.getString(R.string.add_pin_plus)
-
         // Set card background color
         val cardColor = ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[color])
-        binding.mapDetailsCardView.setCardBackgroundColor(cardColor)
-
-        // Set group
-        if (group.isNotEmpty()) {
-            binding.mapPinGroup.text = group
-            binding.mapPinGroup.setTextColor(cardColor)
-            binding.mapPinGroup.visibility = View.VISIBLE
-        } else {
-            binding.mapPinGroup.visibility = View.INVISIBLE
-        }
+        updateFab(true, cardColor)
 
         // Set card coordinates
-        updateLatLong(lat, lng)
+        updateGrids(lat, lng)
 
         isShowingPin = true
     }
 
-    private fun showInCard(checkpoint: ChainNode) {
+    private fun focusOn(checkpoint: ChainNode) {
         toggleCheckpointInfobar(true)
         isShowingCheckpoint = true
         isShowingPin = true
         updateCheckpointInfobar(checkpoint)
         val parentChain = checkpoint.parentChain
-        showInCard(checkpoint.position.latitude,
+        focusOn(checkpoint.position.latitude,
             checkpoint.position.longitude,
-            parentChain?.group ?: "",
             parentChain?.color ?: currentPinColor,
-            null
         )
 
     }
 
-    private fun showInCard(pin: Pin) {
+    private fun focusOn(pin: Pin) {
         toggleCheckpointInfobar(false)
         isShowingCheckpoint = false
-        showInCard(pin.latitude, pin.longitude, pin.group, pin.color, pin.name)
         isShowingPin = true
+        focusOn(pin.latitude, pin.longitude,pin.color)
     }
 
-    private fun resetCard() {
-        binding.mapPinNameText.text = resources.getString(R.string.add_pin_plus)
-        binding.mapPinGroup.visibility = View.INVISIBLE
+    private fun removeFocus() {
+        updateFab(false)
         isShowingPin = false
         isShowingCheckpoint = false
         toggleCheckpointInfobar(false)
@@ -1035,6 +1028,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private fun onEnterPolylineMode() {
         binding.mapPolylineUndo.isEnabled = true
+        binding.mapPolylineAdd.isEnabled = true
+        binding.mapPolylineSave.isEnabled = false // Only enable when >1 node
+        binding.mapChainFab.hide()
+        toggleChainControls(true)
     }
 
     private fun onExitPolylineMode() {
@@ -1042,11 +1039,23 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         currentPolyline = null
         currentPolylineMarkers.map { it.remove() }
         currentPolylineMarkers.clear()
+        binding.mapChainFab.show()
+
+        // Disable all buttons
         binding.mapPolylineUndo.isEnabled = false
+        binding.mapPolylineAdd.isEnabled = false
         binding.mapPolylineSave.isEnabled = false
+
+        toggleChainControls(false)
     }
 
     private fun onAddPolylinePoint(name: String = "") {
+        if (!viewModel.isInPolylineMode.value!!) {
+            viewModel.enterPolylineMode()
+            if (!viewModel.chainsGuideShown) {
+                showChainsGuide()
+            }
+        }
         viewModel.currentPolylinePoints.let {
             it.add(ChainNode(name, map.cameraPosition.target))
             if (it.size >= 2) {
@@ -1088,6 +1097,14 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     else -> {
                         // Group name is valid, add to ArrayAdapter and set in AutoCompleteTextView
                         onAddPolylinePoint(it.toString())
+
+                        // Enter Polyline mode if not already inside
+                        if (!viewModel.isInPolylineMode.value!!) {
+                            viewModel.enterPolylineMode()
+                            if (!viewModel.chainsGuideShown) {
+                                showChainsGuide()
+                            }
+                        }
                         alertDialog.dismiss()
                     }
                 }
@@ -1190,6 +1207,70 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             alertDialog.dismiss()
             viewModel.chainsGuideShown = true
             viewModel.sharedPreference.edit().putBoolean(CHAINS_GUIDE_SHOWN_KEY, true).apply()
+        }
+    }
+
+
+    private fun toggleChainControls(makeVisible: Boolean = true) {
+
+        // Return with no changes if LiveMeasurement visibility is already equal to make_visible
+        // or if location is not granted.
+        if (isChainControlsVisible == makeVisible) {
+            return
+        }
+
+        val chainControls = binding.mapPolylineControlsCardView
+
+        val centreX = chainControls.width / 2
+        val centreY = chainControls.height
+
+        // Get radius of circle covering entire element
+        val radius = hypot(centreX.toDouble(), centreY.toDouble()).toFloat()
+
+        if (makeVisible) {
+            try {
+                // Attempt to create and start the animation
+                val anim = ViewAnimationUtils.createCircularReveal(
+                    chainControls,
+                    centreX,
+                    centreY,
+                    0f,
+                    radius
+                )
+                chainControls.visibility = View.VISIBLE
+                anim.duration = 200
+                anim.start()
+            } catch (e: Exception) {
+                // If view is detached, just toggle visibility without animation
+                chainControls.visibility = View.VISIBLE
+            } finally {
+                isChainControlsVisible = true
+            }
+        } else {
+            try {
+                // Attempt to create and start the animation
+                val anim = ViewAnimationUtils.createCircularReveal(
+                    chainControls,
+                    centreX,
+                    centreY,
+                    radius,
+                    0f
+                )
+                anim.addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        chainControls.visibility = View.INVISIBLE
+                        isChainControlsVisible = false
+                    }
+
+                })
+                anim.duration = 200
+                anim.start()
+            } catch (e: Exception) {
+                // If view is detached, just toggle visibility without animation
+                chainControls.visibility = View.INVISIBLE
+                isChainControlsVisible = false
+            }
         }
     }
 

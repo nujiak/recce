@@ -23,14 +23,12 @@ import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.databinding.FragmentSavedBinding
-import com.nujiak.reconnaissance.fragments.PinInfoFragment
 import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.ITEM_VIEW_TYPE_CHAIN
 import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.ITEM_VIEW_TYPE_HEADER
 import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.ITEM_VIEW_TYPE_PIN
 import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.SORT_BY_GROUP
 import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.SORT_BY_NAME
 import com.nujiak.reconnaissance.fragments.saved.PinAdapter.Companion.SORT_BY_TIME
-import com.nujiak.reconnaissance.modalsheets.SettingsSheet
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter
 
@@ -162,7 +160,7 @@ class SavedFragment : Fragment() {
         binding.pinAppBar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.settings -> {
-                    openSettings()
+                    viewModel.openSettings()
                     true
                 }
                 R.id.sort_by_alphabetical_asc -> {
@@ -215,10 +213,7 @@ class SavedFragment : Fragment() {
             viewModel.toggleSelection(pin.pinId, isChain = false)
             refreshList()
         } else {
-            // viewModel.showPinOnMap(pin)
-            val pinInfoFragment = PinInfoFragment()
-            pinInfoFragment.pinId = pin.pinId
-            pinInfoFragment.show(childFragmentManager, "pin_info")
+            viewModel.showPinInfo(pin.pinId)
         }
     }
 
@@ -247,11 +242,6 @@ class SavedFragment : Fragment() {
             refreshList()
         }
         return true
-    }
-
-    private fun openSettings() {
-        val settingsSheet = SettingsSheet()
-        settingsSheet.show(parentFragmentManager, settingsSheet.tag)
     }
 
     private fun onSortList() {

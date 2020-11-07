@@ -96,6 +96,32 @@ class MainViewModel @ViewModelInject constructor(
         get() = _chainToAdd
 
     /**
+     * LiveData to hold pin to be shown as a PinInfoFragment dialog,
+     * MainActivity observes this to start PinInfoFragment
+     */
+    private val _pinToShowInfo = MutableLiveData<Long>()
+    val pinToShowInfo: LiveData<Long>
+        get() = _pinToShowInfo
+    fun showPinInfo(pinId: Long?) {
+        _pinToShowInfo.value = pinId
+    }
+    fun hidePinInfo() = showPinInfo(null)
+
+    /**
+     * LiveData to hold Boolean on whether to open Settings sheet.
+     * MainActivity observes this to start SettingsSheet
+     */
+    private val _toOpenSettings = MutableLiveData<Boolean>(false)
+    val toOpenSettings: LiveData<Boolean>
+        get() = _toOpenSettings
+    fun openSettings() {
+        _toOpenSettings.value = true
+    }
+    fun finishedOpenSettings() {
+        _toOpenSettings.value = false
+    }
+
+    /**
      * Pin Creator
      */
     fun openPinCreator(pin: Pin?) {
