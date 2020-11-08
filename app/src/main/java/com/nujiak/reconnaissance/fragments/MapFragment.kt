@@ -735,6 +735,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun focusOn(lat: Double, lng: Double,color: Int) {
+
+        isShowingMyLocation = false
+        toggleLiveMeasurement(true)
+
         // update currentPinColor
         currentPinColor = color
 
