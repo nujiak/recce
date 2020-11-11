@@ -780,14 +780,21 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun updateCheckpointInfobar(checkpoint: ChainNode) {
-        binding.mapCheckpointName.text = checkpoint.name
-        binding.mapCheckpointChain.text =
-            checkpoint.parentChain?.name ?: getString(R.string.unnamed)
+        if (checkpoint.name.isEmpty()) {
+            binding.mapCheckpointChain.text =
+                checkpoint.parentChain?.name ?: getString(R.string.unnamed)
+        } else {
+            binding.mapCheckpointChain.text = resources.getString(
+                R.string.route_checkpoint,
+                checkpoint.parentChain?.name ?: getString(R.string.unnamed),
+                checkpoint.name)
+        }
+        binding.mapCheckpointChain.isSelected = true
 
         val bgColor =
             if (checkpoint.parentChain != null) {
                 ContextCompat.getColor(
-                    requireContext(), PIN_CARD_DARK_BACKGROUNDS[checkpoint.parentChain.color]
+                    requireContext(), PIN_CARD_BACKGROUNDS[checkpoint.parentChain.color]
                 )
             } else {
                 val typedValue = TypedValue()
@@ -803,9 +810,21 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 typedValue.data
             }
 
-        binding.mapCheckpointName.setTextColor(textColor)
+        checkpoint.parentChain?.let {
+            if (it.cyclical) {
+                // Area
+                binding.areaIcon.visibility = View.VISIBLE
+                binding.routeIcon.visibility = View.INVISIBLE
+            } else {
+                // Route
+                binding.areaIcon.visibility = View.INVISIBLE
+                binding.routeIcon.visibility = View.VISIBLE
+            }
+        }
+
+
         binding.mapCheckpointChain.setTextColor(textColor)
-        binding.mapCheckpointInfobar.setCardBackgroundColor(bgColor)
+        binding.mapCheckpointInfobar.backgroundTintList = ColorStateList.valueOf(bgColor)
 
     }
 
@@ -817,7 +836,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         val checkpointInfobar = binding.mapCheckpointInfobar
 
         val centreX = checkpointInfobar.width / 2
-        val centreY = checkpointInfobar.height / 2
+        val centreY = checkpointInfobar.height
 
         // Get radius of circle covering entire element
         val radius = hypot(centreX.toDouble(), centreY.toDouble()).toFloat()
@@ -828,7 +847,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 val anim = ViewAnimationUtils.createCircularReveal(
                     checkpointInfobar,
                     centreX,
-                    centreY,
+                    0, // Start animation from above
                     0f,
                     radius
                 )
@@ -847,7 +866,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 val anim = ViewAnimationUtils.createCircularReveal(
                     checkpointInfobar,
                     centreX,
-                    centreY,
+                    0, // Start animation from above
                     radius,
                     0f
                 )

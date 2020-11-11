@@ -34,9 +34,9 @@
         android:id="@+id/map_type_card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardElevation="1dp"
         android:layout_marginStart="@dimen/large_padding"
         android:layout_marginBottom="40dp"
+        app:cardElevation="1dp"
         app:layout_constraintBottom_toBottomOf="@+id/mapView"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -100,7 +100,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:background="@drawable/map_live_measurement_background"
-        android:elevation="1dp"
+        android:elevation="4dp"
         android:orientation="horizontal"
         android:paddingStart="@dimen/small_padding"
         android:paddingTop="@dimen/small_padding"
@@ -141,52 +141,79 @@
             tools:text="0393.4 mils" />
     </LinearLayout>
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/map_checkpoint_infobar"
+    <Space
+        android:id="@+id/infobar_space"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/small_padding"
+        android:layout_height="40sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map_live_measurement" />
+
+    <FrameLayout
+        android:id="@+id/map_checkpoint_infobar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/large_padding"
+        android:layout_marginEnd="@dimen/large_padding"
+        android:background="@drawable/map_checkpoint_infobar_background"
+        android:elevation="1dp"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="vertical"
         android:visibility="invisible"
-        app:cardCornerRadius="32dp"
-        app:cardElevation="1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/infobar_space"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/map_live_measurement"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:backgroundTint="@color/tagAzure"
         tools:visibility="visible">
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
             android:orientation="vertical"
-            android:paddingStart="@dimen/large_padding"
-            android:paddingEnd="@dimen/large_padding"
-            android:paddingTop="@dimen/small_padding"
             android:paddingBottom="@dimen/small_padding">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginBottom="@dimen/large_padding"
+                android:layout_weight="1"
+                android:background="@color/pinDetailShade" />
 
             <TextView
                 android:id="@+id/map_checkpoint_chain"
-                style="@style/TextAppearance.MaterialComponents.Overline"
+                style="@style/TextAppearance.MaterialComponents.Headline6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
+                android:ellipsize="marquee"
                 android:gravity="center"
-                android:maxLines="1"
+                android:singleLine="true"
                 android:textColor="?android:attr/textColorPrimary"
-                tools:text="Route" />
-
-            <TextView
-                android:id="@+id/map_checkpoint_name"
-                style="@style/TextAppearance.MaterialComponents.Caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:gravity="center"
-                android:maxLines="1"
-                android:textColor="?android:attr/textColorPrimary"
-                tools:text="Checkpoint" />
+                tools:text="Route"
+                tools:textColor="@android:color/white" />
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+
+        <ImageView
+            android:id="@+id/route_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:adjustViewBounds="true"
+            android:padding="@dimen/large_padding"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_route" />
+
+        <ImageView
+            android:id="@+id/area_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:adjustViewBounds="true"
+            android:padding="@dimen/large_padding"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_area"
+            android:visibility="invisible" />
+    </FrameLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/map_chain_fab"
@@ -253,8 +280,8 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
+
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/materialCardView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/large_padding"
