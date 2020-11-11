@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.nujiak.reconnaissance.MainViewModel
+import com.nujiak.reconnaissance.R
 import com.nujiak.reconnaissance.database.Pin
 import com.nujiak.reconnaissance.databinding.DialogPinInfoBinding
 import com.nujiak.reconnaissance.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
@@ -27,7 +28,7 @@ class PinInfoFragment : DialogFragment() {
     var pinId = -1L
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(requireActivity())
+        val builder = AlertDialog.Builder(requireActivity(), R.style.Theme_Reconnaissance_InfoDialogs)
         val layoutInflater = LayoutInflater.from(context)
         binding = DialogPinInfoBinding.inflate(layoutInflater, null, false)
         builder.setView(binding.root)

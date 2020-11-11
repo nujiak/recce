@@ -137,4 +137,13 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
+    <style name="Theme.Reconnaissance.InfoDialogs" parent="Theme.MaterialComponents.DayNight.Dialog">
+        <item name="android:windowAnimationStyle">@style/Animation.Reconnaissance.InfoDialogs</item>
+        <item name="android:layout_width">match_parent</item>
+    </style>
+    
+    <style name="Animation.Reconnaissance.InfoDialogs" parent="@android:style/Animation.Activity">
+        <item name="android:windowEnterAnimation">@anim/info_dialog_enter_animation</item>
+        <item name="android:windowExitAnimation">@anim/info_dialog_exit_animation</item>
+    </style>
 </resources>

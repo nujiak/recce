@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/pin_list_item_parent"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/tiny_padding"
+    android:layout_margin="@dimen/large_padding"
     android:elevation="2dp"
     app:cardCornerRadius="16dp"
     app:cardElevation="1dp"
@@ -91,6 +91,7 @@
             android:background="@drawable/pin_background_lower"
             android:orientation="horizontal"
             android:paddingStart="@dimen/large_padding"
+            android:paddingEnd="@dimen/large_padding"
             android:paddingTop="@dimen/small_padding"
             android:paddingBottom="@dimen/small_padding"
             tools:ignore="RtlSymmetry"
@@ -114,7 +115,9 @@
                     style="@style/TextAppearance.Reconnaissance.Number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    tools:text="1.363566 103.245243" />
+                    tools:text="1.363566 103.245243"
+                    android:singleLine="true"
+                    android:ellipsize="none"/>
 
                 <TextView
                     style="@style/TextAppearance.Reconnaissance.NumberHeader"
@@ -133,9 +136,9 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_marginStart="@dimen/large_padding"
                 android:orientation="vertical">
 
                 <TextView

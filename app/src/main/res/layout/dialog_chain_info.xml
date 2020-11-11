@@ -3,8 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/pin_list_item_parent"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:minWidth="320dp"
     android:layout_margin="@dimen/tiny_padding"
     android:elevation="2dp"
     app:cardCornerRadius="16dp"
@@ -113,6 +114,7 @@
             android:baselineAligned="false"
             android:orientation="vertical"
             android:paddingStart="@dimen/large_padding"
+            android:paddingEnd="@dimen/large_padding"
             android:paddingTop="@dimen/small_padding"
             android:paddingBottom="@dimen/small_padding"
             tools:ignore="RtlSymmetry">
