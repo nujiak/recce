@@ -33,6 +33,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.database.Pin
+import com.nujiak.reconnaissance.fragments.ChainInfoFragment
 import com.nujiak.reconnaissance.fragments.PinInfoFragment
 import com.nujiak.reconnaissance.modalsheets.ChainCreatorSheet
 import com.nujiak.reconnaissance.modalsheets.PinCreatorSheet
@@ -177,6 +178,7 @@ class MainActivity : AppCompatActivity() {
 
         // Set up pin info showing sequence
         viewModel.pinToShowInfo.observe(this) { openPinInfo(it) }
+        viewModel.chainToShowInfo.observe(this) { openChainInfo(it) }
 
         // Set up ruler adding sequence
         viewModel.switchToRuler.observe(this, { switchToRuler ->
@@ -371,6 +373,14 @@ class MainActivity : AppCompatActivity() {
             val pinInfoFragment = PinInfoFragment()
             pinInfoFragment.pinId = pinId
             pinInfoFragment.show(supportFragmentManager, "pin_info")
+        }
+    }
+
+    private fun openChainInfo(chainId: Long?) {
+        chainId?.let {
+            val chainInfoFragment = ChainInfoFragment()
+            chainInfoFragment.chainId = chainId
+            chainInfoFragment.show(supportFragmentManager, "chain_info")
         }
     }
 

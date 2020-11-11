@@ -1139,13 +1139,13 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private fun onPolylineClick(polyline: Polyline) {
         polylinesMap[polyline]?.let {
-            viewModel.openChainCreator(it)
+            viewModel.showChainInfo(it.chainId)
         }
     }
 
     private fun onPolygonClick(polygon: Polygon) {
         polygonsMap[polygon]?.let {
-            viewModel.openChainCreator(it)
+            viewModel.showChainInfo(it.chainId)
         }
     }
 
