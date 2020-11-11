@@ -231,7 +231,7 @@ class SavedFragment : Fragment() {
             viewModel.toggleSelection(chain.chainId, true)
             refreshList()
         } else {
-            viewModel.showChainOnMap(chain)
+            viewModel.showChainInfo(chain.chainId)
         }
     }
 

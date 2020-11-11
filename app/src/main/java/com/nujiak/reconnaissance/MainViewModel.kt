@@ -108,6 +108,18 @@ class MainViewModel @ViewModelInject constructor(
     fun hidePinInfo() = showPinInfo(null)
 
     /**
+     * LiveData to hold chain to be shown as a ChainInfoFragment dialog,
+     * MainActivity observes this to start ChainInfoFragment
+     */
+    private val _chainToShowInfo = MutableLiveData<Long>()
+    val chainToShowInfo: LiveData<Long>
+        get() = _chainToShowInfo
+    fun showChainInfo(chainId: Long?) {
+        _chainToShowInfo.value = chainId
+    }
+    fun hideChainInfo() = showChainInfo(null)
+
+    /**
      * LiveData to hold Boolean on whether to open Settings sheet.
      * MainActivity observes this to start SettingsSheet
      */
