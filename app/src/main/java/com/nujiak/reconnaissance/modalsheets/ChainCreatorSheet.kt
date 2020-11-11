@@ -26,6 +26,7 @@ import com.nujiak.reconnaissance.database.Chain
 import com.nujiak.reconnaissance.databinding.SheetChainCreatorBinding
 import com.nujiak.reconnaissance.utils.COLORS
 import com.nujiak.reconnaissance.utils.PIN_CARD_DARK_BACKGROUNDS
+import com.nujiak.reconnaissance.utils.animateColor
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
@@ -253,9 +254,12 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
     private fun updateSheetColor(colorIdx: Int = 0) {
         context?.let {
             val color = ContextCompat.getColor(it, PIN_CARD_DARK_BACKGROUNDS[colorIdx])
-            activity?.window?.navigationBarColor = color // Set navigation bar color
-            binding.root.setBackgroundColor(color)
-            binding.newChainSave.setTextColor(color)
+
+            animateColor(binding.root.background, color, 150) { intermediateColor ->
+                binding.root.setBackgroundColor(intermediateColor)
+                binding.newChainSave.setTextColor(intermediateColor)
+                activity?.window?.navigationBarColor = intermediateColor // Set navigation bar color
+            }
         }
     }
 

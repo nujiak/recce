@@ -515,8 +515,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun updateFab(color: Int? = null) {
-        color?.let {
-            binding.mapFab.backgroundTintList = ColorStateList.valueOf(color)
+        if (color != null) {
+            animateColor(binding.mapFab.backgroundTintList, color, 150) { intermediateColor ->
+                binding.mapFab.backgroundTintList = ColorStateList.valueOf((intermediateColor))
+            }
         }
     }
 
@@ -784,7 +786,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 ContextCompat.getColor(requireContext(), android.R.color.black)
             }
 
-        binding.mapCheckpointInfobar.backgroundTintList = ColorStateList.valueOf(bgColor)
+        animateColor(binding.mapCheckpointInfobar.backgroundTintList, bgColor, 150) {
+            binding.mapCheckpointInfobar.backgroundTintList = ColorStateList.valueOf(it)
+        }
 
     }
 
