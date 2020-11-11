@@ -188,7 +188,7 @@
                 android:ellipsize="marquee"
                 android:gravity="center"
                 android:singleLine="true"
-                android:textColor="?android:attr/textColorPrimary"
+                android:textColor="@android:color/white"
                 tools:text="Route"
                 tools:textColor="@android:color/white" />
         </LinearLayout>

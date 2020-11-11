@@ -15,7 +15,6 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Property
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewAnimationUtils
@@ -551,17 +550,14 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onAddPinFromMap(): Boolean {
-        if (isShowingPin && !isShowingCheckpoint) {
-            viewModel.showPinInfo(viewModel.pinInFocus.value?.pinId)
-        } else {
-            val cameraPosition = map.cameraPosition
-            val target = cameraPosition.target
-            val pinLat = target.latitude.toString().toDouble()
-            val pinLong = target.longitude.toString().toDouble()
+        val cameraPosition = map.cameraPosition
+        val target = cameraPosition.target
+        val pinLat = target.latitude.toString().toDouble()
+        val pinLong = target.longitude.toString().toDouble()
 
-            val newPin = Pin("", pinLat, pinLong, currentPinColor)
-            viewModel.openPinCreator(newPin)
-        }
+        val newPin = Pin("", pinLat, pinLong, currentPinColor)
+        viewModel.openPinCreator(newPin)
+
         return true
     }
 
@@ -785,20 +781,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     requireContext(), PIN_CARD_BACKGROUNDS[colorId]
                 )
             } else {
-                val typedValue = TypedValue()
-                requireContext().theme.resolveAttribute(R.attr.colorSurface, typedValue, true)
-                typedValue.data
-            }
-        val textColor =
-            if (colorId != null) {
-                ContextCompat.getColor(requireContext(), R.color.textColorLight)
-            } else {
-                val typedValue = TypedValue()
-                requireContext().theme.resolveAttribute(R.attr.colorOnSurface, typedValue, true)
-                typedValue.data
+                ContextCompat.getColor(requireContext(), android.R.color.black)
             }
 
-        binding.mapCheckpointChain.setTextColor(textColor)
         binding.mapCheckpointInfobar.backgroundTintList = ColorStateList.valueOf(bgColor)
 
     }
