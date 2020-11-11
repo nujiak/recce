@@ -28,7 +28,7 @@ class ChainInfoFragment : DialogFragment() {
     var chainId = -1L
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(requireActivity())
+        val builder = AlertDialog.Builder(requireActivity(), R.style.Theme_Reconnaissance_InfoDialogs)
         val layoutInflater = LayoutInflater.from(context)
         binding = DialogChainInfoBinding.inflate(layoutInflater, null, false)
         builder.setView(binding.root)

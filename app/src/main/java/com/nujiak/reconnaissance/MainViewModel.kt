@@ -46,7 +46,8 @@ class MainViewModel @ViewModelInject constructor(
     fun updatePin(pin: Pin) = uiScope.launch { update(pin) }
     fun deletePin(pin: Pin) = uiScope.launch { deletePin(pin.pinId) }
 
-    fun addChain(chain: Chain) = uiScope.launch { insert(chain) }
+    fun addChain(chain: Chain) =
+        runBlocking { lastAddedId = insert(chain) }
     fun updateChain(chain: Chain) = uiScope.launch { update(chain) }
     fun deleteChain(chain: Chain) = uiScope.launch { deleteChain(chain.chainId) }
     private fun addPinsAndChains(pins: List<Pin>, chains: List<Chain>) {

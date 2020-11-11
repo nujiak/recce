@@ -289,6 +289,11 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
 
         // Reset navigation bar color
         activity?.window?.navigationBarColor = ContextCompat.getColor(requireContext(), android.R.color.transparent)
+
+        when {
+            isUpdate -> viewModel.showChainInfo(chain.chainId)
+            else -> viewModel.showChainInfo(viewModel.lastAddedId)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
