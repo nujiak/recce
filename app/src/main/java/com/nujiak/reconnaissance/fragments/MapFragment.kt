@@ -123,7 +123,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             }
             val color =
                 ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[currentPinColor])
-            updateFab(false, color)
+            updateFab(color)
         }
 
         binding.mapLiveGrids.setOnClickListener { viewModel.openSettings() }
@@ -275,11 +275,13 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             // Add markers
             viewModel.allPins.observe(viewLifecycleOwner, { allPins ->
                 drawMarkers(allPins)
+                toggleCheckpointInfobar(false)
             })
 
             // Add polylines
             viewModel.allChains.observe(viewLifecycleOwner, { allChains ->
                 drawChains(allChains)
+                toggleCheckpointInfobar(false)
             })
 
             // Draw current polyline is available. This is needed
@@ -513,14 +515,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         updateLiveMeasurements(latitude, longitude)
     }
 
-    private fun updateFab(showingPin: Boolean, color: Int? = null) {
+    private fun updateFab(color: Int? = null) {
         color?.let {
             binding.mapFab.backgroundTintList = ColorStateList.valueOf(color)
-        }
-        if (showingPin) {
-            binding.mapFab.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_map_pin_icon))
-        } else {
-            binding.mapFab.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_round_add_24))
         }
     }
 
@@ -682,7 +679,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private fun onCameraMoveStarted(reason: Int) {
         if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
             removeFocus()
-            updateFab(false)
         }
         if (reason != GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION || isShowingPin) {
             isShowingMyLocation = false
@@ -744,7 +740,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
         // Set card background color
         val cardColor = ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[color])
-        updateFab(true, cardColor)
+        updateFab(cardColor)
 
         // Set card coordinates
         updateGrids(lat, lng)
@@ -766,35 +762,27 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun focusOn(pin: Pin) {
-        toggleCheckpointInfobar(false)
         isShowingCheckpoint = false
         isShowingPin = true
+        updateCheckpointInfobar(pin)
+        toggleCheckpointInfobar(true)
         focusOn(pin.latitude, pin.longitude,pin.color)
     }
 
     private fun removeFocus() {
-        updateFab(false)
         isShowingPin = false
         isShowingCheckpoint = false
         toggleCheckpointInfobar(false)
     }
 
-    private fun updateCheckpointInfobar(checkpoint: ChainNode) {
-        if (checkpoint.name.isEmpty()) {
-            binding.mapCheckpointChain.text =
-                checkpoint.parentChain?.name ?: getString(R.string.unnamed)
-        } else {
-            binding.mapCheckpointChain.text = resources.getString(
-                R.string.route_checkpoint,
-                checkpoint.parentChain?.name ?: getString(R.string.unnamed),
-                checkpoint.name)
-        }
+    private fun updateCheckpointInfobar(name: String, colorId: Int?) {
+        binding.mapCheckpointChain.text = name
         binding.mapCheckpointChain.isSelected = true
 
         val bgColor =
-            if (checkpoint.parentChain != null) {
+            if (colorId != null) {
                 ContextCompat.getColor(
-                    requireContext(), PIN_CARD_BACKGROUNDS[checkpoint.parentChain.color]
+                    requireContext(), PIN_CARD_BACKGROUNDS[colorId]
                 )
             } else {
                 val typedValue = TypedValue()
@@ -802,7 +790,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 typedValue.data
             }
         val textColor =
-            if (checkpoint.parentChain != null) {
+            if (colorId != null) {
                 ContextCompat.getColor(requireContext(), R.color.textColorLight)
             } else {
                 val typedValue = TypedValue()
@@ -810,8 +798,23 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 typedValue.data
             }
 
-        checkpoint.parentChain?.let {
-            if (it.cyclical) {
+        binding.mapCheckpointChain.setTextColor(textColor)
+        binding.mapCheckpointInfobar.backgroundTintList = ColorStateList.valueOf(bgColor)
+
+    }
+
+    private fun updateCheckpointInfobar(checkpoint: ChainNode) {
+        val name = if (checkpoint.name.isEmpty()) {
+            checkpoint.parentChain?.name ?: getString(R.string.unnamed)
+        } else {
+            resources.getString(
+                R.string.route_checkpoint,
+                checkpoint.parentChain?.name ?: getString(R.string.unnamed),
+                checkpoint.name)
+        }
+
+        if (checkpoint.parentChain != null) {
+            if (checkpoint.parentChain.cyclical) {
                 // Area
                 binding.areaIcon.visibility = View.VISIBLE
                 binding.routeIcon.visibility = View.INVISIBLE
@@ -820,12 +823,23 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 binding.areaIcon.visibility = View.INVISIBLE
                 binding.routeIcon.visibility = View.VISIBLE
             }
+            binding.mapCheckpointInfobar.setOnClickListener {
+                viewModel.showChainInfo(checkpoint.parentChain.chainId)
+            }
+        } else {
+            binding.mapCheckpointInfobar.isClickable = false
         }
 
+        updateCheckpointInfobar(name, checkpoint.parentChain?.color)
+    }
 
-        binding.mapCheckpointChain.setTextColor(textColor)
-        binding.mapCheckpointInfobar.backgroundTintList = ColorStateList.valueOf(bgColor)
+    private fun updateCheckpointInfobar(pin: Pin) {
+        updateCheckpointInfobar(pin.name, pin.color)
 
+        binding.areaIcon.visibility = View.INVISIBLE
+        binding.routeIcon.visibility = View.INVISIBLE
+
+        binding.mapCheckpointInfobar.setOnClickListener { viewModel.showPinInfo(pin.pinId) }
     }
 
     private fun toggleCheckpointInfobar(makeVisible: Boolean = true) {
