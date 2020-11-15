@@ -1,9 +1,6 @@
 package com.nujiak.reconnaissance.fragments
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.ObjectAnimator
-import android.animation.TypeEvaluator
+import android.animation.*
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.res.ColorStateList
@@ -14,7 +11,6 @@ import android.graphics.Matrix
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Property
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewAnimationUtils
@@ -86,6 +82,24 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
         const val MAP_TYPE_KEY = "map_type"
         const val CHAINS_GUIDE_SHOWN_KEY = "chains_guide_shown"
+
+        // Lat Lng evaluator for animating myLocationMarker and myLocationCircle positions
+        private val latLngEvaluator by lazy {
+            TypeEvaluator<LatLng> { fraction, startValue, endValue ->
+                SphericalUtil.interpolate(
+                    startValue,
+                    endValue,
+                    fraction.toDouble()
+                )
+            }
+        }
+
+        // Lat Lng evaluator for animating myLocationCircle radius
+        private val doubleEvaluator by lazy {
+            TypeEvaluator<Double> { fraction, startValue, endValue ->
+                startValue + fraction * (endValue - startValue)
+            }
+        }
     }
 
     override fun onCreateView(
@@ -404,46 +418,34 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         binding.mapLocationButton.isEnabled = true
         val position = LatLng(locationData.latitude, locationData.longitude)
         if (myLocationMarker != null && myLocationCircle != null) {
-            val latLngEvaluator =
-                TypeEvaluator<LatLng> { fraction, startValue, endValue ->
-                    SphericalUtil.interpolate(
-                        startValue,
-                        endValue,
-                        fraction.toDouble()
-                    )
+            // MyLocation marker position animator
+            ValueAnimator.ofObject(latLngEvaluator, myLocationMarker!!.position, position).apply {
+                duration = 750
+                addUpdateListener {
+                    myLocationMarker?.position = it.animatedValue as LatLng
                 }
+                start()
+            }
 
-            val doubleEvaluator =
-                TypeEvaluator<Double> { fraction, startValue, endValue ->
-                    startValue + fraction * (endValue - startValue)
+            // MyLocation accuracy position animator
+            ValueAnimator.ofObject(latLngEvaluator, myLocationCircle!!.center, position).apply {
+                duration = 750
+                addUpdateListener {
+                    myLocationCircle?.center = it.animatedValue as LatLng
                 }
+                start()
+            }
 
-            val markerProperty = Property.of(Marker::class.java, LatLng::class.java, "position")
-            val circleCenterProperty = Property.of(Circle::class.java, LatLng::class.java, "center")
-            val circleRadiusProperty = Property.of(Circle::class.java, Double::class.java, "radius")
-
-            val markerAnimator =
-                ObjectAnimator.ofObject(myLocationMarker, markerProperty, latLngEvaluator, position)
-            val circleCenterAnimator = ObjectAnimator.ofObject(
-                myLocationCircle,
-                circleCenterProperty,
-                latLngEvaluator,
-                position
-            )
-            val circleRadiusAnimator = ObjectAnimator.ofObject(
-                myLocationCircle,
-                circleRadiusProperty,
-                doubleEvaluator,
-                locationData.accuracy.toDouble()
-            )
-
-            markerAnimator.duration = 750
-            circleCenterAnimator.duration = 750
-            circleRadiusAnimator.duration = 750
-
-            markerAnimator.start()
-            circleCenterAnimator.start()
-            circleRadiusAnimator.start()
+            // MyLocation accuracy radius animator
+            ObjectAnimator.ofObject(
+                doubleEvaluator, myLocationCircle!!.radius, locationData.accuracy.toDouble()
+            ).apply {
+                duration = 750
+                addUpdateListener {
+                    myLocationCircle?.radius = it.animatedValue as Double
+                }
+                start()
+            }
         } else {
             drawMyLocation(locationData)
         }
