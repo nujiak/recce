@@ -10,6 +10,8 @@ sealed class ReconData {
     abstract val name: String
     abstract val color: Int
     abstract val group: String
+    abstract val description: String
+
 }
 
 /**
@@ -31,7 +33,10 @@ data class Pin(
     val pinId: Long = 0L,
 
     @ColumnInfo(defaultValue = "")
-    override val group: String = ""
+    override val group: String = "",
+
+    @ColumnInfo(defaultValue = "")
+    override val description: String = ""
 
 ) : Parcelable, ReconData()
 
@@ -52,6 +57,9 @@ data class Chain(
     override val group: String = "",
 
     @ColumnInfo(defaultValue = "0")
-    val cyclical: Boolean = false
+    val cyclical: Boolean = false,
+
+    @ColumnInfo(defaultValue = "")
+    override val description: String = ""
 
 ) : Parcelable, ReconData()
