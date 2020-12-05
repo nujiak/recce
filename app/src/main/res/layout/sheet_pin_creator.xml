@@ -95,8 +95,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/tiny_padding"
-                    android:layout_weight="3"
-                    app:errorEnabled="true">
+                    android:layout_weight="3">
 
                     <AutoCompleteTextView
                         android:id="@+id/new_pin_group_dropdown"
@@ -114,8 +113,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/tiny_padding"
-                    android:layout_weight="2"
-                    app:errorEnabled="true">
+                    android:layout_weight="2">
 
                     <AutoCompleteTextView
                         android:id="@+id/new_pin_color_dropdown"
@@ -126,6 +124,17 @@
                         android:maxLines="1" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/small_padding"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/description"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

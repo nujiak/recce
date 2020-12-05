@@ -80,6 +80,7 @@
     <string name="none">None</string>
     <string name="mgrs_string">MGRS String</string>
     <string name="tap_enter_hint">Press \'Enter\' to update coordinates</string>
+    <string name="description">Description</string>
     <!-- Errors -->
     <string name="name_blank_error">Name cannot be blank</string>
     <string name="name_too_long_error">Name cannot exceed 20 characters</string>
