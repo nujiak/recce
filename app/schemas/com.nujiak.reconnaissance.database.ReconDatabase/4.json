@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "089d0090af8ec0641d035c7338feeb2d",
+    "identityHash": "c0fcb57927bf6aa1009f707ea86e466f",
     "entities": [
       {
         "tableName": "pins_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `color` INTEGER NOT NULL, `pinId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `group` TEXT NOT NULL DEFAULT '')",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `color` INTEGER NOT NULL, `pinId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `group` TEXT NOT NULL DEFAULT '', `description` TEXT NOT NULL DEFAULT '')",
         "fields": [
           {
             "fieldPath": "name",
@@ -44,6 +44,13 @@
             "affinity": "TEXT",
             "notNull": true,
             "defaultValue": "''"
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
           }
         ],
         "primaryKey": {
@@ -57,7 +64,7 @@
       },
       {
         "tableName": "chains_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `data` TEXT NOT NULL, `color` INTEGER NOT NULL, `chainId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `group` TEXT NOT NULL DEFAULT '', `cyclical` INTEGER NOT NULL DEFAULT 0)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `data` TEXT NOT NULL, `color` INTEGER NOT NULL, `chainId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `group` TEXT NOT NULL DEFAULT '', `cyclical` INTEGER NOT NULL DEFAULT 0, `description` TEXT NOT NULL DEFAULT '')",
         "fields": [
           {
             "fieldPath": "name",
@@ -96,6 +103,13 @@
             "affinity": "INTEGER",
             "notNull": true,
             "defaultValue": "0"
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
           }
         ],
         "primaryKey": {
@@ -111,7 +125,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '089d0090af8ec0641d035c7338feeb2d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c0fcb57927bf6aa1009f707ea86e466f')"
     ]
   }
 }
