@@ -57,7 +57,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = SheetPinCreatorBinding.inflate(inflater, container, false)
 
         // Fetch coordinate system setting
@@ -125,6 +125,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             if (pin.group.isNotEmpty()) pin.group else getString(R.string.none),
             false
         )
+        binding.newPinDescriptionEditText.setText(pin.description)
 
         // Set up buttons
         binding.newChainSave.setOnClickListener { onCompleted() }
@@ -163,7 +164,11 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                 latitude = binding.newPinLatEditText.text.toString().toDouble(),
                 longitude = wrapLngDeg(binding.newPinLongEditText.text.toString().toDouble()),
                 color = COLORS.indexOf(binding.newPinColorDropdown.text.toString()),
-                group = group
+                group = group,
+                description = binding.newPinDescriptionEditText.text
+                    .toString()
+                    .replace(Regex("\\n{3,}"), "\n\n")
+                    .trim()
             )
 
             when (isUpdate) {
