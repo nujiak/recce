@@ -101,7 +101,6 @@
     <!-- Map -->
     <string name="map">Map</string>
     <string name="zone">Zone</string>
-    <string name="add_pin_plus">+ Add pin</string>
     <string name="new_checkpoint">New Checkpoint</string>
     <string name="unnamed">Unnamed</string>
     <string name="route_checkpoint">%s: %s</string>
