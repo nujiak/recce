@@ -8,9 +8,8 @@ import com.nujiak.reconnaissance.utils.round
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
@@ -86,10 +85,14 @@ private data class ChainSurrogate(
     val g: String, val cy: Int, val d: String
 )
 
+// Static references to serializers for encoding and decoding
+private val pinListSerializer = ListSerializer(Pin.serializer())
+private val chainListSerializer = ListSerializer(Chain.serializer())
+
 fun toPinsAndChains(shareCode: String): Pair<List<Pin>, List<Chain>> {
     return try {
-        val pins = Json.decodeFromString<List<Pin>>(shareCode.substringBefore('\n'))
-        val chains = Json.decodeFromString<List<Chain>>(shareCode.substringAfter('\n'))
+        val pins = Json.decodeFromString(pinListSerializer, shareCode.substringBefore('\n'))
+        val chains = Json.decodeFromString(chainListSerializer, shareCode.substringAfter('\n'))
         Pair(pins, chains)
     } catch (e: Exception) {
         Pair(listOf(), listOf())
@@ -98,9 +101,9 @@ fun toPinsAndChains(shareCode: String): Pair<List<Pin>, List<Chain>> {
 
 fun toShareCode(pins: List<Pin>?, chains: List<Chain>?): String {
     val shareCodeBuilder = StringBuilder().apply {
-        append(Json.encodeToString(pins))
+        append(Json.encodeToString(pinListSerializer, pins ?: listOf()))
         append("\n")
-        append(Json.encodeToString(chains))
+        append(Json.encodeToString(chainListSerializer, chains ?: listOf()))
     }
 
     return shareCodeBuilder.toString()
