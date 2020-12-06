@@ -70,6 +70,15 @@ class ChainInfoFragment : DialogFragment() {
                 dismiss()
             }
 
+            if (chain.description.isNotEmpty()) {
+                binding.chainDescriptionHeading.visibility = View.VISIBLE
+                binding.chainDescription.visibility = View.VISIBLE
+                binding.chainDescription.text = chain.description
+            } else {
+                binding.chainDescriptionHeading.visibility = View.GONE
+                binding.chainDescription.visibility = View.GONE
+            }
+
             val chainNodes = chain.getNodes()
             val checkpoints = mutableListOf<String>()
             var distance = 0.0

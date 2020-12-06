@@ -67,6 +67,15 @@ class PinInfoFragment : DialogFragment() {
             binding.pinMgrsGrid.text = getGridString(pin.latitude, pin.longitude, COORD_SYS_ID_MGRS, resources)
             binding.pinKertauGrid.text = getGridString(pin.latitude, pin.longitude, COORD_SYS_ID_KERTAU, resources)
 
+            if (pin.description.isNotEmpty()) {
+                binding.pinDescriptionHeading.visibility = View.VISIBLE
+                binding.pinDescription.visibility = View.VISIBLE
+                binding.pinDescription.text = pin.description
+            } else {
+                binding.pinDescriptionHeading.visibility = View.GONE
+                binding.pinDescription.visibility = View.GONE
+            }
+
             binding.pinMap.setOnClickListener {
                 viewModel.showPinOnMap(pin)
                 dismiss()
