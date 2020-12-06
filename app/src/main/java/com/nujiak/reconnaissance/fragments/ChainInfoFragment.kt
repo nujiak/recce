@@ -2,7 +2,6 @@ package com.nujiak.reconnaissance.fragments
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -102,10 +101,5 @@ class ChainInfoFragment : DialogFragment() {
             }
 
         }
-    }
-
-    override fun onDismiss(dialog: DialogInterface) {
-        super.onDismiss(dialog)
-        viewModel.hideChainInfo()
     }
 }

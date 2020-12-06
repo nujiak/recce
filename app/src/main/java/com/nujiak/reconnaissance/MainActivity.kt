@@ -373,6 +373,7 @@ class MainActivity : AppCompatActivity() {
             val pinInfoFragment = PinInfoFragment()
             pinInfoFragment.pinId = pinId
             pinInfoFragment.show(supportFragmentManager, "pin_info")
+            viewModel.hidePinInfo()
         }
     }
 
@@ -381,6 +382,7 @@ class MainActivity : AppCompatActivity() {
             val chainInfoFragment = ChainInfoFragment()
             chainInfoFragment.chainId = chainId
             chainInfoFragment.show(supportFragmentManager, "chain_info")
+            viewModel.hideChainInfo()
         }
     }
 

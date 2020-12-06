@@ -28,7 +28,6 @@ import com.nujiak.reconnaissance.utils.COLORS
 import com.nujiak.reconnaissance.utils.PIN_CARD_DARK_BACKGROUNDS
 import com.nujiak.reconnaissance.utils.animateColor
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
 
 @AndroidEntryPoint
 class ChainCreatorSheet : BottomSheetDialogFragment() {
@@ -152,6 +151,13 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
                 false -> viewModel.addChain(newChain)
             }
             viewModel.exitPolylineMode()
+
+            // Open Chain Info
+            when {
+                isUpdate -> viewModel.showChainInfo(chain.chainId)
+                else -> viewModel.showChainInfo(viewModel.lastAddedId)
+            }
+
             dismiss()
         }
     }
@@ -242,8 +248,7 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
                 newGroup.length > 12 -> {
                     inputLayout.error = getString(R.string.group_too_long_error)
                 }
-                newGroup.toString().toLowerCase(Locale.ROOT)
-                        == getString(R.string.none).toLowerCase(Locale.ROOT) -> {
+                newGroup.toString().equals(getString(R.string.none), ignoreCase = true) -> {
                     inputLayout.error = getString(R.string.group_invalid_error)
                 }
                 else -> {
@@ -298,11 +303,6 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
 
         // Reset navigation bar color
         activity?.window?.navigationBarColor = ContextCompat.getColor(requireContext(), android.R.color.transparent)
-
-        when {
-            isUpdate -> viewModel.showChainInfo(chain.chainId)
-            else -> viewModel.showChainInfo(viewModel.lastAddedId)
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

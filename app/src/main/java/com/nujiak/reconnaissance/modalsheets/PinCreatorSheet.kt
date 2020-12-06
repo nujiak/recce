@@ -34,7 +34,6 @@ import com.nujiak.reconnaissance.utils.PIN_CARD_DARK_BACKGROUNDS
 import com.nujiak.reconnaissance.utils.animateColor
 import com.nujiak.reconnaissance.utils.wrapLngDeg
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
 import kotlin.math.floor
 
 @AndroidEntryPoint
@@ -175,6 +174,13 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                 true -> viewModel.updatePin(updatedPin!!)
                 false -> viewModel.addPin(updatedPin!!)
             }
+
+            // Open Pin Info
+            when {
+                isUpdate -> viewModel.showPinInfo(pin.pinId)
+                updatedPin != null -> viewModel.showPinOnMap(updatedPin!!.copy(pinId = viewModel.lastAddedId))
+            }
+
             dismiss()
         }
     }
@@ -458,8 +464,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                 newGroup.length > 12 -> {
                     inputLayout.error = getString(R.string.group_too_long_error)
                 }
-                newGroup.toString().toLowerCase(Locale.ROOT)
-                        == getString(R.string.none).toLowerCase(Locale.ROOT) -> {
+                newGroup.toString().equals(getString(R.string.none), ignoreCase = true) -> {
                     inputLayout.error = getString(R.string.group_invalid_error)
                 }
                 else -> {
@@ -490,11 +495,6 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
 
         // Reset navigation bar color
         activity?.window?.navigationBarColor = ContextCompat.getColor(requireContext(), android.R.color.transparent)
-
-        when {
-            isUpdate -> viewModel.showPinInfo(pin.pinId)
-            updatedPin != null -> viewModel.showPinOnMap(updatedPin!!.copy(pinId = viewModel.lastAddedId))
-        }
     }
 
     /**
