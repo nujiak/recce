@@ -200,10 +200,6 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                 binding.newPinNameInput.error = getString(R.string.name_too_long_error)
                 isInputValid = false
             }
-            name.contains(Regex("[;,|]")) -> {
-                binding.newPinNameInput.error = getString(R.string.name_invalid_error)
-                isInputValid = false
-            }
         }
 
         // Validate latitude

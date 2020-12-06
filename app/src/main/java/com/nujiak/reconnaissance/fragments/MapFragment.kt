@@ -106,7 +106,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         // Set up data binding
         binding = FragmentMapBinding.inflate(inflater, container, false)
@@ -1117,7 +1117,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         posBtn.setOnClickListener {
             editText.text?.trim()?.let {
                 when {
-                    it.contains(Regex("[;,|]")) -> {
+                    it.contains(Regex("[;,]")) -> {
                         inputLayout.error = getString(R.string.checkpoint_invalid_error)
                     }
                     it.length > 20 -> {
