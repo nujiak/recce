@@ -90,7 +90,6 @@
     <string name="group_empty_error">Group cannot be blank</string>
     <string name="group_too_long_error">Group name cannot exceed 12 characters</string>
     <string name="group_invalid_error">Group name invalid</string>
-    <string name="name_invalid_error">Name contains invalid characters</string>
 
     <!-- Chain Creator -->
     <string name="chain_name">Chain Name</string>
