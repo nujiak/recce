@@ -47,7 +47,7 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = SheetChainCreatorBinding.inflate(inflater, container, false)
 
         setUpTextFields()
@@ -103,6 +103,7 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
         binding.newChainTypeDropdown.setText(
             getString(if (chain.cyclical) R.string.area else R.string.route),
             false)
+        binding.newChainDescriptionEditText.setText(chain.description)
 
         // Set up buttons
         binding.newChainSave.setOnClickListener { onCompleted() }
@@ -139,7 +140,11 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
                 data = chain.data,
                 color = COLORS.indexOf(binding.newChainColorDropdown.text.toString()),
                 group = group,
-                cyclical = binding.newChainTypeDropdown.text.toString() == getString(R.string.area)
+                cyclical = binding.newChainTypeDropdown.text.toString() == getString(R.string.area),
+                description = binding.newChainDescriptionEditText.text
+                    .toString()
+                    .replace(Regex("\\n{3,}"), "\n\n")
+                    .trim()
             )
 
             when (isUpdate) {
