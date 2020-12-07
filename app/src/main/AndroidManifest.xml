@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.nujiak.reconnaissance">
+    package="com.nujiak.recce">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name=".ReconApp"
+        android:name="com.nujiak.recce.ReconApp"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -15,11 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Reconnaissance">
         <activity
-            android:name=".onboarding.OnboardingActivity"
+            android:name="com.nujiak.recce.onboarding.OnboardingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Reconnaissance.Onboarding"/>
         <activity
-            android:name=".MainActivity"
+            android:name="com.nujiak.recce.MainActivity"
             android:windowSoftInputMode="adjustNothing"
             android:theme="@style/SplashScreen">
             <intent-filter>

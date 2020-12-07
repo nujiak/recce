@@ -32,10 +32,10 @@
 #}
 #
 ## Change here com.nujiak.reconnaissance
-#-keep,includedescriptorclasses class com.nujiak.reconnaissance.**$$serializer { *; } # <-- change package name to your app's
-#-keepclassmembers class com.nujiak.reconnaissance.** { # <-- change package name to your app's
+#-keep,includedescriptorclasses class com.nujiak.recce.**$$serializer { *; } # <-- change package name to your app's
+#-keepclassmembers class com.nujiak.recce.** { # <-- change package name to your app's
 #    *** Companion;
 #}
-#-keepclasseswithmembers class com.nujiak.reconnaissance.** { # <-- change package name to your app's
+#-keepclasseswithmembers class com.nujiak.recce.** { # <-- change package name to your app's
 #    kotlinx.serialization.KSerializer serializer(...);
 #}

@@ -19,8 +19,8 @@ package com.nujiak.reconnaissance
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.nujiak.reconnaissance.database.ReconDatabase
-import com.nujiak.reconnaissance.database.ReconDatabaseDao
+import com.nujiak.recce.database.ReconDatabase
+import com.nujiak.recce.database.ReconDatabaseDao
 import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
