@@ -391,9 +391,13 @@ class MainViewModel @ViewModelInject constructor(
     }
 
     fun processShareCode(shareCode: String): Boolean {
-        val (pins, chains) = toPinsAndChains(shareCode)
-        addPinsAndChains(pins, chains)
-        return !(pins.isEmpty() && chains.isEmpty())
+        val pair = toPinsAndChains(shareCode)
+        return if (pair != null && !(pair.first.isEmpty() && pair.second.isEmpty())) {
+            addPinsAndChains(pair.first, pair.second)
+            true
+        } else {
+            false
+        }
     }
 
     /**
