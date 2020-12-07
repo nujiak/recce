@@ -9,6 +9,7 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.PairSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -88,25 +89,18 @@ private data class ChainSurrogate(
 // Static references to serializers for encoding and decoding
 private val pinListSerializer = ListSerializer(Pin.serializer())
 private val chainListSerializer = ListSerializer(Chain.serializer())
+private val pairListsSerializer = PairSerializer(pinListSerializer, chainListSerializer)
 
-fun toPinsAndChains(shareCode: String): Pair<List<Pin>, List<Chain>> {
+fun toPinsAndChains(shareCode: String): Pair<List<Pin>, List<Chain>>? {
     return try {
-        val pins = Json.decodeFromString(pinListSerializer, shareCode.substringBefore('\n'))
-        val chains = Json.decodeFromString(chainListSerializer, shareCode.substringAfter('\n'))
-        Pair(pins, chains)
+        Json.decodeFromString(pairListsSerializer, shareCode)
     } catch (e: Exception) {
         Pair(listOf(), listOf())
     }
 }
 
 fun toShareCode(pins: List<Pin>?, chains: List<Chain>?): String {
-    val shareCodeBuilder = StringBuilder().apply {
-        append(Json.encodeToString(pinListSerializer, pins ?: listOf()))
-        append("\n")
-        append(Json.encodeToString(chainListSerializer, chains ?: listOf()))
-    }
-
-    return shareCodeBuilder.toString()
+    return Json.encodeToString(pairListsSerializer, Pair(pins ?: listOf(), chains ?: listOf()))
 }
 
 private object PinSerializer : KSerializer<Pin> {
