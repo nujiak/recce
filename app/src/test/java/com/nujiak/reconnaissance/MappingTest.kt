@@ -1,7 +1,7 @@
 package com.nujiak.reconnaissance
 
-import com.nujiak.reconnaissance.mapping.getKertauGrids
-import com.nujiak.reconnaissance.mapping.getLatLngFromKertau
+import com.nujiak.recce.mapping.getKertauGrids
+import com.nujiak.recce.mapping.getLatLngFromKertau
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -25,10 +25,8 @@ class MappingTest {
         for ((index, grids) in kertauGrids.withIndex()) {
             val latLngPair = getLatLngFromKertau(grids.first, grids.second)
             val trueCoords = wgsCoords[index]
-            if (latLngPair != null) {
-                assertEquals(latLngPair.first, trueCoords.first, 0.00001)
-                assertEquals(latLngPair.second, trueCoords.second, 0.00001)
-            }
+            assertEquals(latLngPair.first, trueCoords.first, 0.00001)
+            assertEquals(latLngPair.second, trueCoords.second, 0.00001)
         }
     }
 

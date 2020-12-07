@@ -17,7 +17,7 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
     defaultConfig {
-        applicationId "com.nujiak.reconnaissance"
+        applicationId "com.nujiak.recce"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 19
