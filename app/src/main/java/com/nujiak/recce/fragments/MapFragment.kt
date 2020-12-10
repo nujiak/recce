@@ -32,7 +32,7 @@ import com.nujiak.recce.MainViewModel
 import com.nujiak.recce.R
 import com.nujiak.recce.database.*
 import com.nujiak.recce.databinding.FragmentMapBinding
-import com.nujiak.recce.location.FusedLocationLiveData
+import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.NumberFormat

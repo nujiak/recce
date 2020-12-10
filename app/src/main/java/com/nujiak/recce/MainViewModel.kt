@@ -14,7 +14,8 @@ import androidx.lifecycle.Transformations
 import com.nujiak.recce.database.*
 import com.nujiak.recce.fragments.ruler.RulerItem
 import com.nujiak.recce.fragments.ruler.generateRulerList
-import com.nujiak.recce.location.FusedLocationLiveData
+import com.nujiak.recce.livedatas.FusedLocationLiveData
+import com.nujiak.recce.livedatas.RotationLiveData
 import com.nujiak.recce.modalsheets.SettingsSheet.Companion.ANGLE_UNIT_KEY
 import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_KEY
 import kotlinx.coroutines.*
@@ -30,6 +31,10 @@ class MainViewModel @ViewModelInject constructor(
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     var screenRotation = 0
+        set(newRotation) {
+            field = newRotation
+            rotationLiveData.updateRotation(newRotation)
+        }
 
     /* Shared preference trackers for showing guides */
     var chainsGuideShown = false // Used in MapFragment
@@ -82,6 +87,11 @@ class MainViewModel @ViewModelInject constructor(
      * FusedLocationLiveData for fetching and observing Fused Location
      */
     val fusedLocationData = FusedLocationLiveData(application)
+
+    /**
+     * RotationLiveData for fetching and observing device rotation
+     */
+    val rotationLiveData = RotationLiveData(application, screenRotation)
 
     /**
      * LiveData to hold pin to be added, MainActivity observes this
