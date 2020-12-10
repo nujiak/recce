@@ -1,4 +1,4 @@
-package com.nujiak.recce.location
+package com.nujiak.recce.livedatas
 
 import android.annotation.SuppressLint
 import android.content.Context
