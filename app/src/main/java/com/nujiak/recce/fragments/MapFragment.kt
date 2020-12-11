@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import android.widget.Button
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -59,6 +60,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private var myLocationMarker: Marker? = null
     private var myLocationCircle: Circle? = null
+    private var myLocationDirection: Marker? = null
     private var currentPolyline: Polyline? = null
     private val currentPolylineMarkers = mutableListOf<Marker>()
 
@@ -77,6 +79,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private lateinit var numberFormat: NumberFormat
 
     private var currentMapType = GoogleMap.MAP_TYPE_HYBRID
+
+    private var lastDirectionUpdate = 0L
 
     companion object {
 
@@ -273,10 +277,36 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             }
 
             // Observe location to update Live Measurement
-            viewModel.fusedLocationData.observe(viewLifecycleOwner, {
+            viewModel.fusedLocationData.observe(viewLifecycleOwner) {
                 updateLiveMeasurements()
                 updateMyLocation(it)
-            })
+            }
+            viewModel.rotationLiveData.observe(viewLifecycleOwner) {
+                val marker = myLocationDirection
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastDirectionUpdate > 100 && marker != null) {
+                    var newRotation = it.azimuth * 180 / Math.PI.toFloat() - 90
+                    val currentRotation = marker.rotation
+                    val difference = newRotation - currentRotation
+
+                    // Correction for rotation past 0 or 360 degrees
+                    newRotation = when {
+                        difference > 180 -> currentRotation - (360 - difference)
+                        difference < -180 -> currentRotation + (360 + difference)
+                        else -> newRotation
+                    }
+
+                    ValueAnimator.ofObject(FloatEvaluator(), currentRotation, newRotation).apply {
+                        duration = 100
+                        addUpdateListener { valAnim ->
+                            marker.rotation = valAnim.animatedValue as Float
+                        }
+                        interpolator = LinearInterpolator()
+                        start()
+                    }
+                    lastDirectionUpdate = currentTime
+                }
+            }
 
             // Disable built-in Maps controls
             map.uiSettings.apply {
@@ -297,7 +327,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 toggleCheckpointInfobar(false)
             })
 
-            // Draw current polyline is available. This is needed
+            // Draw current polyline if available. This is needed
             // to restore the polyline after a rotation change
             drawCurrentPolyline(true)
 
@@ -392,6 +422,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
         myLocationMarker?.remove()
         myLocationCircle?.remove()
+        myLocationDirection?.remove()
         val position = LatLng(locationData.latitude, locationData.longitude)
         myLocationMarker = map.addMarker(
             MarkerOptions()
@@ -410,6 +441,14 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 .zIndex(Float.MAX_VALUE - 1)
                 .fillColor(ContextCompat.getColor(requireContext(), R.color.myLocationFill))
         )
+        myLocationDirection = map.addMarker(
+            MarkerOptions()
+                .position(position)
+                .anchor(-0.2f, .5f)
+                .flat(true)
+                .zIndex(Float.MAX_VALUE - 2)
+                .icon(bitmapDescriptorFromVector(R.drawable.ic_twotone_play_arrow_24))
+        )
     }
 
     private fun updateMyLocation(locationData: FusedLocationLiveData.LocationData?) {
@@ -418,12 +457,20 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
         binding.mapLocationButton.isEnabled = true
         val position = LatLng(locationData.latitude, locationData.longitude)
-        if (myLocationMarker != null && myLocationCircle != null) {
+        if (myLocationMarker != null && myLocationCircle != null && myLocationDirection != null) {
             // MyLocation marker position animator
             ValueAnimator.ofObject(latLngEvaluator, myLocationMarker!!.position, position).apply {
                 duration = 750
                 addUpdateListener {
                     myLocationMarker?.position = it.animatedValue as LatLng
+                }
+                start()
+            }
+            // MyLocation direction marker position animator
+            ValueAnimator.ofObject(latLngEvaluator, myLocationDirection!!.position, position).apply {
+                duration = 750
+                addUpdateListener {
+                    myLocationDirection?.position = it.animatedValue as LatLng
                 }
                 start()
             }
