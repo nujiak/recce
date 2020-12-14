@@ -1,6 +1,5 @@
 package com.nujiak.recce.modalsheets
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -31,7 +30,6 @@ class SettingsSheet : BottomSheetDialogFragment() {
     private val themePrefs: Array<String> by lazy { resources.getStringArray(R.array.theme_prefs) }
 
     private var currentThemePrefId = THEME_PREF_AUTO
-    private var newThemePrefId = THEME_PREF_AUTO
 
     companion object {
         const val COORD_SYS_KEY = "coordinate_system"
@@ -85,7 +83,19 @@ class SettingsSheet : BottomSheetDialogFragment() {
         }
         binding.settingsThemeDropdown.setOnItemClickListener { _, _, position, _ ->
             viewModel.sharedPreference.edit().putInt(THEME_PREF_KEY, position).apply()
-            newThemePrefId = position
+
+            binding.settingsThemeDropdown.dismissDropDown()
+            if (position != currentThemePrefId) {
+                currentThemePrefId = position
+                AppCompatDelegate.setDefaultNightMode(
+                    when (position) {
+                        THEME_PREF_AUTO -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                        THEME_PREF_LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
+                        THEME_PREF_DARK -> AppCompatDelegate.MODE_NIGHT_YES
+                        else -> throw IllegalArgumentException("Invalid theme pref index: $position")
+                    }
+                )
+            }
         }
 
         // Set up reset guides
@@ -113,7 +123,6 @@ class SettingsSheet : BottomSheetDialogFragment() {
         sharedPreferences.getInt(THEME_PREF_KEY, 0).let {
             binding.settingsThemeDropdown.setText(themePrefs[it], false)
             currentThemePrefId = it
-            newThemePrefId = it
         }
     }
 
@@ -132,19 +141,5 @@ class SettingsSheet : BottomSheetDialogFragment() {
         startActivity(intent)
         requireActivity().finish()
 
-    }
-
-    override fun onDismiss(dialog: DialogInterface) {
-        if (newThemePrefId != currentThemePrefId) {
-            AppCompatDelegate.setDefaultNightMode(
-                when (newThemePrefId) {
-                    THEME_PREF_AUTO -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                    THEME_PREF_LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
-                    THEME_PREF_DARK -> AppCompatDelegate.MODE_NIGHT_YES
-                    else -> throw IllegalArgumentException("Invalid theme pref index: $newThemePrefId")
-                }
-            )
-        }
-        super.onDismiss(dialog)
     }
 }
