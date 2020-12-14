@@ -26,7 +26,7 @@ class OnboardingActivity : AppCompatActivity() {
 
         val viewModel: OnboardingViewModel by viewModels()
         viewModel.sharedPreference =
-            getSharedPreferences("com.nujiak.reconnaissance", Context.MODE_PRIVATE)
+            getSharedPreferences("com.nujiak.recce", Context.MODE_PRIVATE)
 
         viewpager = findViewById(R.id.onboarding_viewpager)
         viewpager.apply {

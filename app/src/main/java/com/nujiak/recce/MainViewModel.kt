@@ -21,7 +21,7 @@ import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_KEY
 import kotlinx.coroutines.*
 
 class MainViewModel @ViewModelInject constructor(
-    private val database: ReconDatabaseDao,
+    private val database: RecceDatabaseDao,
     val sharedPreference: SharedPreferences,
     application: Application
 ) :
@@ -276,7 +276,7 @@ class MainViewModel @ViewModelInject constructor(
         get() = _rulerList
 
     fun onAddSelectionToRuler() {
-        val newRulerList = mutableListOf<ReconData>()
+        val newRulerList = mutableListOf<RecceData>()
         for (id in selectedIds) {
             if (id > 0) {
                 newRulerList.add(allPins.value!!.first { it.pinId == id })
