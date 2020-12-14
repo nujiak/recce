@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
@@ -14,6 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.nujiak.recce.MainActivity
 import com.nujiak.recce.MainViewModel
+import com.nujiak.recce.NoFilterArrayAdapter
 import com.nujiak.recce.R
 import com.nujiak.recce.databinding.SheetSettingsBinding
 import com.nujiak.recce.fragments.MapFragment
@@ -61,17 +61,17 @@ class SettingsSheet : BottomSheetDialogFragment() {
 
         // Set up exposed dropdown menus content
         binding.settingsCoordsysDropdown.setAdapter(
-            ArrayAdapter(
+            NoFilterArrayAdapter(
                 requireContext(), R.layout.dropdown_menu_popup_item, coordinateSystems
             )
         )
         binding.settingsAngleDropdown.setAdapter(
-            ArrayAdapter(
+            NoFilterArrayAdapter(
                 requireContext(), R.layout.dropdown_menu_popup_item, angleUnits
             )
         )
         binding.settingsThemeDropdown.setAdapter(
-            ArrayAdapter(requireContext(), R.layout.dropdown_menu_popup_item, themePrefs)
+            NoFilterArrayAdapter(requireContext(), R.layout.dropdown_menu_popup_item, themePrefs)
         )
 
         // Set up exposed dropdown menus on-click
