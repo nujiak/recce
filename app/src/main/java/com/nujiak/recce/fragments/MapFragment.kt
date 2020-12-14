@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.Button
 import androidx.core.app.ActivityCompat
@@ -48,26 +49,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var binding: FragmentMapBinding
-    lateinit var map: GoogleMap
+    private var mapMgr: MapManager? = null
     private var coordSysId = 0
     private var angleUnitId = 0
 
     private var currentPinColor = 2
-    private var markersMap = HashMap<Marker, Pin>()
-    private var polylinesMap = HashMap<Polyline, Chain>()
-    private var polygonsMap = HashMap<Polygon, Chain>()
-    private var checkpointsMap = HashMap<Marker, ChainNode>()
-
-    private var myLocationMarker: Marker? = null
-    private var myLocationCircle: Circle? = null
-    private var myLocationDirection: Marker? = null
-    private var currentPolyline: Polyline? = null
-    private val currentPolylineMarkers = mutableListOf<Marker>()
-
-    private var isShowingPin = false
-    private var isShowingMyLocation = false
-    private var isShowingCheckpoint = false
-    private var zoomStack = 0f
 
     private var isCheckpointInfobarVisible = false
     private var isLiveMeasurementVisible = false
@@ -77,8 +63,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private var isChainControlsVisible = false
 
     private lateinit var numberFormat: NumberFormat
-
-    private var currentMapType = GoogleMap.MAP_TYPE_HYBRID
 
     private var lastDirectionUpdate = 0L
 
@@ -127,8 +111,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         binding.mapFab.setOnClickListener { onAddPinFromMap() }
 
         // Set up custom map controls
-        binding.mapZoomInButton.setOnClickListener { onZoomIn() }
-        binding.mapZoomOutButton.setOnClickListener { onZoomOut() }
+        binding.mapZoomInButton.setOnClickListener { mapMgr?.zoomIn() }
+        binding.mapZoomOutButton.setOnClickListener { mapMgr?.zoomOut() }
         binding.mapLocationButton.apply {
             setOnClickListener { onMyLocationPressed(false) }
             setOnLongClickListener { onMyLocationPressed(true); true }
@@ -193,29 +177,23 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         viewModel.coordinateSystem.observe(viewLifecycleOwner, {
             coordSysId = it
             updateCardGridSystem(coordSysId)
-            if (this::map.isInitialized) {
-                // Force card update
-                updateGrids()
-            }
+            updateGrids()
         })
         viewModel.angleUnit.observe(viewLifecycleOwner, {
             angleUnitId = it
-            if (this::map.isInitialized) {
-                // Force Live Measurements update
-                updateLiveMeasurements()
-            }
+            updateLiveMeasurements()
         })
 
         // Set up Map Type toggle buttons
         binding.mapNormalType.setOnClickListener {
-            updateMapType(GoogleMap.MAP_TYPE_NORMAL)
+            mapMgr?.mapType = GoogleMap.MAP_TYPE_NORMAL
 
         }
         binding.mapHybridType.setOnClickListener {
-            updateMapType(GoogleMap.MAP_TYPE_HYBRID)
+            mapMgr?.mapType = GoogleMap.MAP_TYPE_HYBRID
         }
         binding.mapSatelliteType.setOnClickListener {
-            updateMapType(GoogleMap.MAP_TYPE_SATELLITE)
+            mapMgr?.mapType = GoogleMap.MAP_TYPE_SATELLITE
         }
 
         // NumberFormat used to format distances in Live Measurements
@@ -224,7 +202,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         numberFormat.maximumFractionDigits = 1
 
         // Set up Map rotation reset
-        binding.mapCompass.setOnClickListener { onResetMapRotation() }
+        binding.mapCompass.setOnClickListener { mapMgr?.resetMapRotation() }
 
         viewModel.chainsGuideShown =
             viewModel.sharedPreference.getBoolean(CHAINS_GUIDE_SHOWN_KEY, false)
@@ -232,22 +210,13 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         return binding.root
     }
 
-    private fun updateMapType(newMapType: Int) {
-        if (currentMapType == newMapType) {
-            return
-        }
-        currentMapType = newMapType
-        map.mapType = newMapType
-        viewModel.sharedPreference.edit().putInt(MAP_TYPE_KEY, newMapType).apply()
-    }
-
     override fun onMapReady(mMap: GoogleMap?) {
         if (mMap != null) {
-            map = mMap
+            mapMgr = MapManager(mMap)
 
-            val newMapType = viewModel.sharedPreference.getInt(MAP_TYPE_KEY, currentMapType)
-            map.mapType = newMapType
-            currentMapType = newMapType
+            val newMapType =
+                viewModel.sharedPreference.getInt(MAP_TYPE_KEY, GoogleMap.MAP_TYPE_HYBRID)
+            mapMgr?.mapType = newMapType
             binding.mapTypeGroup.check(
                 when (newMapType) {
                     GoogleMap.MAP_TYPE_NORMAL -> R.id.map_normal_type
@@ -257,20 +226,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 }
             )
 
-            map.apply {
-                setOnCameraMoveListener { onCameraMove() }
-                setOnMarkerClickListener { onMarkerClick(it) }
-                setOnCameraMoveStartedListener { onCameraMoveStarted(it) }
-                setOnPolylineClickListener { onPolylineClick(it) }
-                setOnPolygonClickListener { onPolygonClick(it) }
-                isIndoorEnabled = false
-                setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style))
-                uiSettings.isZoomControlsEnabled = true
-            }
-
             // Set up show pin and checkpoint sequence
-            viewModel.pinInFocus.observe(viewLifecycleOwner, { pin -> moveMapTo(pin) })
-            viewModel.chainInFocus.observe(viewLifecycleOwner, { node -> moveMapTo(node) })
+            viewModel.pinInFocus.observe(viewLifecycleOwner, { pin -> focusOn(pin) })
+            viewModel.chainInFocus.observe(viewLifecycleOwner, { chain -> focusOn(chain) })
 
             if (viewModel.isLocationGranted) {
                 onLocPermGranted()
@@ -279,10 +237,10 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             // Observe location to update Live Measurement
             viewModel.fusedLocationData.observe(viewLifecycleOwner) {
                 updateLiveMeasurements()
-                updateMyLocation(it)
+                mapMgr?.updateMyLocation(it)
             }
             viewModel.rotationLiveData.observe(viewLifecycleOwner) {
-                val marker = myLocationDirection
+                val marker = mapMgr?.myLocationDirection
                 val currentTime = System.currentTimeMillis()
                 if (currentTime - lastDirectionUpdate > 100 && marker != null) {
                     var newRotation = it.azimuth * 180 / Math.PI.toFloat() - 90
@@ -308,218 +266,30 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 }
             }
 
-            // Disable built-in Maps controls
-            map.uiSettings.apply {
-                isZoomControlsEnabled = false
-                isMyLocationButtonEnabled = false
-                isCompassEnabled = false
-            }
-
             // Add markers
             viewModel.allPins.observe(viewLifecycleOwner, { allPins ->
-                drawMarkers(allPins)
+                mapMgr?.drawMarkers(allPins)
                 toggleCheckpointInfobar(false)
             })
 
             // Add polylines
             viewModel.allChains.observe(viewLifecycleOwner, { allChains ->
-                drawChains(allChains)
+                mapMgr?.drawChains(allChains)
                 toggleCheckpointInfobar(false)
             })
 
             // Draw current polyline if available. This is needed
             // to restore the polyline after a rotation change
-            drawCurrentPolyline(true)
+            mapMgr?.drawCurrentPolyline(true)
 
             updateGrids()
-            drawMyLocation(viewModel.fusedLocationData.value)
+            mapMgr?.drawMyLocation(viewModel.fusedLocationData.value)
         }
     }
 
-    private fun drawMarkers(allPins: List<Pin>) {
-        for (marker in markersMap.keys) {
-            marker.remove()
-        }
-        markersMap.clear()
-
-        for (pin in allPins) {
-            val marker = map.addMarker(
-                MarkerOptions()
-                    .position(LatLng(pin.latitude, pin.longitude))
-                    .title(pin.name)
-                    .icon(bitmapDescriptorFromVector(PIN_VECTOR_DRAWABLE[pin.color]))
-            )
-            markersMap[marker] = pin
-        }
-    }
-
-    private fun drawChains(allChains: List<Chain>) {
-        polylinesMap.keys.forEach { it.remove() }
-        polylinesMap.clear()
-
-        checkpointsMap.keys.forEach { it.remove() }
-        checkpointsMap.clear()
-
-        polygonsMap.keys.forEach { it.remove() }
-        polygonsMap.clear()
-
-        val scale = resources.displayMetrics.density
-        for (chain in allChains) {
-            val chainNodes = chain.getNodes()
-            val points = chainNodes.map { it.position }
-            if (chain.cyclical) {
-                val color =
-                    ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[chain.color])
-                val polygonOptions = PolygonOptions()
-                points.forEach { polygonOptions.add(it) }
-                polygonOptions.apply {
-                    strokeColor(color)
-                    strokeWidth(2 * scale)
-                    fillColor(withAlpha(color, 50))
-                    strokeJointType(JointType.ROUND)
-                    clickable(true)
-                    geodesic(true)
-                }
-                val polygon = map.addPolygon(polygonOptions)
-                polygonsMap[polygon] = chain
-            } else {
-                val polyline = map.addPolyline(PolylineOptions())
-                polyline.apply {
-                    color =
-                        ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[chain.color])
-                    width = 4 * scale
-                    jointType = JointType.ROUND
-                    startCap = ButtCap()
-                    endCap = startCap
-                    isClickable = true
-                    isGeodesic = true
-                }
-                polyline.points = points
-                polylinesMap[polyline] = chain
-            }
-
-            for (node in chainNodes) {
-                if (node.isCheckpoint) {
-                    val marker = map.addMarker(
-                        MarkerOptions()
-                            .position(node.position)
-                            .anchor(0.5f, 0.5f)
-                            .flat(true)
-                            .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
-                    )
-                    checkpointsMap[marker] = node
-                }
-            }
-        }
-
-
-    }
-
-    private fun drawMyLocation(locationData: FusedLocationLiveData.LocationData?) {
-        if (locationData == null) {
-            return
-        }
-
-        myLocationMarker?.remove()
-        myLocationCircle?.remove()
-        myLocationDirection?.remove()
-        val position = LatLng(locationData.latitude, locationData.longitude)
-        myLocationMarker = map.addMarker(
-            MarkerOptions()
-                .position(position)
-                .anchor(0.5f, 0.5f)
-                .flat(true)
-                .zIndex(Float.MAX_VALUE)
-                .icon(bitmapDescriptorFromVector(R.drawable.ic_map_my_location))
-        )
-        myLocationCircle = map.addCircle(
-            CircleOptions()
-                .center(position)
-                .radius(locationData.accuracy.toDouble())
-                .strokeColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
-                .strokeWidth(1f)
-                .zIndex(Float.MAX_VALUE - 1)
-                .fillColor(ContextCompat.getColor(requireContext(), R.color.myLocationFill))
-        )
-        myLocationDirection = map.addMarker(
-            MarkerOptions()
-                .position(position)
-                .anchor(-0.2f, .5f)
-                .flat(true)
-                .zIndex(Float.MAX_VALUE - 2)
-                .icon(bitmapDescriptorFromVector(R.drawable.ic_twotone_play_arrow_24))
-        )
-    }
-
-    private fun updateMyLocation(locationData: FusedLocationLiveData.LocationData?) {
-        if (locationData == null) {
-            return
-        }
-        binding.mapLocationButton.isEnabled = true
-        val position = LatLng(locationData.latitude, locationData.longitude)
-        if (myLocationMarker != null && myLocationCircle != null && myLocationDirection != null) {
-            // MyLocation marker position animator
-            ValueAnimator.ofObject(latLngEvaluator, myLocationMarker!!.position, position).apply {
-                duration = 750
-                addUpdateListener {
-                    myLocationMarker?.position = it.animatedValue as LatLng
-                }
-                start()
-            }
-            // MyLocation direction marker position animator
-            ValueAnimator.ofObject(latLngEvaluator, myLocationDirection!!.position, position).apply {
-                duration = 750
-                addUpdateListener {
-                    myLocationDirection?.position = it.animatedValue as LatLng
-                }
-                start()
-            }
-
-            // MyLocation accuracy position animator
-            ValueAnimator.ofObject(latLngEvaluator, myLocationCircle!!.center, position).apply {
-                duration = 750
-                addUpdateListener {
-                    myLocationCircle?.center = it.animatedValue as LatLng
-                }
-                start()
-            }
-
-            // MyLocation accuracy radius animator
-            ObjectAnimator.ofObject(
-                doubleEvaluator, myLocationCircle!!.radius, locationData.accuracy.toDouble()
-            ).apply {
-                duration = 750
-                addUpdateListener {
-                    myLocationCircle?.radius = it.animatedValue as Double
-                }
-                start()
-            }
-        } else {
-            drawMyLocation(locationData)
-        }
-
-        if (isShowingMyLocation) {
-            val cameraPosition = map.cameraPosition
-            val newCameraPosition = CameraPosition.Builder()
-                .target(position)
-                .bearing(cameraPosition.bearing)
-                .tilt(cameraPosition.tilt)
-                .zoom(cameraPosition.zoom)
-                .build()
-            map.animateCamera(
-                CameraUpdateFactory.newCameraPosition(newCameraPosition),
-                750,
-                object : GoogleMap.CancelableCallback {
-                    override fun onFinish() {}
-                    override fun onCancel() {
-                        // If animation is cancelled prematurely (i.e through map rotation reset), set
-                        // isShowingMyLocation to false and switch on Live Measurement
-                        isShowingMyLocation = false
-                        toggleLiveMeasurement(true)
-                    }
-
-                })
-        }
+    private fun onMyLocationPressed(resetRotation: Boolean) {
+        toggleCheckpointInfobar(false)
+        mapMgr?.goToMyLocation(resetRotation)
     }
 
     private fun bitmapDescriptorFromVector(vectorResId: Int): BitmapDescriptor? {
@@ -541,27 +311,42 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             viewLifecycleOwner,
             object : Observer<FusedLocationLiveData.LocationData> {
                 override fun onChanged(location: FusedLocationLiveData.LocationData) {
-                    val cameraPosition = CameraPosition.builder()
-                        .target(LatLng(location.latitude, location.longitude))
-                        .zoom(15f)
-                        .build()
-                    map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+                    mapMgr?.moveTo(
+                        target = LatLng(location.latitude, location.longitude),
+                        zoom = 15f,
+                        duration = 0
+                    )
                     updateGrids()
                     removeFocus()
-                    drawMyLocation(location)
+                    mapMgr?.drawMyLocation(location)
                     viewModel.fusedLocationData.removeObserver(this)
                 }
             })
     }
 
+    private fun onCameraMoveStarted(reason: Int) {
+        if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+            removeFocus()
+        }
+        if (reason != GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION || mapMgr?.isShowingPin == true) {
+            mapMgr?.isShowingMyLocation = false
+            toggleLiveMeasurement(true)
+        }
+    }
+
     @SuppressLint("SetTextI18n")
     private fun updateGrids(latitude: Double? = null, longitude: Double? = null) {
-        val cameraTarget = map.cameraPosition.target
-        val lat = latitude ?: cameraTarget.latitude
-        val lng = longitude ?: cameraTarget.longitude
-        binding.mapCurrentGrids.text = getGridString(lat, lng, coordSysId, resources)
-
-        updateLiveMeasurements(latitude, longitude)
+        if (latitude != null && longitude != null) {
+            binding.mapCurrentGrids.text = getGridString(latitude, longitude, coordSysId, resources)
+            updateLiveMeasurements(latitude, longitude)
+        } else if (mapMgr != null && mapMgr?.isShowingPin != true) {
+            // Update grids and live measurement only if not showing Pin
+            val cameraTarget = mapMgr!!.cameraPosition.target
+            val lat = cameraTarget.latitude
+            val lng = cameraTarget.longitude
+            binding.mapCurrentGrids.text = getGridString(lat, lng, coordSysId, resources)
+            updateLiveMeasurements(lat, lng)
+        }
     }
 
     private fun updateFab(color: Int? = null) {
@@ -574,14 +359,18 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
     @SuppressLint("SetTextI18n")
     private fun updateLiveMeasurements(lat: Double? = null, lng: Double? = null) {
+        val fusedLocationData = viewModel.fusedLocationData.value ?: return
         var targetLat = lat
         var targetLng = lng
-        if (targetLat == null || targetLng == null) {
-            val mapTarget = map.cameraPosition.target
-            targetLat = mapTarget.latitude
-            targetLng = mapTarget.longitude
+        if ((targetLat == null || targetLng == null)) {
+            if (mapMgr != null) {
+                val mapTarget = mapMgr!!.cameraPosition.target
+                targetLat = mapTarget.latitude
+                targetLng = mapTarget.longitude
+            } else {
+                return
+            }
         }
-        val fusedLocationData = viewModel.fusedLocationData.value ?: return
 
         val myLatLng = LatLng(fusedLocationData.latitude, fusedLocationData.longitude)
         val targetLatLng = LatLng(targetLat, targetLng)
@@ -602,205 +391,18 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onAddPinFromMap(): Boolean {
-        val cameraPosition = map.cameraPosition
+        val mapMgr = this.mapMgr ?: return true
+        val cameraPosition = mapMgr.cameraPosition
         val target = cameraPosition.target
         val pinLat = target.latitude.toString().toDouble()
         val pinLong = target.longitude.toString().toDouble()
 
         val newPin = Pin("", pinLat, pinLong, currentPinColor)
         viewModel.openPinCreator(newPin)
-
         return true
-    }
-
-    private fun onZoomIn() {
-        zoomStack = if (zoomStack < 0) 1f else zoomStack + 1
-
-        val currentZoomStack = zoomStack
-
-        map.animateCamera(
-            CameraUpdateFactory.zoomBy(zoomStack),
-            300,
-            object : GoogleMap.CancelableCallback {
-                override fun onFinish() {
-                    zoomStack = 0f
-                }
-
-                override fun onCancel() {
-                    // Call onFinish() if animation is cancelled NOT due to another call to zoom.
-                    if (zoomStack == currentZoomStack) {
-                        onFinish()
-                    }
-                }
-
-            })
-    }
-
-    private fun onZoomOut() {
-        zoomStack = if (zoomStack > 0) -1f else zoomStack - 1
-
-        val currentZoomStack = zoomStack
-
-        map.animateCamera(
-            CameraUpdateFactory.zoomBy(zoomStack),
-            300,
-            object : GoogleMap.CancelableCallback {
-                override fun onFinish() {
-                    zoomStack = 0f
-                }
-
-                override fun onCancel() {
-                    // Call onFinish() if animation is cancelled NOT due to another call to zoom.
-                    if (zoomStack == currentZoomStack) {
-                        onFinish()
-                    }
-                }
-            })
-    }
-
-    private fun onMyLocationPressed(resetRotation: Boolean) {
-        isShowingMyLocation = true
-        val currentCameraPosition = map.cameraPosition
-        val currentZoom = currentCameraPosition.zoom
-        val location = viewModel.fusedLocationData.value
-        if (location != null) {
-            val cameraPosition = CameraPosition.builder()
-                .target(LatLng(location.latitude, location.longitude))
-                .zoom(if (currentZoom < 10) 15f else currentZoom)
-                .tilt(if (resetRotation) 0f else currentCameraPosition.tilt)
-                .bearing(if (resetRotation) 0f else currentCameraPosition.bearing)
-                .build()
-            map.animateCamera(
-                CameraUpdateFactory.newCameraPosition(cameraPosition),
-                500,
-                object : GoogleMap.CancelableCallback {
-                    override fun onFinish() {
-                        toggleLiveMeasurement(false)
-                    }
-
-                    override fun onCancel() {}
-                })
-            removeFocus()
-        }
-    }
-
-    private fun onCameraMove() {
-        if (!isShowingPin) {
-            updateGrids()
-        }
-
-        val bearing = map.cameraPosition.bearing
-        val tilt = map.cameraPosition.tilt
-        if (bearing != 0f || tilt != 0f) {
-            toggleMapCompass(true)
-            updateMapCompass(bearing, tilt)
-        } else {
-            toggleMapCompass(false)
-        }
-
-        if (viewModel.isInPolylineMode.value!!) {
-            drawCurrentPolyline()
-        }
-    }
-
-    private fun onMarkerClick(marker: Marker): Boolean {
-        // Marker is My Location custom marker
-        if (marker == myLocationMarker) {
-            onMyLocationPressed(false)
-            return true
-        }
-
-        // Marker represents a save polyline checkpoint
-        checkpointsMap[marker]?.let { node ->
-            moveMapTo(node)
-            return true
-        }
-
-        // Marker represents a current polyline checkpoint
-        if (currentPolylineMarkers.contains(marker)) {
-            val position = marker.position
-            val checkpointNode = ChainNode(marker.title, position, null)
-            moveMapTo(checkpointNode)
-            return true
-        }
-
-        // Marker represents a saved Pin
-        markersMap[marker]?.let { pin ->
-            viewModel.showPinOnMap(pin)
-            toggleLiveMeasurement(true)
-            return true
-        }
-
-        return true
-    }
-
-    private fun onCameraMoveStarted(reason: Int) {
-        if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-            removeFocus()
-        }
-        if (reason != GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION || isShowingPin) {
-            isShowingMyLocation = false
-            toggleLiveMeasurement(true)
-        }
-    }
-
-    private fun moveMapTo(pin: Pin) {
-        moveMapTo(pin.latitude, pin.longitude)
-        focusOn(pin)
-    }
-
-    private fun moveMapTo(chain: Chain) {
-        val nodes = chain.getNodes()
-        if (chain.cyclical) {
-            // Area
-            val bounds = LatLngBounds.builder().apply {
-                for (node in nodes) {
-                    include(node.position)
-                }
-            }.build()
-            val padding = 64 * resources.displayMetrics.density
-            map.animateCamera(
-                CameraUpdateFactory.newLatLngBounds(bounds, padding.toInt()),
-                350,
-                null
-            )
-
-        } else {
-            // Route
-            moveMapTo(nodes[0])
-        }
-    }
-
-    private fun moveMapTo(node: ChainNode) {
-        moveMapTo(node.position.latitude, node.position.longitude)
-        focusOn(node)
-    }
-
-    private fun moveMapTo(
-        lat: Double,
-        lng: Double,
-        bearing: Float? = null,
-        tilt: Float? = null,
-        zoom: Float? = null
-    ) {
-        val currentPosition = map.cameraPosition
-
-        val toBearing = bearing ?: currentPosition.bearing
-        val toTilt = tilt ?: currentPosition.tilt
-        val toZoom = zoom ?: if (map.cameraPosition.zoom < 10f) 15f else map.cameraPosition.zoom
-
-        val cameraPosition = CameraPosition.builder()
-            .target(LatLng(lat, lng))
-            .zoom(toZoom)
-            .bearing(toBearing)
-            .tilt(toTilt)
-            .build()
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 350, null)
     }
 
     private fun focusOn(lat: Double, lng: Double, color: Int) {
-
-        isShowingMyLocation = false
         toggleLiveMeasurement(true)
 
         // update currentPinColor
@@ -812,35 +414,38 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
         // Set card coordinates
         updateGrids(lat, lng)
-
-        isShowingPin = true
     }
 
     private fun focusOn(checkpoint: ChainNode) {
-        isShowingCheckpoint = true
-        isShowingPin = true
         updateCheckpointInfobar(checkpoint)
         toggleCheckpointInfobar(true)
         val parentChain = checkpoint.parentChain
+        mapMgr?.moveTo(checkpoint)
         focusOn(
             checkpoint.position.latitude,
             checkpoint.position.longitude,
             parentChain?.color ?: currentPinColor,
         )
-
     }
 
     private fun focusOn(pin: Pin) {
-        isShowingCheckpoint = false
-        isShowingPin = true
+        mapMgr?.moveTo(pin)
         updateCheckpointInfobar(pin)
         toggleCheckpointInfobar(true)
         focusOn(pin.latitude, pin.longitude, pin.color)
     }
 
+    private fun focusOn(chain: Chain) {
+        if (chain.cyclical) {
+            removeFocus()
+            mapMgr?.moveTo(chain)
+        } else {
+            focusOn(chain.getNodes()[0])
+        }
+    }
+
     private fun removeFocus() {
-        isShowingPin = false
-        isShowingCheckpoint = false
+        mapMgr?.removeFocus()
         toggleCheckpointInfobar(false)
     }
 
@@ -1048,23 +653,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         binding.mapCompassImg.imageMatrix = matrix
     }
 
-    private fun onResetMapRotation() {
-        val cameraPosition = map.cameraPosition
-        val newPosition = CameraPosition(cameraPosition.target, cameraPosition.zoom, 0f, 0f)
-
-        map.animateCamera(
-            CameraUpdateFactory.newCameraPosition(newPosition),
-            350,
-            object : GoogleMap.CancelableCallback {
-                override fun onFinish() {
-                    toggleMapCompass(false)
-                }
-
-                override fun onCancel() {}
-
-            })
-    }
-
     private fun toggleMapCompass(makeVisible: Boolean = true) {
 
         if (isMapCompassVisible == makeVisible) {
@@ -1135,10 +723,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onExitPolylineMode() {
-        currentPolyline?.remove()
-        currentPolyline = null
-        currentPolylineMarkers.map { it.remove() }
-        currentPolylineMarkers.clear()
+        mapMgr?.exitPolylineMode()
         binding.mapChainFab.show()
 
         // Disable all buttons
@@ -1150,6 +735,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onAddPolylinePoint(name: String = "") {
+        val mapMgr = this.mapMgr ?: return
         if (!viewModel.isInPolylineMode.value!!) {
             viewModel.enterPolylineMode()
             if (!viewModel.chainsGuideShown) {
@@ -1157,12 +743,12 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             }
         }
         viewModel.currentPolylinePoints.let {
-            it.add(ChainNode(name, map.cameraPosition.target))
+            it.add(ChainNode(name, mapMgr.cameraPosition.target))
             if (it.size >= 2) {
                 binding.mapPolylineSave.isEnabled = true
             }
         }
-        drawCurrentPolyline(true)
+        mapMgr.drawCurrentPolyline(true)
     }
 
     private fun onAddPolylineNamedPoint() {
@@ -1214,71 +800,23 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onPolylineClick(polyline: Polyline) {
-        polylinesMap[polyline]?.let {
+        val mapMgr = this.mapMgr ?: return
+        mapMgr.polylinesMap[polyline]?.let {
             viewModel.showChainInfo(it.chainId)
         }
     }
 
     private fun onPolygonClick(polygon: Polygon) {
-        polygonsMap[polygon]?.let {
+        val mapMgr = this.mapMgr ?: return
+        mapMgr.polygonsMap[polygon]?.let {
             viewModel.showChainInfo(it.chainId)
-        }
-    }
-
-    private fun drawCurrentPolyline(redrawCheckpoints: Boolean = false) {
-        if (currentPolyline == null) {
-            val polylineOptions = PolylineOptions()
-            for (point in viewModel.currentPolylinePoints) {
-                polylineOptions.add(point.position)
-            }
-            polylineOptions.add(map.cameraPosition.target)
-            currentPolyline = map.addPolyline(polylineOptions)
-            val scale = resources.displayMetrics.density
-            currentPolyline?.apply {
-                pattern = listOf(
-                    Dash(8 * scale),
-                    Gap(4 * scale)
-                )
-                width = 6 * scale
-                color = ContextCompat.getColor(requireContext(), R.color.colorPrimaryLight)
-                jointType = JointType.ROUND
-                endCap = ButtCap()
-                isGeodesic = true
-            }
-        } else {
-            currentPolyline?.points = viewModel.currentPolylinePoints
-                .map { it.position }
-                .toMutableList().apply {
-                    add(map.cameraPosition.target)
-                }
-        }
-
-        if (redrawCheckpoints) {
-            for (marker in currentPolylineMarkers) {
-                marker.remove()
-            }
-            currentPolylineMarkers.clear()
-
-            for (node in viewModel.currentPolylinePoints) {
-                if (node.isCheckpoint) {
-                    val marker = map.addMarker(
-                        MarkerOptions()
-                            .position(node.position)
-                            .anchor(0.5f, 0.5f)
-                            .title(node.name)
-                            .flat(true)
-                            .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
-                    )
-                    currentPolylineMarkers.add(marker)
-                }
-            }
         }
     }
 
     private fun undoPolyline() {
         viewModel.currentPolylinePoints.let {
             it.removeAt(it.size - 1)
-            drawCurrentPolyline(true)
+            mapMgr?.drawCurrentPolyline(true)
 
             if (it.size == 0) {
                 viewModel.exitPolylineMode()
@@ -1374,6 +912,26 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
     }
 
+    private fun onCameraMove() {
+        val mapMgr = mapMgr ?: return
+
+        updateGrids()
+
+        val position = mapMgr.cameraPosition
+        val bearing = position.bearing
+        val tilt = position.tilt
+        if (bearing != 0f || tilt != 0f) {
+            toggleMapCompass(true)
+            updateMapCompass(bearing, tilt)
+        } else {
+            toggleMapCompass(false)
+        }
+
+        if (viewModel.isInPolylineMode.value!!) {
+            mapMgr.drawCurrentPolyline()
+        }
+    }
+
     /**
      * Functions below are to forward lifecycle
      * events to MapView
@@ -1413,5 +971,460 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     override fun onResume() {
         super.onResume()
         binding.mapView.onResume()
+    }
+
+    private inner class MapManager(var map: GoogleMap) {
+        var markersMap = HashMap<Marker, Pin>()
+        var polylinesMap = HashMap<Polyline, Chain>()
+        var polygonsMap = HashMap<Polygon, Chain>()
+        var checkpointsMap = HashMap<Marker, ChainNode>()
+
+        var myLocationMarker: Marker? = null
+        var myLocationCircle: Circle? = null
+        var myLocationDirection: Marker? = null
+        var currentPolyline: Polyline? = null
+        val currentPolylineMarkers = mutableListOf<Marker>()
+
+        var isShowingPin = false
+        var isShowingMyLocation = false
+        var isShowingCheckpoint = false
+        var zoomStack = 0f
+
+        var isAnimating = false
+
+        var mapType: Int = map.mapType
+            set(value) {
+                if (field != value) {
+                    map.mapType = value
+                    viewModel.sharedPreference.edit().putInt(MAP_TYPE_KEY, value).apply()
+                    field = value
+                }
+            }
+
+        private var targetPosition: CameraPosition = map.cameraPosition
+        val cameraPosition: CameraPosition
+            get() = map.cameraPosition
+
+        init {
+            map.apply {
+                setOnCameraMoveListener { onCameraMove() }
+                setOnMarkerClickListener { onMarkerClick(it) }
+                setOnCameraMoveStartedListener { onCameraMoveStarted(it) }
+                setOnPolylineClickListener { onPolylineClick(it) }
+                setOnPolygonClickListener { onPolygonClick(it) }
+                isIndoorEnabled = false
+                setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style))
+                uiSettings.isZoomControlsEnabled = true
+            }
+
+            map.uiSettings.apply {
+                isZoomControlsEnabled = false
+                isMyLocationButtonEnabled = false
+                isCompassEnabled = false
+            }
+        }
+
+        fun moveTo(
+            target: LatLng? = null,
+            bearing: Float? = null,
+            tilt: Float? = null,
+            zoom: Float? = null,
+            duration: Int = 350,
+            onAnimFinish: () -> Unit = { },
+            onAnimCancel: () -> Unit = { }
+        ) {
+            // If starting from static position, record current position as target
+            if (!isAnimating) {
+                targetPosition = map.cameraPosition
+            }
+
+            // Fetch undeclared parameters from target position
+            val tgt = target ?: targetPosition.target
+            val zm = zoom ?: if (map.cameraPosition.zoom < 10f) 15f else map.cameraPosition.zoom
+            val brng = bearing ?: targetPosition.bearing
+            val tlt = tilt ?: targetPosition.tilt
+
+            // Create new camera position
+            val cameraPosition = CameraPosition.builder()
+                .target(tgt)
+                .zoom(zm)
+                .bearing(brng)
+                .tilt(tlt)
+                .build()
+
+            targetPosition = cameraPosition
+
+            if (duration > 0) {
+                isAnimating = true
+                map.animateCamera(
+                    CameraUpdateFactory.newCameraPosition(cameraPosition),
+                    duration,
+                    object : GoogleMap.CancelableCallback {
+                        override fun onFinish() {
+                            onAnimFinish()
+                            isAnimating = false
+                        }
+
+                        override fun onCancel() {
+                            onAnimCancel()
+                            isAnimating = false
+                        }
+                    }
+                )
+            } else {
+                map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+                isAnimating = false
+            }
+        }
+
+        fun moveTo(pin: Pin) {
+            isShowingPin = true
+            isShowingCheckpoint = false
+            isShowingMyLocation = false
+            moveTo(target = LatLng(pin.latitude, pin.longitude))
+        }
+
+        fun moveTo(chain: Chain) {
+            isShowingCheckpoint = false
+            isShowingPin = false
+            isShowingMyLocation = false
+            val nodes = chain.getNodes()
+            if (chain.cyclical) {
+                // Area
+                val bounds = LatLngBounds.builder().apply {
+                    for (node in nodes) {
+                        include(node.position)
+                    }
+                }.build()
+                val padding = 64 * resources.displayMetrics.density
+                map.animateCamera(
+                    CameraUpdateFactory.newLatLngBounds(bounds, padding.toInt()),
+                    350,
+                    null
+                )
+
+            } else {
+                // Route
+                moveTo(nodes[0])
+            }
+        }
+
+        fun moveTo(node: ChainNode) {
+            isShowingPin = true
+            isShowingCheckpoint = true
+            isShowingMyLocation = false
+            moveTo(target = LatLng(node.position.latitude, node.position.longitude))
+        }
+
+        private fun onMarkerClick(marker: Marker): Boolean {
+            // Marker is My Location custom marker
+            if (marker == myLocationMarker) {
+                onMyLocationPressed(false)
+                return true
+            }
+
+            // Marker represents a save polyline checkpoint
+            checkpointsMap[marker]?.let { node ->
+                focusOn(node)
+                return true
+            }
+
+            // Marker represents a current polyline checkpoint
+            if (currentPolylineMarkers.contains(marker)) {
+                val position = marker.position
+                val checkpointNode = ChainNode(marker.title, position, null)
+                focusOn(checkpointNode)
+                return true
+            }
+
+            // Marker represents a saved Pin
+            markersMap[marker]?.let { pin ->
+                viewModel.showPinOnMap(pin)
+                toggleLiveMeasurement(true)
+                return true
+            }
+
+            return true
+        }
+
+        fun drawMarkers(allPins: List<Pin>) {
+            for (marker in markersMap.keys) {
+                marker.remove()
+            }
+            markersMap.clear()
+
+            for (pin in allPins) {
+                val marker = map.addMarker(
+                    MarkerOptions()
+                        .position(LatLng(pin.latitude, pin.longitude))
+                        .title(pin.name)
+                        .icon(bitmapDescriptorFromVector(PIN_VECTOR_DRAWABLE[pin.color]))
+                )
+                markersMap[marker] = pin
+            }
+        }
+
+        fun drawChains(allChains: List<Chain>) {
+            polylinesMap.keys.forEach { it.remove() }
+            polylinesMap.clear()
+
+            checkpointsMap.keys.forEach { it.remove() }
+            checkpointsMap.clear()
+
+            polygonsMap.keys.forEach { it.remove() }
+            polygonsMap.clear()
+
+            val scale = resources.displayMetrics.density
+            for (chain in allChains) {
+                val chainNodes = chain.getNodes()
+                val points = chainNodes.map { it.position }
+                if (chain.cyclical) {
+                    val color =
+                        ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[chain.color])
+                    val polygonOptions = PolygonOptions()
+                    points.forEach { polygonOptions.add(it) }
+                    polygonOptions.apply {
+                        strokeColor(color)
+                        strokeWidth(2 * scale)
+                        fillColor(withAlpha(color, 50))
+                        strokeJointType(JointType.ROUND)
+                        clickable(true)
+                        geodesic(true)
+                    }
+                    val polygon = map.addPolygon(polygonOptions)
+                    polygonsMap[polygon] = chain
+                } else {
+                    val polyline = map.addPolyline(PolylineOptions())
+                    polyline.apply {
+                        color =
+                            ContextCompat.getColor(
+                                requireContext(),
+                                PIN_CARD_BACKGROUNDS[chain.color]
+                            )
+                        width = 4 * scale
+                        jointType = JointType.ROUND
+                        startCap = ButtCap()
+                        endCap = startCap
+                        isClickable = true
+                        isGeodesic = true
+                    }
+                    polyline.points = points
+                    polylinesMap[polyline] = chain
+                }
+
+                for (node in chainNodes) {
+                    if (node.isCheckpoint) {
+                        val marker = map.addMarker(
+                            MarkerOptions()
+                                .position(node.position)
+                                .anchor(0.5f, 0.5f)
+                                .flat(true)
+                                .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
+                        )
+                        checkpointsMap[marker] = node
+                    }
+                }
+            }
+
+
+        }
+
+        fun drawMyLocation(locationData: FusedLocationLiveData.LocationData?) {
+            if (locationData == null) {
+                return
+            }
+
+            myLocationMarker?.remove()
+            myLocationCircle?.remove()
+            myLocationDirection?.remove()
+            val position = LatLng(locationData.latitude, locationData.longitude)
+            myLocationMarker = map.addMarker(
+                MarkerOptions()
+                    .position(position)
+                    .anchor(0.5f, 0.5f)
+                    .flat(true)
+                    .zIndex(Float.MAX_VALUE)
+                    .icon(bitmapDescriptorFromVector(R.drawable.ic_map_my_location))
+            )
+            myLocationCircle = map.addCircle(
+                CircleOptions()
+                    .center(position)
+                    .radius(locationData.accuracy.toDouble())
+                    .strokeColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
+                    .strokeWidth(1f)
+                    .zIndex(Float.MAX_VALUE - 1)
+                    .fillColor(ContextCompat.getColor(requireContext(), R.color.myLocationFill))
+            )
+            myLocationDirection = map.addMarker(
+                MarkerOptions()
+                    .position(position)
+                    .anchor(-0.2f, .5f)
+                    .flat(true)
+                    .zIndex(Float.MAX_VALUE - 2)
+                    .icon(bitmapDescriptorFromVector(R.drawable.ic_twotone_play_arrow_24))
+            )
+        }
+
+        fun updateMyLocation(locationData: FusedLocationLiveData.LocationData) {
+            val position = LatLng(locationData.latitude, locationData.longitude)
+            if (myLocationMarker != null && myLocationCircle != null && myLocationDirection != null) {
+                // Marker positions animator
+                ValueAnimator.ofObject(latLngEvaluator, myLocationMarker!!.position, position)
+                    .apply {
+                        duration = 750
+                        addUpdateListener {
+                            val newPosition = it.animatedValue as LatLng
+                            if (isShowingMyLocation) {
+                                moveTo(target = newPosition, duration = 0)
+                            }
+                            myLocationMarker?.position = newPosition
+                            myLocationDirection?.position = newPosition
+                            myLocationCircle?.center = newPosition
+                        }
+                        interpolator = AccelerateDecelerateInterpolator()
+                        start()
+                    }
+                // MyLocation accuracy radius animator
+                ObjectAnimator.ofObject(
+                    doubleEvaluator, myLocationCircle!!.radius, locationData.accuracy.toDouble()
+                ).apply {
+                    duration = 750
+                    addUpdateListener {
+                        myLocationCircle?.radius = it.animatedValue as Double
+                    }
+                    start()
+                }
+            } else {
+                drawMyLocation(locationData)
+            }
+        }
+
+        fun drawCurrentPolyline(redrawCheckpoints: Boolean = false) {
+            if (currentPolyline == null) {
+                val polylineOptions = PolylineOptions()
+                for (point in viewModel.currentPolylinePoints) {
+                    polylineOptions.add(point.position)
+                }
+                polylineOptions.add(map.cameraPosition.target)
+                currentPolyline = map.addPolyline(polylineOptions)
+                val scale = resources.displayMetrics.density
+                currentPolyline?.apply {
+                    pattern = listOf(
+                        Dash(8 * scale),
+                        Gap(4 * scale)
+                    )
+                    width = 6 * scale
+                    color = ContextCompat.getColor(requireContext(), R.color.colorPrimaryLight)
+                    jointType = JointType.ROUND
+                    endCap = ButtCap()
+                    isGeodesic = true
+                }
+            } else {
+                currentPolyline?.points = viewModel.currentPolylinePoints
+                    .map { it.position }
+                    .toMutableList().apply {
+                        add(map.cameraPosition.target)
+                    }
+            }
+
+            if (redrawCheckpoints) {
+                for (marker in currentPolylineMarkers) {
+                    marker.remove()
+                }
+                currentPolylineMarkers.clear()
+
+                for (node in viewModel.currentPolylinePoints) {
+                    if (node.isCheckpoint) {
+                        val marker = map.addMarker(
+                            MarkerOptions()
+                                .position(node.position)
+                                .anchor(0.5f, 0.5f)
+                                .title(node.name)
+                                .flat(true)
+                                .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
+                        )
+                        currentPolylineMarkers.add(marker)
+                    }
+                }
+            }
+        }
+
+        private val resetZoomStack = { zoomStack = 0f }
+
+        fun zoomIn() {
+            zoomStack = if (zoomStack < 0) 1f else zoomStack + 1
+
+            val currentZoomStack = zoomStack
+
+            val onCancel = {
+                if (zoomStack == currentZoomStack) {
+                    resetZoomStack()
+                }
+            }
+
+            moveTo(
+                zoom = targetPosition.zoom + zoomStack,
+                duration = 300,
+                onAnimFinish = resetZoomStack,
+                onAnimCancel = onCancel
+            )
+        }
+
+        fun zoomOut() {
+            zoomStack = if (zoomStack > 0) -1f else zoomStack - 1
+
+            val currentZoomStack = zoomStack
+
+            val onCancel = {
+                if (zoomStack == currentZoomStack) {
+                    resetZoomStack()
+                }
+            }
+
+            moveTo(
+                zoom = targetPosition.zoom + zoomStack,
+                duration = 300,
+                onAnimFinish = resetZoomStack,
+                onAnimCancel = onCancel
+            )
+        }
+
+        private val hideLiveMeasurement = { toggleLiveMeasurement(false) }
+        fun goToMyLocation(resetRotation: Boolean) {
+            isShowingMyLocation = true
+            val location = viewModel.fusedLocationData.value
+            if (location != null) {
+                if (resetRotation) {
+                    moveTo(
+                        target = LatLng(location.latitude, location.longitude),
+                        tilt = 0f,
+                        bearing = 0f,
+                        duration = 500,
+                        onAnimFinish = hideLiveMeasurement
+                    )
+                } else {
+                    moveTo(
+                        target = LatLng(location.latitude, location.longitude),
+                        duration = 500,
+                        onAnimFinish = hideLiveMeasurement
+                    )
+                }
+                removeFocus()
+            }
+        }
+
+        fun resetMapRotation() = moveTo(tilt = 0f, bearing = 0f)
+
+        fun exitPolylineMode() {
+            currentPolyline?.remove()
+            currentPolyline = null
+            currentPolylineMarkers.map { it.remove() }
+            currentPolylineMarkers.clear()
+        }
+
+        fun removeFocus() {
+            isShowingPin = false
+            isShowingCheckpoint = false
+        }
     }
 }
