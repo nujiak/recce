@@ -11,6 +11,7 @@ import android.graphics.Matrix
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewAnimationUtils
@@ -240,12 +241,16 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 mapMgr?.updateMyLocation(it)
             }
             viewModel.rotationLiveData.observe(viewLifecycleOwner) {
-                val marker = mapMgr?.myLocationDirection
+                val mMapMgr = mapMgr ?: return@observe
+                val marker = mMapMgr.myLocationDirection ?: return@observe
                 val currentTime = System.currentTimeMillis()
-                if (currentTime - lastDirectionUpdate > 100 && marker != null) {
+                if (currentTime - lastDirectionUpdate > 100) {
                     var newRotation = it.azimuth * 180 / Math.PI.toFloat() - 90
                     val currentRotation = marker.rotation
                     val difference = newRotation - currentRotation
+
+                    // Record tilt for updating map compass
+                    val tilt = mMapMgr.cameraPosition.tilt
 
                     // Correction for rotation past 0 or 360 degrees
                     newRotation = when {
@@ -257,7 +262,17 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     ValueAnimator.ofObject(FloatEvaluator(), currentRotation, newRotation).apply {
                         duration = 100
                         addUpdateListener { valAnim ->
-                            marker.rotation = valAnim.animatedValue as Float
+                            val rotation = valAnim.animatedValue as Float
+                            marker.rotation = rotation
+                            if (mapMgr != null && mapMgr!!.isShowingMyLocationRotation) {
+                                mapMgr?.moveTo(
+                                    bearing = rotation + 90,
+                                    duration = 0,
+                                    zoom = mapMgr!!.targetPosition.zoom
+                                )
+                                // Update map compass
+                                updateMapCompass(rotation + 90, tilt)
+                            }
                         }
                         interpolator = LinearInterpolator()
                         start()
@@ -974,23 +989,76 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private inner class MapManager(var map: GoogleMap) {
-        var markersMap = HashMap<Marker, Pin>()
+        private var markersMap = HashMap<Marker, Pin>()
         var polylinesMap = HashMap<Polyline, Chain>()
         var polygonsMap = HashMap<Polygon, Chain>()
-        var checkpointsMap = HashMap<Marker, ChainNode>()
+        private var checkpointsMap = HashMap<Marker, ChainNode>()
 
-        var myLocationMarker: Marker? = null
-        var myLocationCircle: Circle? = null
+        private var myLocationMarker: Marker? = null
+        private var myLocationCircle: Circle? = null
         var myLocationDirection: Marker? = null
-        var currentPolyline: Polyline? = null
-        val currentPolylineMarkers = mutableListOf<Marker>()
+        private var currentPolyline: Polyline? = null
+        private val currentPolylineMarkers = mutableListOf<Marker>()
 
         var isShowingPin = false
         var isShowingMyLocation = false
-        var isShowingCheckpoint = false
-        var zoomStack = 0f
+            set(value) {
+                field = value
+                if (!value) {
+                    isShowingMyLocationRotation = false
+                }
+            }
+        var isShowingMyLocationRotation = false
+            private set(value) {
+                val lightGreen = ContextCompat.getColor(requireContext(), R.color.colorPrimaryRipple)
+                val clear = ContextCompat.getColor(requireContext(), android.R.color.transparent)
+                if (value && field != value) {
+                    animateColor(clear, lightGreen, 350) { color ->
+                        val colorState = ColorStateList.valueOf(color)
+                        binding.mapLocationButton.backgroundTintList = colorState
+                        binding.mapCompass.foregroundTintList = colorState
+                    }
+                    val compass = binding.mapCompass
 
-        var isAnimating = false
+                    val green = ContextCompat.getColor(requireContext(), R.color.colorPrimary)
+                    val white = ContextCompat.getColor(requireContext(), android.R.color.white)
+
+                    animateColor(compass.backgroundTintList, green, 350) { color ->
+                        binding.mapCompass.backgroundTintList = ColorStateList.valueOf(color)
+                    }
+                    animateColor(binding.mapCompassImg.imageTintList, white, 350) { color ->
+                        binding.mapCompassImg.imageTintList = ColorStateList.valueOf(color)
+                    }
+                } else if (!value && field != value) {
+                    animateColor(lightGreen, clear, 350) { color ->
+                        val colorState = ColorStateList.valueOf(color)
+                        binding.mapLocationButton.backgroundTintList = colorState
+                        binding.mapCompass.foregroundTintList = colorState
+                    }
+
+                    val compass = binding.mapCompass
+                    val colorSurfaceTypedValue = TypedValue()
+                    val colorOnSurfaceTypedValue = TypedValue()
+
+                    requireContext().theme.resolveAttribute(R.attr.colorSurface, colorSurfaceTypedValue, true)
+                    requireContext().theme.resolveAttribute(R.attr.colorOnSurface, colorOnSurfaceTypedValue, true)
+
+                    val colorSurface = ContextCompat.getColor(requireContext(), colorSurfaceTypedValue.resourceId)
+                    val colorOnSurface = ContextCompat.getColor(requireContext(), colorOnSurfaceTypedValue.resourceId)
+
+                    animateColor(compass.backgroundTintList, colorSurface, 350) { color ->
+                        binding.mapCompass.backgroundTintList = ColorStateList.valueOf(color)
+                    }
+                    animateColor(binding.mapCompassImg.imageTintList, colorOnSurface, 350) { color ->
+                        binding.mapCompassImg.imageTintList = ColorStateList.valueOf(color)
+                    }
+                }
+                field = value
+            }
+        var isShowingCheckpoint = false
+        private var zoomStack = 0f
+
+        private var isAnimating = false
 
         var mapType: Int = map.mapType
             set(value) {
@@ -1001,7 +1069,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 }
             }
 
-        private var targetPosition: CameraPosition = map.cameraPosition
+        var targetPosition: CameraPosition = map.cameraPosition
         val cameraPosition: CameraPosition
             get() = map.cameraPosition
 
@@ -1275,7 +1343,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                         addUpdateListener {
                             val newPosition = it.animatedValue as LatLng
                             if (isShowingMyLocation) {
-                                moveTo(target = newPosition, duration = 0)
+                                moveTo(target = newPosition, duration = 0, zoom = targetPosition.zoom)
                             }
                             myLocationMarker?.position = newPosition
                             myLocationDirection?.position = newPosition
@@ -1352,68 +1420,114 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         private val resetZoomStack = { zoomStack = 0f }
 
         fun zoomIn() {
-            zoomStack = if (zoomStack < 0) 1f else zoomStack + 1
+            if (isShowingMyLocationRotation) {
+                moveTo(
+                    zoom = targetPosition.zoom + 1,
+                    duration = 0,
+                    onAnimFinish = resetZoomStack
+                )
+            } else {
+                zoomStack = if (zoomStack < 0) 1f else zoomStack + 1
 
-            val currentZoomStack = zoomStack
+                val currentZoomStack = zoomStack
 
-            val onCancel = {
-                if (zoomStack == currentZoomStack) {
-                    resetZoomStack()
+                val onCancel = {
+                    if (zoomStack == currentZoomStack) {
+                        resetZoomStack()
+                    }
                 }
+                moveTo(
+                    zoom = targetPosition.zoom + zoomStack,
+                    duration = 300,
+                    onAnimFinish = resetZoomStack,
+                    onAnimCancel = onCancel
+                )
             }
 
-            moveTo(
-                zoom = targetPosition.zoom + zoomStack,
-                duration = 300,
-                onAnimFinish = resetZoomStack,
-                onAnimCancel = onCancel
-            )
         }
 
         fun zoomOut() {
-            zoomStack = if (zoomStack > 0) -1f else zoomStack - 1
+            if (isShowingMyLocationRotation) {
+                moveTo(
+                    zoom = targetPosition.zoom - 1,
+                    duration = 0,
+                    onAnimFinish = resetZoomStack
+                )
+            } else {
+                zoomStack = if (zoomStack > 0) -1f else zoomStack - 1
 
-            val currentZoomStack = zoomStack
+                val currentZoomStack = zoomStack
 
-            val onCancel = {
-                if (zoomStack == currentZoomStack) {
-                    resetZoomStack()
+                val onCancel = {
+                    if (zoomStack == currentZoomStack) {
+                        resetZoomStack()
+                    }
                 }
+                moveTo(
+                    zoom = targetPosition.zoom + zoomStack,
+                    duration = 300,
+                    onAnimFinish = resetZoomStack,
+                    onAnimCancel = onCancel
+                )
             }
 
-            moveTo(
-                zoom = targetPosition.zoom + zoomStack,
-                duration = 300,
-                onAnimFinish = resetZoomStack,
-                onAnimCancel = onCancel
-            )
         }
 
-        private val hideLiveMeasurement = { toggleLiveMeasurement(false) }
-        fun goToMyLocation(resetRotation: Boolean) {
+        private val goToMyLocationOnFinish = {
+            toggleLiveMeasurement(false)
             isShowingMyLocation = true
+        }
+        fun goToMyLocation(resetRotation: Boolean) {
+
+            var newBearing = map.cameraPosition.bearing
+
+            if (isShowingMyLocationRotation) {
+                isShowingMyLocationRotation = false
+                newBearing = 0f
+            } else if (isShowingMyLocation && !resetRotation) {
+                isShowingMyLocationRotation = true
+            }
             val location = viewModel.fusedLocationData.value
             if (location != null) {
-                if (resetRotation) {
-                    moveTo(
+                when {
+                    resetRotation -> moveTo(
                         target = LatLng(location.latitude, location.longitude),
                         tilt = 0f,
                         bearing = 0f,
                         duration = 500,
-                        onAnimFinish = hideLiveMeasurement
+                        onAnimFinish = goToMyLocationOnFinish
                     )
-                } else {
-                    moveTo(
-                        target = LatLng(location.latitude, location.longitude),
-                        duration = 500,
-                        onAnimFinish = hideLiveMeasurement
-                    )
+                    isShowingMyLocationRotation -> {
+                        val azimuth = viewModel.rotationLiveData.value?.azimuth
+                        val bearing = if (azimuth != null) {
+                            azimuth * 180 / Math.PI.toFloat() - 90
+                        } else {
+                            0f
+                        }
+                        moveTo(
+                            target = LatLng(location.latitude, location.longitude),
+                            bearing = bearing,
+                            duration = 500,
+                            onAnimFinish = goToMyLocationOnFinish
+                        )
+                    }
+                    else -> {
+                        moveTo(
+                            target = LatLng(location.latitude, location.longitude),
+                            duration = 500,
+                            bearing = newBearing,
+                            onAnimFinish = goToMyLocationOnFinish
+                        )
+                    }
                 }
                 removeFocus()
             }
         }
 
-        fun resetMapRotation() = moveTo(tilt = 0f, bearing = 0f)
+        fun resetMapRotation() {
+            isShowingMyLocationRotation = false
+            moveTo(tilt = 0f, bearing = 0f)
+        }
 
         fun exitPolylineMode() {
             currentPolyline?.remove()
