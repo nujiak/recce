@@ -24,7 +24,7 @@
 
         <TextView
             android:id="@+id/ruler_pin_name"
-            style="@style/TextAppearance.Reconnaissance.PinName"
+            style="@style/TextAppearance.Recce.PinName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="marquee"
@@ -48,7 +48,7 @@
             android:paddingBottom="@dimen/small_padding">
 
                 <TextView
-                    style="@style/TextAppearance.Reconnaissance.NumberHeader"
+                    style="@style/TextAppearance.Recce.NumberHeader"
                     android:id="@+id/ruler_pin_grid_system"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
 
                 <TextView
                     android:id="@+id/ruler_pin_grid"
-                    style="@style/TextAppearance.Reconnaissance.Number"
+                    style="@style/TextAppearance.Recce.Number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:text="395930 503850" />

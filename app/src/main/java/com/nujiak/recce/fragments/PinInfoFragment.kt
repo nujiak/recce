@@ -28,7 +28,7 @@ class PinInfoFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder =
-            AlertDialog.Builder(requireActivity(), R.style.Theme_Reconnaissance_InfoDialogs)
+            AlertDialog.Builder(requireActivity(), R.style.Theme_Recce_InfoDialogs)
         val layoutInflater = LayoutInflater.from(context)
         binding = DialogPinInfoBinding.inflate(layoutInflater, null, false)
         builder.setView(binding.root)

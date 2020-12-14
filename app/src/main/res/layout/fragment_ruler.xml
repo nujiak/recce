@@ -27,7 +27,7 @@
                 app:menu="@menu/ruler_options" />
 
             <TextView
-                style="@style/Widget.Reconnaissance.Toolbar.Title"
+                style="@style/Widget.Recce.Toolbar.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

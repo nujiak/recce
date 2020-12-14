@@ -50,21 +50,21 @@
 
             <Button
                 android:id="@+id/map_normal_type"
-                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly.Small"
+                style="@style/Widget.Recce.Button.TextButton.IconOnly.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_map_white_24dp" />
 
             <Button
                 android:id="@+id/map_satellite_type"
-                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly.Small"
+                style="@style/Widget.Recce.Button.TextButton.IconOnly.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_outline_satellite_24" />
 
             <Button
                 android:id="@+id/map_hybrid_type"
-                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly.Small"
+                style="@style/Widget.Recce.Button.TextButton.IconOnly.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_outline_traffic_24" />
@@ -257,7 +257,7 @@
 
             <Button
                 android:id="@+id/map_polyline_undo"
-                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly"
+                style="@style/Widget.Recce.Button.TextButton.IconOnly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:enabled="false"
@@ -265,14 +265,14 @@
 
             <Button
                 android:id="@+id/map_polyline_add"
-                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly"
+                style="@style/Widget.Recce.Button.TextButton.IconOnly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_round_add_24" />
 
             <Button
                 android:id="@+id/map_polyline_save"
-                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly"
+                style="@style/Widget.Recce.Button.TextButton.IconOnly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:enabled="false"
@@ -308,7 +308,7 @@
 
                 <TextView
                     android:id="@+id/map_grid_system"
-                    style="@style/TextAppearance.Reconnaissance.NumberHeader"
+                    style="@style/TextAppearance.Recce.NumberHeader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/small_padding"
@@ -344,14 +344,14 @@
 
                 <Button
                     android:id="@+id/map_zoom_out_button"
-                    style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly"
+                    style="@style/Widget.Recce.Button.TextButton.IconOnly"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/ic_zoom_out_white_24dp" />
 
                 <Button
                     android:id="@+id/map_location_button"
-                    style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly"
+                    style="@style/Widget.Recce.Button.TextButton.IconOnly"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:enabled="false"
@@ -359,7 +359,7 @@
 
                 <Button
                     android:id="@+id/map_zoom_in_button"
-                    style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly"
+                    style="@style/Widget.Recce.Button.TextButton.IconOnly"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:icon="@drawable/ic_zoom_in_white_24dp" />

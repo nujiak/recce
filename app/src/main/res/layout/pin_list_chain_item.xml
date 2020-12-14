@@ -39,7 +39,7 @@
 
         <TextView
             android:id="@+id/chain_group"
-            style="@style/Theme.Reconnaissance.Tags"
+            style="@style/Theme.Recce.Tags"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -58,7 +58,7 @@
             tools:textColor="#000000" />
         <TextView
             android:id="@+id/chain_name"
-            style="@style/TextAppearance.Reconnaissance.PinName"
+            style="@style/TextAppearance.Recce.PinName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -82,20 +82,20 @@
             tools:ignore="RtlSymmetry">
 
             <TextView
-                style="@style/TextAppearance.Reconnaissance.NumberHeader"
+                style="@style/TextAppearance.Recce.NumberHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/checkpoints"/>
 
             <TextView
                 android:id="@+id/chain_checkpoints"
-                style="@style/TextAppearance.Reconnaissance.Number"
+                style="@style/TextAppearance.Recce.Number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="Audi, Benz, Chevy" />
 
             <TextView
-                style="@style/TextAppearance.Reconnaissance.NumberHeader"
+                style="@style/TextAppearance.Recce.NumberHeader"
                 android:id="@+id/chain_distance_desc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
 
             <TextView
                 android:id="@+id/chain_distance"
-                style="@style/TextAppearance.Reconnaissance.Number"
+                style="@style/TextAppearance.Recce.Number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="395930 503850" />
@@ -120,7 +120,7 @@
 
     <TextView
         android:id="@+id/chain_selected_index"
-        style="@style/Theme.Reconnaissance.Badges"
+        style="@style/Theme.Recce.Badges"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="end|top"
