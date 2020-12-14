@@ -6,9 +6,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(entities = [Pin::class, Chain::class], version = 5, exportSchema = true)
-abstract class ReconDatabase : RoomDatabase() {
+abstract class RecceDatabase : RoomDatabase() {
 
-    abstract val pinDatabaseDao: ReconDatabaseDao
+    abstract val pinDatabaseDao: RecceDatabaseDao
 
     companion object {
         /**
@@ -21,9 +21,9 @@ abstract class ReconDatabase : RoomDatabase() {
          *  thread to shared data are visible to other threads.
          */
         @Volatile
-        private var INSTANCE: ReconDatabase? = null
+        private var INSTANCE: RecceDatabase? = null
 
-        fun getInstance(context: Context): ReconDatabase {
+        fun getInstance(context: Context): RecceDatabase {
 
             synchronized(this) {
 
@@ -34,14 +34,9 @@ abstract class ReconDatabase : RoomDatabase() {
                 if (instance == null) {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
-                        ReconDatabase::class.java,
-                        "pin_database"
-                    )
-                        .addMigrations(MIGRATION_1_2)
-                        .addMigrations(MIGRATION_2_3)
-                        .addMigrations(MIGRATION_3_4)
-                        .addMigrations(MIGRATION_4_5)
-                        .build()
+                        RecceDatabase::class.java,
+                        "recce_database"
+                    ).build()
                     // Assign INSTANCE to the newly created database.
                     INSTANCE = instance
                 }

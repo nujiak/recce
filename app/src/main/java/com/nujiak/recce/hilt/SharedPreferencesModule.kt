@@ -15,6 +15,6 @@ class SharedPreferencesModule {
     @Provides
     @Singleton
     fun provideSharedPreferences(@ApplicationContext appContext: Context): SharedPreferences {
-        return appContext.getSharedPreferences("com.nujiak.reconnaissance", Context.MODE_PRIVATE)
+        return appContext.getSharedPreferences("com.nujiak.recce", Context.MODE_PRIVATE)
     }
 }

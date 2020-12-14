@@ -15,7 +15,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 
-sealed class ReconData {
+sealed class RecceData {
     abstract val name: String
     abstract val color: Int
     abstract val group: String
@@ -47,7 +47,7 @@ data class Pin(
     @ColumnInfo(defaultValue = "")
     override val description: String = ""
 
-) : Parcelable, ReconData()
+) : Parcelable, RecceData()
 
 @Parcelize
 @Serializable(with = ChainSerializer::class)
@@ -72,7 +72,7 @@ data class Chain(
     @ColumnInfo(defaultValue = "")
     override val description: String = ""
 
-) : Parcelable, ReconData()
+) : Parcelable, RecceData()
 
 @Serializable
 private data class PinSurrogate(

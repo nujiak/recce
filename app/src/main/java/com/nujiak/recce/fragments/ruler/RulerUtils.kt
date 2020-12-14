@@ -7,7 +7,7 @@ import com.nujiak.recce.database.*
 
 fun generateRulerList(
     oldList: List<RulerItem>?,
-    items: List<ReconData>,
+    items: List<RecceData>,
     resources: Resources
 ): MutableList<RulerItem> {
 

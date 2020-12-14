@@ -1,8 +1,8 @@
 package com.nujiak.recce.hilt
 
 import android.content.Context
-import com.nujiak.recce.database.ReconDatabase
-import com.nujiak.recce.database.ReconDatabaseDao
+import com.nujiak.recce.database.RecceDatabase
+import com.nujiak.recce.database.RecceDatabaseDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,13 +14,13 @@ import javax.inject.Singleton
 @InstallIn(ApplicationComponent::class)
 class DatabaseModule {
     @Provides
-    fun provideReconDatabaseDao(reconDatabase: ReconDatabase): ReconDatabaseDao {
-        return reconDatabase.pinDatabaseDao
+    fun provideReconDatabaseDao(recceDatabase: RecceDatabase): RecceDatabaseDao {
+        return recceDatabase.pinDatabaseDao
     }
 
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext appContext: Context): ReconDatabase {
-        return ReconDatabase.getInstance(appContext)
+    fun provideAppDatabase(@ApplicationContext appContext: Context): RecceDatabase {
+        return RecceDatabase.getInstance(appContext)
     }
 }
