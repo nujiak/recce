@@ -27,7 +27,7 @@
                 android:elevation="0dp" />
 
             <TextView
-                style="@style/Widget.Reconnaissance.Toolbar.Title"
+                style="@style/Widget.Recce.Toolbar.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -62,7 +62,7 @@
                     android:padding="@dimen/large_padding">
 
                     <TextView
-                        style="@style/TextAppearance.Reconnaissance.GpsSectionHeader"
+                        style="@style/TextAppearance.Recce.GpsSectionHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -89,14 +89,14 @@
                             android:orientation="vertical">
 
                             <TextView
-                                style="@style/TextAppearance.Reconnaissance.GpsHeader"
+                                style="@style/TextAppearance.Recce.GpsHeader"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/accuracy" />
 
                             <TextView
                                 android:id="@+id/gps_accuracy"
-                                style="@style/TextAppearance.Reconnaissance.GpsNumber"
+                                style="@style/TextAppearance.Recce.GpsNumber"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/not_available"
@@ -111,14 +111,14 @@
                             android:orientation="vertical">
 
                             <TextView
-                                style="@style/TextAppearance.Reconnaissance.GpsHeader"
+                                style="@style/TextAppearance.Recce.GpsHeader"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/altitude" />
 
                             <TextView
                                 android:id="@+id/gps_altitude"
-                                style="@style/TextAppearance.Reconnaissance.GpsNumber"
+                                style="@style/TextAppearance.Recce.GpsNumber"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/not_available"
@@ -135,14 +135,14 @@
                         android:background="@color/dividerGrey" />
 
                     <TextView
-                        style="@style/TextAppearance.Reconnaissance.GpsHeader"
+                        style="@style/TextAppearance.Recce.GpsHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/lat_lng" />
 
                     <TextView
                         android:id="@+id/gps_lat_lng"
-                        style="@style/TextAppearance.Reconnaissance.GpsNumber"
+                        style="@style/TextAppearance.Recce.GpsNumber"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/not_available"
@@ -150,7 +150,7 @@
 
                     <TextView
                         android:id="@+id/gps_grid_system"
-                        style="@style/TextAppearance.Reconnaissance.GpsHeader"
+                        style="@style/TextAppearance.Recce.GpsHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/small_padding"
@@ -158,7 +158,7 @@
 
                     <TextView
                         android:id="@+id/gps_grids"
-                        style="@style/TextAppearance.Reconnaissance.GpsNumber"
+                        style="@style/TextAppearance.Recce.GpsNumber"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/not_available"
@@ -181,7 +181,7 @@
                     android:padding="@dimen/large_padding">
 
                     <TextView
-                        style="@style/TextAppearance.Reconnaissance.GpsSectionHeader"
+                        style="@style/TextAppearance.Recce.GpsSectionHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -201,7 +201,7 @@
 
                         <TextView
                             android:id="@+id/gps_azimuth_desc"
-                            style="@style/TextAppearance.Reconnaissance.GpsHeader"
+                            style="@style/TextAppearance.Recce.GpsHeader"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -210,7 +210,7 @@
 
                         <TextView
                             android:id="@+id/gps_pitch_desc"
-                            style="@style/TextAppearance.Reconnaissance.GpsHeader"
+                            style="@style/TextAppearance.Recce.GpsHeader"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -219,7 +219,7 @@
 
                         <TextView
                             android:id="@+id/gps_roll_desc"
-                            style="@style/TextAppearance.Reconnaissance.GpsHeader"
+                            style="@style/TextAppearance.Recce.GpsHeader"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -235,7 +235,7 @@
 
                         <TextView
                             android:id="@+id/gps_azimuth"
-                            style="@style/TextAppearance.Reconnaissance.GpsNumber"
+                            style="@style/TextAppearance.Recce.GpsNumber"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -245,7 +245,7 @@
 
                         <TextView
                             android:id="@+id/gps_pitch"
-                            style="@style/TextAppearance.Reconnaissance.GpsNumber"
+                            style="@style/TextAppearance.Recce.GpsNumber"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -255,7 +255,7 @@
 
                         <TextView
                             android:id="@+id/gps_roll"
-                            style="@style/TextAppearance.Reconnaissance.GpsNumber"
+                            style="@style/TextAppearance.Recce.GpsNumber"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -266,7 +266,7 @@
                     </LinearLayout>
 
                     <TextView
-                        style="@style/TextAppearance.Reconnaissance.GpsInfo"
+                        style="@style/TextAppearance.Recce.GpsInfo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
@@ -314,7 +314,7 @@
                     </FrameLayout>
 
                     <TextView
-                        style="@style/TextAppearance.Reconnaissance.GpsInfo"
+                        style="@style/TextAppearance.Recce.GpsInfo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"

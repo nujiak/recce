@@ -33,7 +33,7 @@
 
                 <TextView
                     android:id="@+id/pin_group"
-                    style="@style/Theme.Reconnaissance.Tags"
+                    style="@style/Theme.Recce.Tags"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -53,7 +53,7 @@
 
             <Button
                 android:id="@+id/pin_map"
-                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly"
+                style="@style/Widget.Recce.Button.TextButton.IconOnly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_map_white_24dp"
@@ -61,7 +61,7 @@
 
             <Button
                 android:id="@+id/pin_edit"
-                style="@style/Widget.Reconnaissance.Button.TextButton.IconOnly"
+                style="@style/Widget.Recce.Button.TextButton.IconOnly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
@@ -72,7 +72,7 @@
 
         <TextView
             android:id="@+id/pin_name"
-            style="@style/TextAppearance.Reconnaissance.PinName"
+            style="@style/TextAppearance.Recce.PinName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -98,7 +98,7 @@
 
                 <TextView
                     android:id="@+id/pin_description_heading"
-                    style="@style/TextAppearance.Reconnaissance.NumberHeader"
+                    style="@style/TextAppearance.Recce.NumberHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/description"
@@ -108,7 +108,7 @@
 
                 <TextView
                     android:id="@+id/pin_description"
-                    style="@style/TextAppearance.Reconnaissance.Number"
+                    style="@style/TextAppearance.Recce.Number"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/large_padding"
@@ -133,7 +133,7 @@
                         android:orientation="vertical">
 
                         <TextView
-                            style="@style/TextAppearance.Reconnaissance.NumberHeader"
+                            style="@style/TextAppearance.Recce.NumberHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/lat_lng"
@@ -141,7 +141,7 @@
 
                         <TextView
                             android:id="@+id/pin_lat_lng"
-                            style="@style/TextAppearance.Reconnaissance.Number"
+                            style="@style/TextAppearance.Recce.Number"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:ellipsize="none"
@@ -149,7 +149,7 @@
                             tools:text="1.363566 103.245243" />
 
                         <TextView
-                            style="@style/TextAppearance.Reconnaissance.NumberHeader"
+                            style="@style/TextAppearance.Recce.NumberHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/small_padding"
@@ -158,7 +158,7 @@
 
                         <TextView
                             android:id="@+id/pin_mgrs_grid"
-                            style="@style/TextAppearance.Reconnaissance.Number"
+                            style="@style/TextAppearance.Recce.Number"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             tools:text="395930 503850" />
@@ -171,7 +171,7 @@
                         android:orientation="vertical">
 
                         <TextView
-                            style="@style/TextAppearance.Reconnaissance.NumberHeader"
+                            style="@style/TextAppearance.Recce.NumberHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/utm"
@@ -179,14 +179,14 @@
 
                         <TextView
                             android:id="@+id/pin_utm_grid"
-                            style="@style/TextAppearance.Reconnaissance.Number"
+                            style="@style/TextAppearance.Recce.Number"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             tools:text="395930 503850" />
 
 
                         <TextView
-                            style="@style/TextAppearance.Reconnaissance.NumberHeader"
+                            style="@style/TextAppearance.Recce.NumberHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/small_padding"
@@ -195,7 +195,7 @@
 
                         <TextView
                             android:id="@+id/pin_kertau_grid"
-                            style="@style/TextAppearance.Reconnaissance.Number"
+                            style="@style/TextAppearance.Recce.Number"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             tools:text="395930 503850" />

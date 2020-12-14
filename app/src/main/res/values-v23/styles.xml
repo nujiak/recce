@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Reconnaissance" parent="BaseTheme.Reconnaissance">
+    <style name="Theme.Recce" parent="BaseTheme.Recce">
         <!-- Customize your theme here. -->
         <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
     </style>

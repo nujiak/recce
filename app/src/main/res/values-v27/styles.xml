@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Reconnaissance" parent="BaseTheme.Reconnaissance">
+    <style name="Theme.Recce" parent="BaseTheme.Recce">
         <!-- Customize your theme here. -->
         <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
         <item name="android:windowLightNavigationBar">?attr/isLightTheme</item>
     </style>
 
-    <style name="Theme.Reconnaissance.Onboarding" parent="Theme.Reconnaissance.OnboardingBase">
+    <style name="Theme.Recce.Onboarding" parent="Theme.Recce.OnboardingBase">
         <item name="android:windowLightNavigationBar">false</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>

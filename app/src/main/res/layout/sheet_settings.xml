@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingTop="@dimen/large_padding"
-    android:theme="@style/Theme.Reconnaissance.BottomSheetDialog">
+    android:theme="@style/Theme.Recce.BottomSheetDialog">
 
     <TextView
         style="@style/TextAppearance.MaterialComponents.Headline5"

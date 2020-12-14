@@ -14,7 +14,7 @@ import javax.inject.Singleton
 @InstallIn(ApplicationComponent::class)
 class DatabaseModule {
     @Provides
-    fun provideReconDatabaseDao(recceDatabase: RecceDatabase): RecceDatabaseDao {
+    fun provideRecceDatabaseDao(recceDatabase: RecceDatabase): RecceDatabaseDao {
         return recceDatabase.pinDatabaseDao
     }
 

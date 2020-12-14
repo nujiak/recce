@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="BaseTheme.Reconnaissance" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="BaseTheme.Recce" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -14,20 +14,20 @@
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="shapeAppearanceLargeComponent">
-            @style/ShapeAppearance.Reconnaissance.LargeComponent
+            @style/ShapeAppearance.Recce.LargeComponent
         </item>
         <item name="windowActionModeOverlay">true</item>
-        <item name="actionModeStyle">@style/Widget.Reconnaissance.ActionMode</item>
+        <item name="actionModeStyle">@style/Widget.Recce.ActionMode</item>
         <item name="actionModeCloseDrawable">@drawable/ic_close_white_24dp</item>
-        <item name="actionBarTheme">@style/ThemeOverlay.Reconnaissance.ActionBar</item>
-        <item name="toolbarStyle">@style/Widget.Reconnaissance.Toolbar</item>
+        <item name="actionBarTheme">@style/ThemeOverlay.Recce.ActionBar</item>
+        <item name="toolbarStyle">@style/Widget.Recce.Toolbar</item>
         <item name="android:navigationBarColor">?attr/colorSurface</item>
     </style>
 
-    <style name="Theme.Reconnaissance" parent="BaseTheme.Reconnaissance" />
+    <style name="Theme.Recce" parent="BaseTheme.Recce" />
 
-    <style name="Theme.Reconnaissance.BottomSheetDialog"/>
-    <style name="Theme.Reconnaissance.BottomSheetDialog.Creators">
+    <style name="Theme.Recce.BottomSheetDialog"/>
+    <style name="Theme.Recce.BottomSheetDialog.Creators">
         <item name="colorOnSurface">@android:color/white</item>
         <item name="colorOnBackground">@android:color/white</item>
         <item name="android:textColorPrimary">@android:color/white</item>
@@ -35,30 +35,30 @@
         <item name="background">@android:color/transparent</item>
     </style>
 
-    <style name="Theme.Reconnaissance.OnboardingBase">
+    <style name="Theme.Recce.OnboardingBase">
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowIsTranslucent">false</item>
         <item name="android:navigationBarColor">@android:color/black</item>
     </style>
-    <style name="Theme.Reconnaissance.Onboarding" parent="Theme.Reconnaissance.OnboardingBase"/>
+    <style name="Theme.Recce.Onboarding" parent="Theme.Recce.OnboardingBase"/>
 
-    <style name="Theme.Reconnaissance.Badges">
+    <style name="Theme.Recce.Badges">
         <item name="fontFamily">@font/open_sans_bold</item>
     </style>
 
-    <style name="Theme.Reconnaissance.Tags" parent="TextAppearance.MaterialComponents.Caption">
+    <style name="Theme.Recce.Tags" parent="TextAppearance.MaterialComponents.Caption">
         <item name="fontFamily">@font/open_sans_extrabold</item>
     </style>
 
-    <style name="ThemeOverlay.Reconnaissance.ActionBar" parent="ThemeOverlay.MaterialComponents.ActionBar">
+    <style name="ThemeOverlay.Recce.ActionBar" parent="ThemeOverlay.MaterialComponents.ActionBar">
         <item name="android:colorBackground">?attr/colorSurface</item>
         <item name="colorAccent">@color/colorPrimaryDark</item>
         <item name="tint">?android:attr/textColorPrimary</item>
     </style>
-    <style name="Widget.Reconnaissance.ActionMode" parent="Widget.AppCompat.ActionMode"/>
+    <style name="Widget.Recce.ActionMode" parent="Widget.AppCompat.ActionMode"/>
 
-    <style name="Widget.Reconnaissance.Button.TextButton.IconOnly" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="Widget.Recce.Button.TextButton.IconOnly" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="iconPadding">0dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
@@ -68,7 +68,7 @@
         <item name="android:minHeight">48dp</item>
         <item name="cornerRadius">24dp</item>
     </style>
-    <style name="Widget.Reconnaissance.Button.TextButton.IconOnly.Small" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="Widget.Recce.Button.TextButton.IconOnly.Small" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="iconPadding">0dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
@@ -80,52 +80,52 @@
         <item name="iconSize">20dp</item>
     </style>
 
-    <style name="Widget.Reconnaissance.Toolbar" parent="Widget.MaterialComponents.Toolbar.PrimarySurface">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.Reconnaissance.Toolbar</item>
+    <style name="Widget.Recce.Toolbar" parent="Widget.MaterialComponents.Toolbar.PrimarySurface">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Recce.Toolbar</item>
     </style>
-    <style name="Widget.Reconnaissance.Toolbar.Title" parent="TextAppearance.MaterialComponents.Headline5">
+    <style name="Widget.Recce.Toolbar.Title" parent="TextAppearance.MaterialComponents.Headline5">
         <item name="fontFamily">@font/open_sans_bold</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
-    <style name="ThemeOverlay.Reconnaissance.Toolbar" parent="">
+    <style name="ThemeOverlay.Recce.Toolbar" parent="">
         <item name="colorPrimary">?attr/colorSurface</item>
         <item name="colorPrimaryVariant">@color/colorPrimary</item>
         <item name="colorOnPrimary">@color/colorPrimary</item>
     </style>
 
-    <style name="TextAppearance.Reconnaissance.PinName" parent="TextAppearance.MaterialComponents.Headline5">
+    <style name="TextAppearance.Recce.PinName" parent="TextAppearance.MaterialComponents.Headline5">
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-    <style name="TextAppearance.Reconnaissance.Number" parent="TextAppearance.MaterialComponents.Caption">
+    <style name="TextAppearance.Recce.Number" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textColor">@android:color/white</item>
         <item name="fontFamily">@font/open_sans_bold</item>
     </style>
 
-    <style name="TextAppearance.Reconnaissance.NumberHeader" parent="TextAppearance.MaterialComponents.Caption">
+    <style name="TextAppearance.Recce.NumberHeader" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textColor">@android:color/white</item>
         <item name="fontFamily">@font/open_sans</item>
     </style>
 
-    <style name="TextAppearance.Reconnaissance.GpsSectionHeader" parent="TextAppearance.MaterialComponents.Headline5"/>
-    <style name="TextAppearance.Reconnaissance.GpsHeader" parent="TextAppearance.MaterialComponents.Subtitle1">
+    <style name="TextAppearance.Recce.GpsSectionHeader" parent="TextAppearance.MaterialComponents.Headline5"/>
+    <style name="TextAppearance.Recce.GpsHeader" parent="TextAppearance.MaterialComponents.Subtitle1">
         <item name="fontFamily">@font/open_sans_semibold</item>
     </style>
 
-    <style name="TextAppearance.Reconnaissance.GpsNumber" parent="TextAppearance.MaterialComponents.Headline6"/>
-    <style name="TextAppearance.Reconnaissance.GpsInfo" parent="TextAppearance.MaterialComponents.Caption">
+    <style name="TextAppearance.Recce.GpsNumber" parent="TextAppearance.MaterialComponents.Headline6"/>
+    <style name="TextAppearance.Recce.GpsInfo" parent="TextAppearance.MaterialComponents.Caption">
         <item name="fontFamily">@font/open_sans_semibold</item>
     </style>
 
-    <style name="TextAppearance.Reconnaissance.Onboarding.Description" parent="TextAppearance.MaterialComponents.Subtitle2">
+    <style name="TextAppearance.Recce.Onboarding.Description" parent="TextAppearance.MaterialComponents.Subtitle2">
         <item name="fontFamily">@font/open_sans_semibold</item>
     </style>
 
-    <style name="TextAppearance.Reconnaissance.Ruler.Header" parent="TextAppearance.MaterialComponents.Caption">
+    <style name="TextAppearance.Recce.Ruler.Header" parent="TextAppearance.MaterialComponents.Caption">
         <item name="fontFamily">@font/open_sans_semibold</item>
     </style>
 
-    <style name="ShapeAppearance.Reconnaissance.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+    <style name="ShapeAppearance.Recce.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/large_padding</item>
     </style>
@@ -137,12 +137,12 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
-    <style name="Theme.Reconnaissance.InfoDialogs" parent="Theme.MaterialComponents.DayNight.Dialog">
-        <item name="android:windowAnimationStyle">@style/Animation.Reconnaissance.InfoDialogs</item>
+    <style name="Theme.Recce.InfoDialogs" parent="Theme.MaterialComponents.DayNight.Dialog">
+        <item name="android:windowAnimationStyle">@style/Animation.Recce.InfoDialogs</item>
         <item name="android:layout_width">match_parent</item>
     </style>
     
-    <style name="Animation.Reconnaissance.InfoDialogs" parent="@android:style/Animation.Activity">
+    <style name="Animation.Recce.InfoDialogs" parent="@android:style/Animation.Activity">
         <item name="android:windowEnterAnimation">@anim/info_dialog_enter_animation</item>
         <item name="android:windowExitAnimation">@anim/info_dialog_exit_animation</item>
     </style>
