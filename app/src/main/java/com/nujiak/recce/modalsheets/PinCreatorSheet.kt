@@ -2,7 +2,6 @@ package com.nujiak.recce.modalsheets
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -10,9 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.Filter
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -21,6 +18,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.nujiak.recce.MainViewModel
+import com.nujiak.recce.NoFilterArrayAdapter
 import com.nujiak.recce.R
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.SheetPinCreatorBinding
@@ -71,8 +69,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         // Set up exposed dropdown menus
         requireContext().let {
             binding.newPinColorDropdown.setAdapter(
-                // Unable to use NoFilterArrayAdapter as it only supports List (not Array)
-                ArrayAdapter(
+                NoFilterArrayAdapter(
                     it, R.layout.dropdown_menu_popup_item, COLORS
                 )
             )
@@ -488,31 +485,6 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         // Reset navigation bar color
         activity?.window?.navigationBarColor =
             ContextCompat.getColor(requireContext(), android.R.color.transparent)
-    }
-
-    /**
-     * Custom ArrayAdapter for no filtering
-     */
-    private class NoFilterArrayAdapter<T>(context: Context, resource: Int, val items: List<T>) :
-        ArrayAdapter<T>(context, resource, items) {
-
-        private val filter = NoFilter()
-
-        override fun getFilter(): Filter = filter
-
-        private inner class NoFilter : Filter() {
-            override fun performFiltering(constraint: CharSequence?): FilterResults {
-                return FilterResults().apply {
-                    values = items
-                    count = items.size
-                }
-            }
-
-            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                notifyDataSetChanged()
-            }
-
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
