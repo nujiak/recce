@@ -1108,7 +1108,12 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
             // Fetch undeclared parameters from target position
             val tgt = target ?: targetPosition.target
-            val zm = zoom ?: if (map.cameraPosition.zoom < 10f) 15f else map.cameraPosition.zoom
+            var zm = zoom ?: if (map.cameraPosition.zoom < 10f) 15f else map.cameraPosition.zoom
+            zm = when {
+                zm < 3 -> 3f
+                zm > 20 -> 20f
+                else -> zm
+            }
             val brng = bearing ?: targetPosition.bearing
             val tlt = tilt ?: targetPosition.tilt
 
@@ -1427,7 +1432,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     onAnimFinish = resetZoomStack
                 )
             } else {
-                zoomStack = if (zoomStack < 0) 1f else zoomStack + 1
+                zoomStack = if (zoomStack <= 0) 1f else zoomStack + 1
 
                 val currentZoomStack = zoomStack
 
@@ -1454,7 +1459,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     onAnimFinish = resetZoomStack
                 )
             } else {
-                zoomStack = if (zoomStack > 0) -1f else zoomStack - 1
+                zoomStack = if (zoomStack >= 0) -1f else zoomStack - 1
 
                 val currentZoomStack = zoomStack
 
