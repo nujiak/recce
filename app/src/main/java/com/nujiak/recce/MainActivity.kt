@@ -28,6 +28,7 @@ import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.appcompat.view.ActionMode
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.forEach
 import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -154,6 +155,12 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 else -> false
+            }
+        }
+        bottomNavigation.menu.forEach {
+            findViewById<View>(it.itemId).apply{
+                setOnLongClickListener { callOnClick() }
+                isHapticFeedbackEnabled = false
             }
         }
 
