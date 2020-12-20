@@ -326,14 +326,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             viewLifecycleOwner,
             object : Observer<FusedLocationLiveData.LocationData> {
                 override fun onChanged(location: FusedLocationLiveData.LocationData) {
-                    mapMgr?.moveTo(
-                        target = LatLng(location.latitude, location.longitude),
-                        zoom = 15f,
-                        duration = 0
-                    )
-                    updateGrids()
-                    removeFocus()
                     mapMgr?.drawMyLocation(location)
+                    onMyLocationPressed(false)
                     viewModel.fusedLocationData.removeObserver(this)
                 }
             })
