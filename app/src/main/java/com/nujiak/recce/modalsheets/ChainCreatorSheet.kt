@@ -122,6 +122,11 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
         return binding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        updateSheetColor(COLORS.indexOf(binding.newChainColorDropdown.text.toString()))
+    }
+
     private fun onCompleted() {
         onValidateInput()
         if (isInputValid) {

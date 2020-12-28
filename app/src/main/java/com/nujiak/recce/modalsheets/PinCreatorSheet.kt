@@ -479,6 +479,11 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
 
     }
 
+    override fun onStart() {
+        super.onStart()
+        updateSheetColor(COLORS.indexOf(binding.newPinColorDropdown.text.toString()))
+    }
+
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
 
