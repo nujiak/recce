@@ -1102,9 +1102,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
             // Fetch undeclared parameters from target position
             val tgt = target ?: targetPosition.target
-            val zm = zoom ?: if (map.cameraPosition.zoom < 10f) 15f else map.cameraPosition.zoom
-                .coerceAtLeast(0f)
-                .coerceAtMost(20f)
+            val zm = (zoom ?: if (map.cameraPosition.zoom < 10f) 15f else map.cameraPosition.zoom)
+                .coerceAtLeast(map.minZoomLevel)
+                .coerceAtMost(map.maxZoomLevel)
 
             val brng = bearing ?: targetPosition.bearing
             val tlt = tilt ?: targetPosition.tilt
