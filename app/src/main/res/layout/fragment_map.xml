@@ -220,6 +220,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/large_padding"
+        android:hapticFeedbackEnabled="true"
         android:src="@drawable/ic_baseline_timeline_24"
         app:backgroundTint="?attr/colorSurface"
         app:layout_constraintBottom_toTopOf="@id/map_fab"
@@ -268,7 +269,7 @@
                 style="@style/Widget.Recce.Button.TextButton.IconOnly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_round_add_24" />
+                app:icon="@drawable/ic_round_add_24"/>
 
             <Button
                 android:id="@+id/map_polyline_save"
