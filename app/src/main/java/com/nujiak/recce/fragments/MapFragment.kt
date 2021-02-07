@@ -12,10 +12,7 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewAnimationUtils
-import android.view.ViewGroup
+import android.view.*
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.Button
@@ -131,14 +128,31 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         binding.mapLiveGrids.setOnClickListener { viewModel.openSettings() }
 
         binding.mapPolylineAdd.apply {
-            setOnClickListener { onAddPolylinePoint() }
+            setOnClickListener {
+                onAddPolylinePoint()
+                performHapticFeedback(
+                    HapticFeedbackConstants.VIRTUAL_KEY,
+                    HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+                )
+            }
             setOnLongClickListener {
                 onAddPolylineNamedPoint()
+                performHapticFeedback(
+                    HapticFeedbackConstants.LONG_PRESS,
+                    HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+                )
                 true
             }
+            isHapticFeedbackEnabled = true
         }
         binding.mapChainFab.apply {
-            setOnClickListener { onAddPolylinePoint() }
+            setOnClickListener {
+                onAddPolylinePoint()
+                performHapticFeedback(
+                    HapticFeedbackConstants.VIRTUAL_KEY,
+                    HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+                )
+            }
             setOnLongClickListener {
                 onAddPolylineNamedPoint()
                 true
@@ -146,7 +160,13 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
 
         binding.mapPolylineUndo.apply {
-            setOnClickListener { undoPolyline() }
+            setOnClickListener {
+                undoPolyline()
+                performHapticFeedback(
+                    HapticFeedbackConstants.VIRTUAL_KEY,
+                    HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+                )
+            }
             setOnLongClickListener {
                 viewModel.exitPolylineMode()
                 true
@@ -1004,7 +1024,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             }
         var isShowingMyLocationRotation = false
             private set(value) {
-                val lightGreen = ContextCompat.getColor(requireContext(), R.color.colorPrimaryRipple)
+                val lightGreen =
+                    ContextCompat.getColor(requireContext(), R.color.colorPrimaryRipple)
                 val clear = ContextCompat.getColor(requireContext(), android.R.color.transparent)
                 if (value && field != value) {
                     animateColor(clear, lightGreen, 350) { color ->
@@ -1034,16 +1055,32 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     val colorSurfaceTypedValue = TypedValue()
                     val colorOnSurfaceTypedValue = TypedValue()
 
-                    requireContext().theme.resolveAttribute(R.attr.colorSurface, colorSurfaceTypedValue, true)
-                    requireContext().theme.resolveAttribute(R.attr.colorOnSurface, colorOnSurfaceTypedValue, true)
+                    requireContext().theme.resolveAttribute(
+                        R.attr.colorSurface,
+                        colorSurfaceTypedValue,
+                        true
+                    )
+                    requireContext().theme.resolveAttribute(
+                        R.attr.colorOnSurface,
+                        colorOnSurfaceTypedValue,
+                        true
+                    )
 
-                    val colorSurface = ContextCompat.getColor(requireContext(), colorSurfaceTypedValue.resourceId)
-                    val colorOnSurface = ContextCompat.getColor(requireContext(), colorOnSurfaceTypedValue.resourceId)
+                    val colorSurface =
+                        ContextCompat.getColor(requireContext(), colorSurfaceTypedValue.resourceId)
+                    val colorOnSurface = ContextCompat.getColor(
+                        requireContext(),
+                        colorOnSurfaceTypedValue.resourceId
+                    )
 
                     animateColor(compass.backgroundTintList, colorSurface, 350) { color ->
                         binding.mapCompass.backgroundTintList = ColorStateList.valueOf(color)
                     }
-                    animateColor(binding.mapCompassImg.imageTintList, colorOnSurface, 350) { color ->
+                    animateColor(
+                        binding.mapCompassImg.imageTintList,
+                        colorOnSurface,
+                        350
+                    ) { color ->
                         binding.mapCompassImg.imageTintList = ColorStateList.valueOf(color)
                     }
                 }
@@ -1340,7 +1377,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                         addUpdateListener {
                             val newPosition = it.animatedValue as LatLng
                             if (isShowingMyLocation) {
-                                moveTo(target = newPosition, duration = 0, zoom = targetPosition.zoom)
+                                moveTo(
+                                    target = newPosition,
+                                    duration = 0,
+                                    zoom = targetPosition.zoom
+                                )
                             }
                             myLocationMarker?.position = newPosition
                             myLocationDirection?.position = newPosition
@@ -1474,6 +1515,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             toggleLiveMeasurement(false)
             isShowingMyLocation = true
         }
+
         fun goToMyLocation(resetRotation: Boolean) {
 
             var newBearing = map.cameraPosition.bearing
