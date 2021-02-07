@@ -38,6 +38,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.text.NumberFormat
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.hypot
 
@@ -63,6 +64,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private lateinit var numberFormat: NumberFormat
 
     private var lastDirectionUpdate = 0L
+    private var directionUpdateSum = 0f
+    private var directionUpdateCount = 0
 
     companion object {
 
@@ -264,10 +267,22 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 val mMapMgr = mapMgr ?: return@observe
                 val marker = mMapMgr.myLocationDirection ?: return@observe
                 val currentTime = System.currentTimeMillis()
-                if (currentTime - lastDirectionUpdate > 100) {
-                    var newRotation = it.azimuth * 180 / Math.PI.toFloat() - 90
-                    val currentRotation = marker.rotation
-                    val difference = newRotation - currentRotation
+
+                // Add current update to the cumulative sum
+                directionUpdateSum += it.azimuth
+                directionUpdateCount++
+
+                var newRotation = directionUpdateSum / directionUpdateCount * 180 / Math.PI.toFloat() - 90
+                val currentRotation = marker.rotation
+                val difference = newRotation - currentRotation
+
+                // Update marker if this is the first time, or if 100ms has passed since last
+                // update and difference is larger than .7 degrees
+                if (currentTime == 0L
+                    || (currentTime - lastDirectionUpdate > 100 && abs(difference) > .7)) {
+
+                    directionUpdateSum = 0f
+                    directionUpdateCount = 0
 
                     // Record tilt for updating map compass
                     val tilt = mMapMgr.cameraPosition.tilt
@@ -297,6 +312,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                         interpolator = LinearInterpolator()
                         start()
                     }
+                    lastDirectionUpdate = currentTime
+                } else if (currentTime - lastDirectionUpdate > 500) {
+                    // Dispose outdated rotation information
+                    directionUpdateSum = 0f
+                    directionUpdateCount = 0
                     lastDirectionUpdate = currentTime
                 }
             }
@@ -1537,11 +1557,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                         onAnimFinish = goToMyLocationOnFinish
                     )
                     isShowingMyLocationRotation -> {
-                        val azimuth = viewModel.rotationLiveData.value?.azimuth
-                        val bearing = if (azimuth != null) {
-                            azimuth * 180 / Math.PI.toFloat() - 90
+                        // Turn to direction of the myLocationDirection marker
+                        val bearing = if (myLocationDirection != null) {
+                            myLocationDirection!!.rotation + 90
                         } else {
-                            0f
+                            null
                         }
                         moveTo(
                             target = LatLng(location.latitude, location.longitude),
