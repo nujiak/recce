@@ -10,6 +10,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.gms.maps.model.LatLng
 import com.nujiak.recce.MainViewModel
+import com.nujiak.recce.NoFilterArrayAdapter
 import com.nujiak.recce.R
 import com.nujiak.recce.databinding.DialogGoToBinding
 import com.nujiak.recce.mapping.*
@@ -115,6 +116,15 @@ class GoToFragment : DialogFragment() {
                 else -> throw IllegalArgumentException("Invalid coordinate system id: $coordSys")
             }
         )
+        context?.let {
+            binding.newPinZoneDropdown.setAdapter(
+                NoFilterArrayAdapter(
+                    it, R.layout.dropdown_menu_popup_item,
+                    ZONE_BANDS
+                )
+            )
+        }
+
 
         binding.goButton.setOnClickListener {
             onCompleted()
