@@ -33,7 +33,7 @@ fun getGridString(latDeg: Double, lngDeg: Double, coordSysId: Int, resources: Re
             )
         }
         SettingsSheet.COORD_SYS_ID_LATLNG -> {
-            return String.format("%.6f, %.6f", latDeg, lngDeg)
+            return String.format(Locale.US, "%.6f, %.6f", latDeg, lngDeg)
         }
         else -> throw IllegalArgumentException("Invalid coordinate system index: $coordSysId")
     } ?: resources.getString(R.string.not_available)

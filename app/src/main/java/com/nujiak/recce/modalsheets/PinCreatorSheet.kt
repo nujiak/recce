@@ -32,6 +32,7 @@ import com.nujiak.recce.utils.PIN_CARD_DARK_BACKGROUNDS
 import com.nujiak.recce.utils.animateColor
 import com.nujiak.recce.utils.wrapLngDeg
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 import kotlin.math.floor
 
 @AndroidEntryPoint
@@ -113,8 +114,8 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         }
         if (pin.latitude != 0.0 || pin.longitude != 0.0) {
             // Populate lat long fields if available
-            binding.newPinLatEditText.setText("%.6f".format(pin.latitude))
-            binding.newPinLongEditText.setText("%.6f".format(pin.longitude))
+            binding.newPinLatEditText.setText("%.6f".format(Locale.US, pin.latitude))
+            binding.newPinLongEditText.setText("%.6f".format(Locale.US, pin.longitude))
         }
         binding.newPinColorDropdown.setText(COLORS[pin.color], false)
         binding.newPinGroupDropdown.setText(
@@ -323,8 +324,8 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
 
                     if (!lat.isNaN() && lat < 90 && lat > -90 && !lng.isNaN()) {
                         // Lat and Lng are valid numbers
-                        binding.newPinLatEditText.setText("%.6f".format(lat))
-                        binding.newPinLongEditText.setText("%.6f".format(lng))
+                        binding.newPinLatEditText.setText("%.6f".format(Locale.US, lat))
+                        binding.newPinLongEditText.setText("%.6f".format(Locale.US, lng))
                     } else {
                         // Lat and Lng are invalid (NaN / outside bounds)
                         binding.newPinLatEditText.setText("")
@@ -337,8 +338,8 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                 val latLng = mgrsData?.toUtmData()?.toLatLng()
 
                 if (latLng != null) {
-                    binding.newPinLatEditText.setText("%.6f".format(latLng.first))
-                    binding.newPinLongEditText.setText("%.6f".format(latLng.second))
+                    binding.newPinLatEditText.setText("%.6f".format(Locale.US, latLng.first))
+                    binding.newPinLongEditText.setText("%.6f".format(Locale.US, latLng.second))
                 } else {
                     binding.newPinLatEditText.setText("")
                     binding.newPinLongEditText.setText("")
@@ -356,8 +357,8 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                         )
                     // Lat Lng are valid and kertau grids were within bounds
                     val (lat, lng) = latLngPair
-                    binding.newPinLatEditText.setText("%.6f".format(lat))
-                    binding.newPinLongEditText.setText("%.6f".format(lng))
+                    binding.newPinLatEditText.setText("%.6f".format(Locale.US, lat))
+                    binding.newPinLongEditText.setText("%.6f".format(Locale.US, lng))
                 }
             }
             COORD_SYS_ID_LATLNG -> {

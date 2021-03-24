@@ -13,6 +13,7 @@ import com.nujiak.recce.R
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.DialogPinInfoBinding
 import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
+import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_LATLNG
 import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_MGRS
 import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
@@ -51,10 +52,10 @@ class PinInfoFragment : DialogFragment() {
     private fun update(pin: Pin) {
         dialog?.let { dialog ->
             binding.pinName.text = pin.name
-            binding.pinLatLng.text =
-                String.format("%.6f, %.6f", pin.latitude, pin.longitude)
+
             val color = ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[pin.color])
             binding.root.setCardBackgroundColor(color)
+
             dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
             if (pin.group.isBlank()) {
@@ -64,6 +65,8 @@ class PinInfoFragment : DialogFragment() {
                 binding.pinGroup.setTextColor(color)
             }
 
+            binding.pinLatLng.text =
+                getGridString(pin.latitude, pin.longitude, COORD_SYS_ID_LATLNG, resources)
             binding.pinUtmGrid.text =
                 getGridString(pin.latitude, pin.longitude, COORD_SYS_ID_UTM, resources)
             binding.pinMgrsGrid.text =
