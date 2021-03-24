@@ -13,6 +13,7 @@ import com.nujiak.recce.R
 import com.nujiak.recce.databinding.FragmentGpsBinding
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.livedatas.RotationLiveData
+import com.nujiak.recce.modalsheets.SettingsSheet
 import com.nujiak.recce.utils.formatAsDistanceString
 import com.nujiak.recce.utils.getAngleString
 import com.nujiak.recce.utils.getGridString
@@ -121,7 +122,7 @@ class GpsFragment : Fragment() {
             binding.gpsAccuracy.text = "±" + accuracy.formatAsDistanceString()
             binding.gpsAltitude.text = altitude.formatAsDistanceString()
             binding.gpsLatLng.text =
-                "%.6f, %.6f".format(latitude, longitude)
+                getGridString(latitude, longitude, SettingsSheet.COORD_SYS_ID_LATLNG, resources)
             binding.gpsGrids.text = getGridString(latitude, longitude, coordSysId, resources)
         }
 
