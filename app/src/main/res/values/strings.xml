@@ -104,6 +104,8 @@
     <string name="new_checkpoint">New Checkpoint</string>
     <string name="unnamed">Unnamed</string>
     <string name="route_checkpoint">%s: %s</string>
+    <string name="go_to">Go To</string>
+    <string name="go">Go</string>
     <!-- Errors -->
     <string name="checkpoint_name_too_long_error">Checkpoint name cannot exceed 20 characters</string>
     <string name="checkpoint_invalid_error">Checkpoint name contains invalid characters</string>

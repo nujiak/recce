@@ -31,10 +31,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.forEach
 import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.fragments.ChainInfoFragment
+import com.nujiak.recce.fragments.GoToFragment
 import com.nujiak.recce.fragments.PinInfoFragment
 import com.nujiak.recce.modalsheets.ChainCreatorSheet
 import com.nujiak.recce.modalsheets.PinCreatorSheet
@@ -333,6 +335,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // Set up Go To sequence
+        viewModel.toOpenGoTo.observe(this) { initialLatLng ->
+            if (initialLatLng != null) {
+                openGoTo(initialLatLng)
+            }
+        }
+
         object : OrientationEventListener(baseContext) {
             override fun onOrientationChanged(orientation: Int) {
                 mDisplay?.let {
@@ -401,6 +410,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun openGoTo(initialLatLng: LatLng?) {
+        val goToFragment = GoToFragment()
+        goToFragment.initialLatLng = initialLatLng
+        goToFragment.show(supportFragmentManager, "go_to")
+        viewModel.hideGoTo()
+    }
+
     private fun openSettings() {
         val settingsSheet = SettingsSheet()
         settingsSheet.show(supportFragmentManager, settingsSheet.tag)
@@ -412,6 +428,7 @@ class MainActivity : AppCompatActivity() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             0 -> if (grantResults.isNotEmpty()) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
