@@ -94,7 +94,7 @@ val ZONE_BANDS = List(120) { index ->
     if (index % 2 == 0) {
         "%.0f".format(floor(index / 2.0) + 1) + NORTH_BAND
     } else {
-        "%.0fS".format(floor(index / 2.0) + 1) + SOUTH_BAND
+        "%.0f".format(floor(index / 2.0) + 1) + SOUTH_BAND
     }
 }
 
