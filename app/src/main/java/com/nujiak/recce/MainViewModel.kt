@@ -10,6 +10,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import com.google.android.gms.maps.model.LatLng
 import com.nujiak.recce.database.*
 import com.nujiak.recce.fragments.ruler.RulerItem
 import com.nujiak.recce.fragments.ruler.generateRulerList
@@ -153,6 +154,38 @@ class MainViewModel @Inject constructor(
 
     fun finishedOpenSettings() {
         _toOpenSettings.value = false
+    }
+
+    /**
+     * LiveData to hold Boolean on whether to open Go To dialog.
+     * MainActivity observes this to start GoToFragment
+     */
+    private val _toOpenGoTo = MutableLiveData<LatLng>(null)
+    val toOpenGoTo: LiveData<LatLng>
+        get() = _toOpenGoTo
+
+    fun openGoTo(currentLat: Double, currentLng: Double) {
+        _toOpenGoTo.value = LatLng(currentLat, currentLng)
+    }
+
+    fun hideGoTo() {
+        _toOpenGoTo.value = null
+    }
+
+    /**
+     * LiveData to hold chain to be shown as a ChainInfoFragment dialog,
+     * MainActivity observes this to start ChainInfoFragment
+     */
+    private val _mapGoTo = MutableLiveData<LatLng>()
+    val mapGoTo: LiveData<LatLng>
+        get() = _mapGoTo
+
+    fun mapGoTo(latLng: LatLng) {
+        _mapGoTo.value = latLng
+    }
+
+    fun finishedMapGoTo() {
+        _mapGoTo.value = null
     }
 
     /**

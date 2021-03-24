@@ -128,7 +128,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             updateFab(color)
         }
 
-        binding.mapLiveGrids.setOnClickListener { viewModel.openSettings() }
+        binding.mapLiveGrids.setOnClickListener {
+            mapMgr?.cameraPosition?.target?.let {
+                viewModel.openGoTo(it.latitude, it.longitude)
+            }
+        }
 
         binding.mapPolylineAdd.apply {
             setOnClickListener {
@@ -253,6 +257,12 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             // Set up show pin and checkpoint sequence
             viewModel.pinInFocus.observe(viewLifecycleOwner, { pin -> focusOn(pin) })
             viewModel.chainInFocus.observe(viewLifecycleOwner, { chain -> focusOn(chain) })
+
+            // Set up Go To sequence
+            viewModel.mapGoTo.observe(viewLifecycleOwner) {
+                mapMgr?.moveTo(target = it)
+                mapMgr?.isShowingMyLocation = false
+            }
 
             if (viewModel.isLocationGranted) {
                 onLocPermGranted()
