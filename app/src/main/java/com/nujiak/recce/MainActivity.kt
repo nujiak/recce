@@ -296,7 +296,7 @@ class MainActivity : AppCompatActivity() {
                         if (chainQty > 0) {
                             append(
                                 resources.getQuantityString(
-                                    R.plurals.chains,
+                                    R.plurals.routes_areas,
                                     chainQty,
                                     chainQty
                                 )
