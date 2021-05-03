@@ -16,8 +16,6 @@ import com.nujiak.recce.fragments.ruler.RulerItem
 import com.nujiak.recce.fragments.ruler.generateRulerList
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.livedatas.RotationLiveData
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.ANGLE_UNIT_KEY
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject

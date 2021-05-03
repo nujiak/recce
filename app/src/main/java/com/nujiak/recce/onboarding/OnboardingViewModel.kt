@@ -4,9 +4,10 @@ import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.nujiak.recce.modalsheets.SettingsSheet
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.ANGLE_UNIT_KEY
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_KEY
+import com.nujiak.recce.ANGLE_UNIT_ID_DEG
+import com.nujiak.recce.ANGLE_UNIT_KEY
+import com.nujiak.recce.COORD_SYS_ID_UTM
+import com.nujiak.recce.COORD_SYS_KEY
 
 class OnboardingViewModel : ViewModel() {
 
@@ -29,11 +30,11 @@ class OnboardingViewModel : ViewModel() {
     }
 
     var coordSysId: Int
-        get() = sharedPreference.getInt(COORD_SYS_KEY, SettingsSheet.COORD_SYS_ID_UTM)
+        get() = sharedPreference.getInt(COORD_SYS_KEY, COORD_SYS_ID_UTM)
         set(id) = sharedPreference.edit().putInt(COORD_SYS_KEY, id).apply()
 
     var angleUnitId: Int
-        get() = sharedPreference.getInt(ANGLE_UNIT_KEY, SettingsSheet.ANGLE_UNIT_ID_DEG)
+        get() = sharedPreference.getInt(ANGLE_UNIT_KEY, ANGLE_UNIT_ID_DEG)
         set(id) = sharedPreference.edit().putInt(ANGLE_UNIT_KEY, id).apply()
 
     private val _endOnboarding = MutableLiveData(false)

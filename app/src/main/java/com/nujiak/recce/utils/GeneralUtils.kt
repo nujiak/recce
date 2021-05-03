@@ -2,12 +2,11 @@ package com.nujiak.recce.utils
 
 import android.content.res.Resources
 import android.graphics.Color
-import com.nujiak.recce.R
+import com.nujiak.recce.*
 import com.nujiak.recce.mapping.getKertauGridsString
 import com.nujiak.recce.mapping.getMgrsData
 import com.nujiak.recce.mapping.getUtmData
 import com.nujiak.recce.mapping.toSingleLine
-import com.nujiak.recce.modalsheets.SettingsSheet
 import java.text.NumberFormat
 import java.util.*
 import kotlin.math.abs
@@ -17,22 +16,22 @@ import kotlin.math.roundToInt
 
 fun getGridString(latDeg: Double, lngDeg: Double, coordSysId: Int, resources: Resources): String {
     return when (coordSysId) {
-        SettingsSheet.COORD_SYS_ID_UTM -> {
+        COORD_SYS_ID_UTM -> {
             getUtmData(
                 latDeg,
                 lngDeg
             )?.toSingleLine(5)
         }
-        SettingsSheet.COORD_SYS_ID_MGRS -> {
+        COORD_SYS_ID_MGRS -> {
             getMgrsData(latDeg, lngDeg)?.toSingleLine(includeWhitespace = true)
         }
-        SettingsSheet.COORD_SYS_ID_KERTAU -> {
+        COORD_SYS_ID_KERTAU -> {
             getKertauGridsString(
                 latDeg,
                 lngDeg
             )
         }
-        SettingsSheet.COORD_SYS_ID_LATLNG -> {
+        COORD_SYS_ID_LATLNG -> {
             return String.format(Locale.US, "%.6f, %.6f", latDeg, lngDeg)
         }
         else -> throw IllegalArgumentException("Invalid coordinate system index: $coordSysId")
@@ -41,10 +40,10 @@ fun getGridString(latDeg: Double, lngDeg: Double, coordSysId: Int, resources: Re
 
 fun getAngleString(angleRad: Float, angleUnitId: Int, withSign: Boolean = true): String {
     return when (angleUnitId) {
-        SettingsSheet.ANGLE_UNIT_ID_DEG -> {
+        ANGLE_UNIT_ID_DEG -> {
             "%.1f°".format(radToDeg(angleRad))
         }
-        SettingsSheet.ANGLE_UNIT_ID_NATO_MILS -> {
+        ANGLE_UNIT_ID_NATO_MILS -> {
             if (withSign) {
                 "${if (angleRad > 0) '+' else '-'}${
                     radToNatoMils(abs(angleRad)).roundToInt().toString()

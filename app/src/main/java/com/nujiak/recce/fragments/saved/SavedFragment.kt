@@ -20,6 +20,8 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.nujiak.recce.MainViewModel
 import com.nujiak.recce.R
+import com.nujiak.recce.SORT_ASCENDING_KEY
+import com.nujiak.recce.SORT_BY_KEY
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.FragmentSavedBinding
@@ -41,11 +43,6 @@ class SavedFragment : Fragment() {
 
     private var sortBy = SORT_BY_GROUP
     private var sortAscending = false
-
-    companion object {
-        private const val SORT_ASCENDING_KEY = "sort_ascending"
-        private const val SORT_BY_KEY = "sort_by"
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

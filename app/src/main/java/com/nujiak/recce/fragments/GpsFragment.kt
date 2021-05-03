@@ -8,12 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.nujiak.recce.COORD_SYS_ID_LATLNG
 import com.nujiak.recce.MainViewModel
 import com.nujiak.recce.R
 import com.nujiak.recce.databinding.FragmentGpsBinding
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.livedatas.RotationLiveData
-import com.nujiak.recce.modalsheets.SettingsSheet
 import com.nujiak.recce.utils.formatAsDistanceString
 import com.nujiak.recce.utils.getAngleString
 import com.nujiak.recce.utils.getGridString
@@ -122,7 +122,7 @@ class GpsFragment : Fragment() {
             binding.gpsAccuracy.text = "±" + accuracy.formatAsDistanceString()
             binding.gpsAltitude.text = altitude.formatAsDistanceString()
             binding.gpsLatLng.text =
-                getGridString(latitude, longitude, SettingsSheet.COORD_SYS_ID_LATLNG, resources)
+                getGridString(latitude, longitude, COORD_SYS_ID_LATLNG, resources)
             binding.gpsGrids.text = getGridString(latitude, longitude, coordSysId, resources)
         }
 
