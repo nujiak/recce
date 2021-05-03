@@ -41,10 +41,6 @@ import com.nujiak.recce.fragments.PinInfoFragment
 import com.nujiak.recce.modalsheets.ChainCreatorSheet
 import com.nujiak.recce.modalsheets.PinCreatorSheet
 import com.nujiak.recce.modalsheets.SettingsSheet
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.THEME_PREF_AUTO
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.THEME_PREF_DARK
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.THEME_PREF_KEY
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.THEME_PREF_LIGHT
 import com.nujiak.recce.onboarding.OnboardingActivity
 import com.nujiak.recce.onboarding.OnboardingActivity.Companion.ONBOARDING_COMPLETED_KEY
 import dagger.hilt.android.AndroidEntryPoint

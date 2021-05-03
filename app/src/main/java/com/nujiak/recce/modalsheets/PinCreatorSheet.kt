@@ -17,16 +17,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.nujiak.recce.MainViewModel
-import com.nujiak.recce.NoFilterArrayAdapter
-import com.nujiak.recce.R
+import com.nujiak.recce.*
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.SheetPinCreatorBinding
 import com.nujiak.recce.mapping.*
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_LATLNG
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_MGRS
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
 import com.nujiak.recce.utils.COLORS
 import com.nujiak.recce.utils.PIN_CARD_DARK_BACKGROUNDS
 import com.nujiak.recce.utils.animateColor

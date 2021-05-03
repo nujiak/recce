@@ -8,8 +8,7 @@ import android.widget.Button
 import android.widget.RadioButton
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.nujiak.recce.R
-import com.nujiak.recce.modalsheets.SettingsSheet
+import com.nujiak.recce.*
 
 class OnboardingTitleFragment : Fragment() {
     override fun onCreateView(
@@ -26,8 +25,8 @@ class OnboardingTitleFragment : Fragment() {
         }
 
         view.findViewById<Button>(R.id.onboarding_title_ns).setOnClickListener {
-            viewModel.coordSysId = SettingsSheet.COORD_SYS_ID_KERTAU
-            viewModel.angleUnitId = SettingsSheet.ANGLE_UNIT_ID_NATO_MILS
+            viewModel.coordSysId = COORD_SYS_ID_KERTAU
+            viewModel.angleUnitId = ANGLE_UNIT_ID_NATO_MILS
             viewModel.toPage(OnboardingViewModel.NS_ALL_SET_INDEX)
         }
 
@@ -52,29 +51,29 @@ class OnboardingGridsFragment : Fragment() {
         val latlngBtn = view.findViewById<RadioButton>(R.id.onboarding_radio_latlng)
 
         when (viewModel.coordSysId) {
-            SettingsSheet.COORD_SYS_ID_UTM -> utmBtn.isChecked = true
-            SettingsSheet.COORD_SYS_ID_MGRS -> mgrsBtn.isChecked = true
-            SettingsSheet.COORD_SYS_ID_KERTAU -> kertauBtn.isChecked = true
-            SettingsSheet.COORD_SYS_ID_LATLNG -> latlngBtn.isChecked = true
+            COORD_SYS_ID_UTM -> utmBtn.isChecked = true
+            COORD_SYS_ID_MGRS -> mgrsBtn.isChecked = true
+            COORD_SYS_ID_KERTAU -> kertauBtn.isChecked = true
+            COORD_SYS_ID_LATLNG -> latlngBtn.isChecked = true
         }
 
         view.findViewById<Button>(R.id.onboarding_grids_next).setOnClickListener {
             viewModel.coordSysId = when {
-                utmBtn.isChecked -> SettingsSheet.COORD_SYS_ID_UTM
-                mgrsBtn.isChecked -> SettingsSheet.COORD_SYS_ID_MGRS
-                kertauBtn.isChecked -> SettingsSheet.COORD_SYS_ID_KERTAU
-                latlngBtn.isChecked -> SettingsSheet.COORD_SYS_ID_LATLNG
-                else -> SettingsSheet.COORD_SYS_ID_UTM
+                utmBtn.isChecked -> COORD_SYS_ID_UTM
+                mgrsBtn.isChecked -> COORD_SYS_ID_MGRS
+                kertauBtn.isChecked -> COORD_SYS_ID_KERTAU
+                latlngBtn.isChecked -> COORD_SYS_ID_LATLNG
+                else -> COORD_SYS_ID_UTM
             }
             viewModel.toPage(OnboardingViewModel.ANGLE_INDEX)
         }
         view.findViewById<Button>(R.id.onboarding_grids_prev).setOnClickListener {
             viewModel.coordSysId = when {
-                utmBtn.isChecked -> SettingsSheet.COORD_SYS_ID_UTM
-                mgrsBtn.isChecked -> SettingsSheet.COORD_SYS_ID_MGRS
-                kertauBtn.isChecked -> SettingsSheet.COORD_SYS_ID_KERTAU
-                latlngBtn.isChecked -> SettingsSheet.COORD_SYS_ID_LATLNG
-                else -> SettingsSheet.COORD_SYS_ID_UTM
+                utmBtn.isChecked -> COORD_SYS_ID_UTM
+                mgrsBtn.isChecked -> COORD_SYS_ID_MGRS
+                kertauBtn.isChecked -> COORD_SYS_ID_KERTAU
+                latlngBtn.isChecked -> COORD_SYS_ID_LATLNG
+                else -> COORD_SYS_ID_UTM
             }
             viewModel.toPage(OnboardingViewModel.TITLE_INDEX)
         }
@@ -97,23 +96,23 @@ class OnboardingAnglesFragment : Fragment() {
         val milsBtn = view.findViewById<RadioButton>(R.id.onboarding_radio_mils)
 
         when (viewModel.angleUnitId) {
-            SettingsSheet.ANGLE_UNIT_ID_DEG -> degBtn.isChecked = true
-            SettingsSheet.ANGLE_UNIT_ID_NATO_MILS -> milsBtn.isChecked = true
+            ANGLE_UNIT_ID_DEG -> degBtn.isChecked = true
+            ANGLE_UNIT_ID_NATO_MILS -> milsBtn.isChecked = true
         }
 
         view.findViewById<Button>(R.id.onboarding_angles_next).setOnClickListener {
             viewModel.angleUnitId = when {
-                degBtn.isChecked -> SettingsSheet.ANGLE_UNIT_ID_DEG
-                milsBtn.isChecked -> SettingsSheet.ANGLE_UNIT_ID_NATO_MILS
-                else -> SettingsSheet.ANGLE_UNIT_ID_DEG
+                degBtn.isChecked -> ANGLE_UNIT_ID_DEG
+                milsBtn.isChecked -> ANGLE_UNIT_ID_NATO_MILS
+                else -> ANGLE_UNIT_ID_DEG
             }
             viewModel.toPage(OnboardingViewModel.ALL_SET_INDEX)
         }
         view.findViewById<Button>(R.id.onboarding_angles_prev).setOnClickListener {
             viewModel.angleUnitId = when {
-                degBtn.isChecked -> SettingsSheet.ANGLE_UNIT_ID_DEG
-                milsBtn.isChecked -> SettingsSheet.ANGLE_UNIT_ID_NATO_MILS
-                else -> SettingsSheet.ANGLE_UNIT_ID_DEG
+                degBtn.isChecked -> ANGLE_UNIT_ID_DEG
+                milsBtn.isChecked -> ANGLE_UNIT_ID_NATO_MILS
+                else -> ANGLE_UNIT_ID_DEG
             }
             viewModel.toPage(OnboardingViewModel.COORD_SYS_INDEX)
         }

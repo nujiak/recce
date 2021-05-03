@@ -25,6 +25,8 @@ import com.google.android.gms.maps.model.*
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.maps.android.SphericalUtil
+import com.nujiak.recce.CHAINS_GUIDE_SHOWN_KEY
+import com.nujiak.recce.MAP_TYPE_KEY
 import com.nujiak.recce.MainViewModel
 import com.nujiak.recce.R
 import com.nujiak.recce.database.*
@@ -152,9 +154,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     companion object {
-
-        const val MAP_TYPE_KEY = "map_type"
-        const val CHAINS_GUIDE_SHOWN_KEY = "chains_guide_shown"
 
         // Lat Lng evaluator for animating myLocationMarker and myLocationCircle positions
         private val latLngEvaluator by lazy {

@@ -11,10 +11,7 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.nujiak.recce.MainActivity
-import com.nujiak.recce.MainViewModel
-import com.nujiak.recce.NoFilterArrayAdapter
-import com.nujiak.recce.R
+import com.nujiak.recce.*
 import com.nujiak.recce.databinding.SheetSettingsBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -29,23 +26,6 @@ class SettingsSheet : BottomSheetDialogFragment() {
     private val themePrefs: Array<String> by lazy { resources.getStringArray(R.array.theme_prefs) }
 
     private var currentThemePrefId = THEME_PREF_AUTO
-
-    companion object {
-        const val COORD_SYS_KEY = "coordinate_system"
-        const val COORD_SYS_ID_UTM = 0
-        const val COORD_SYS_ID_MGRS = 1
-        const val COORD_SYS_ID_KERTAU = 2
-        const val COORD_SYS_ID_LATLNG = 3
-
-        const val ANGLE_UNIT_KEY = "angle_unit"
-        const val ANGLE_UNIT_ID_DEG = 0
-        const val ANGLE_UNIT_ID_NATO_MILS = 1
-
-        const val THEME_PREF_KEY = "theme_pref"
-        const val THEME_PREF_AUTO = 0
-        const val THEME_PREF_LIGHT = 1
-        const val THEME_PREF_DARK = 2
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

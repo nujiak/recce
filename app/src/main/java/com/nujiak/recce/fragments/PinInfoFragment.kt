@@ -8,14 +8,9 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import com.nujiak.recce.MainViewModel
-import com.nujiak.recce.R
+import com.nujiak.recce.*
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.DialogPinInfoBinding
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_KERTAU
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_LATLNG
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_MGRS
-import com.nujiak.recce.modalsheets.SettingsSheet.Companion.COORD_SYS_ID_UTM
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.getGridString
 import dagger.hilt.android.AndroidEntryPoint
