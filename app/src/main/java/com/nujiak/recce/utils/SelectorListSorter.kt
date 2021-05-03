@@ -199,14 +199,14 @@ fun sortByTime(
     for ((index, pinChain) in sortedList.withIndex()) {
         if (index == 0) {
             if (currentIsChain) {
-                newList.add(HeaderItem(resources.getString(R.string.chains)))
+                newList.add(HeaderItem(resources.getString(R.string.routes_areas)))
             } else {
                 newList.add(HeaderItem(resources.getString(R.string.pins)))
             }
         }
         if (pinChain.isChain != currentIsChain) {
             currentIsChain = pinChain.isChain
-            newList.add(HeaderItem(resources.getString(if (currentIsChain) R.string.chains else R.string.pins)))
+            newList.add(HeaderItem(resources.getString(if (currentIsChain) R.string.routes_areas else R.string.pins)))
         }
 
         if (pinChain.isChain) {

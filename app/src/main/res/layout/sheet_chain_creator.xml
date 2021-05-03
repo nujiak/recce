@@ -91,7 +91,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/chain_name"
+                android:hint="@string/route_area_name_name"
                 app:counterEnabled="true"
                 app:counterMaxLength="20"
                 app:errorEnabled="true">

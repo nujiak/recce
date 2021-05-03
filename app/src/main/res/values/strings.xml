@@ -31,7 +31,7 @@
 
     <!-- Pin Selector -->
     <string name="pins">Pins</string>
-    <string name="chains">Chains</string>
+    <string name="routes_areas">Routes/Areas</string>
     <string name="add_pin">Add Pin</string>
     <string name="edit_pin">Edit Pin</string>
     <string name="add_to_ruler">Add to ruler</string>
@@ -58,9 +58,9 @@
         <item quantity="one">%d Pin</item>
         <item quantity="other">%d Pins</item>
     </plurals>
-    <plurals name="chains">
-        <item quantity="one">%d Chain</item>
-        <item quantity="other">%d Chains</item>
+    <plurals name="routes_areas">
+        <item quantity="one">%d Route/Area</item>
+        <item quantity="other">%d Routes/Areas</item>
     </plurals>
     <!-- Sorting -->
     <string name="sort">Sort</string>
@@ -92,7 +92,7 @@
     <string name="group_invalid_error">Group name invalid</string>
 
     <!-- Chain Creator -->
-    <string name="chain_name">Chain Name</string>
+    <string name="route_area_name_name">Route/Area Name</string>
     <string name="type">Type</string>
     <string name="route">Route</string>
     <string name="area">Area</string>
@@ -161,7 +161,6 @@
       Guides
       -->
 
-    <string name="guide_show_only_once">This guide will appear only once</string>
     <string name="reset_preferences">Reset Preferences</string>
 
     <!-- Chains Guide -->
@@ -171,7 +170,5 @@
     <string name="next">Next</string>
     <string name="move_around">Move Around</string>
     <string name="guide_chains_move">Move your map around to plot your route/area.</string>
-    <string name="add_node_checkpoint">Add Node/Checkpoint</string>
-    <string name="undo_exit">Undo/Exit</string>
 
 </resources>
