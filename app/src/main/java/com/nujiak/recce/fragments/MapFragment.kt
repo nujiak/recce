@@ -4,10 +4,7 @@ import android.animation.*
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Matrix
+import android.graphics.*
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -35,6 +32,9 @@ import com.nujiak.recce.databinding.FragmentMapBinding
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.utils.*
 import dagger.hilt.android.AndroidEntryPoint
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig
 import java.text.NumberFormat
 import java.util.*
 import kotlin.collections.HashMap
@@ -66,6 +66,90 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private var lastDirectionUpdate = 0L
     private var directionUpdateSum = 0f
     private var directionUpdateCount = 0
+
+    private var isChainGiudeShowing = false
+    private val chainShowcaseView : MaterialShowcaseSequence by lazy {
+        // Colours needed for showcase
+        val maskColour = withAlpha(
+            ContextCompat.getColor(requireContext(),
+                R.color.colorPrimaryDark), 215)
+        val white = ContextCompat.getColor(requireContext(), android.R.color.white)
+
+        MaterialShowcaseSequence(activity).apply {
+
+            // Set showcase configs
+            setConfig(ShowcaseConfig().apply {
+                delay = 100
+                renderOverNavigationBar = true
+                fadeDuration = 300
+            })
+
+            // Showcase for add button
+            addSequenceItem(
+                MaterialShowcaseView.Builder(activity)
+                    .setTarget(binding.mapPolylineAdd)
+                    .setTitleText(R.string.add)
+                    .setContentText(R.string.guide_chains_add)
+                    .setContentTextColor(white)
+                    .setDismissText(R.string.next)
+                    .setMaskColour(maskColour)
+                    .build()
+            )
+            // Showcase for undo button
+            addSequenceItem(
+                MaterialShowcaseView.Builder(activity)
+                    .setTarget(binding.mapPolylineUndo)
+                    .setTitleText(R.string.undo)
+                    .setContentText(R.string.guide_chains_undo)
+                    .setContentTextColor(white)
+                    .setDismissText(R.string.next)
+                    .setMaskColour(maskColour)
+                    .build()
+            )
+
+            // Showcase for save button
+            addSequenceItem(
+                MaterialShowcaseView.Builder(activity)
+                    .setTarget(binding.mapPolylineSave)
+                    .setTitleText(R.string.save)
+                    .setContentText(R.string.guide_chains_save)
+                    .setContentTextColor(white)
+                    .setDismissText(R.string.next)
+                    .setMaskColour(maskColour)
+                    .build()
+            )
+
+            // Showcase for moving map around
+            val lastShowcase = MaterialShowcaseView.Builder(activity)
+                .setTarget(binding.mapCrossHair)
+                .setTitleText(R.string.move_around)
+                .setContentText(R.string.guide_chains_move)
+                .setContentTextColor(white)
+                .setDismissText(R.string.done)
+                .setMaskColour(maskColour)
+                .setShapePadding(200)
+                .build()
+            addSequenceItem(lastShowcase)
+
+            // Set SharedPreference when last showcase is dismissed
+            setOnItemDismissedListener { itemView, _ ->
+                if (itemView.equals(lastShowcase)) {
+                    isChainGiudeShowing = false
+                    viewModel.chainsGuideShown = true
+                    viewModel.sharedPreference.edit().putBoolean(CHAINS_GUIDE_SHOWN_KEY, true).apply()
+                }
+            }
+
+            setOnItemShownListener { itemView, _ ->
+                if (itemView.equals(lastShowcase)) {
+                    mapMgr?.cameraPosition?.target?.let {
+                        mapMgr?.isShowingMyLocation = false
+                        mapMgr?.moveTo(LatLng(it.latitude+0.005, it.longitude), duration = 700)
+                    }
+                }
+            }
+        }
+    }
 
     companion object {
 
@@ -873,8 +957,11 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun undoPolyline() {
+        if (isChainGiudeShowing) {
+            return
+        }
         viewModel.currentPolylinePoints.let {
-            it.removeAt(it.size - 1)
+            it.removeLast()
             mapMgr?.drawCurrentPolyline(true)
 
             if (it.size == 0) {
@@ -890,21 +977,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun showChainsGuide() {
-        val builder = AlertDialog.Builder(requireActivity())
-        builder.apply {
-            setView(R.layout.guide_chains)
-            setCancelable(false)
-        }
-        val alertDialog = builder.create()
-        alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        alertDialog.show()
-
-        val doneBtn = alertDialog.findViewById<Button>(R.id.guide_chain_done)
-        doneBtn.setOnClickListener {
-            alertDialog.dismiss()
-            viewModel.chainsGuideShown = true
-            viewModel.sharedPreference.edit().putBoolean(CHAINS_GUIDE_SHOWN_KEY, true).apply()
-        }
+        isChainGiudeShowing = true
+        chainShowcaseView.start()
     }
 
 
@@ -1032,6 +1106,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         binding.mapView.onResume()
     }
 
+    @SuppressLint("PotentialBehaviorOverride")
     private inner class MapManager(var map: GoogleMap) {
         private var markersMap = HashMap<Marker, Pin>()
         var polylinesMap = HashMap<Polyline, Chain>()

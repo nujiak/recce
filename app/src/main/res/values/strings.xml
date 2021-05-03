@@ -165,13 +165,13 @@
     <string name="reset_preferences">Reset Preferences</string>
 
     <!-- Chains Guide -->
-    <string name="guide_chains">Chains Guide</string>
-    <string name="guide_chain_overview">You have entered the Chain creation mode by pressing the + Add button.
-        \n\nIn this mode, you can plot a Route or demarcate an Area by sliding the map around and placing checkpoints. This mode involves the following 3 buttons:</string>
-    <string name="guide_chains_undo">Click to undo the last node or exit chain-editing mode.
-        \nClick and hold to discard all nodes and exit chain-editing mode.</string>
-    <string name="guide_chains_add">Click to add a node to the line.
-        \nClick and hold to add a named checkpoint.</string>
-    <string name="guide_chains_save">Click to save the plotted line as a Route or an Area.</string>
+    <string name="guide_chains_undo">Tap to undo the previous node or exit line-plotting mode. Tap &amp; hold to discard all nodes and exit.</string>
+    <string name="guide_chains_add">Tap to add a node to the line. Tap &amp; hold to add a checkpoint.</string>
+    <string name="guide_chains_save">Tap to save the plotted line as a Route or an Area.</string>
+    <string name="next">Next</string>
+    <string name="move_around">Move Around</string>
+    <string name="guide_chains_move">Move your map around to plot your route/area.</string>
+    <string name="add_node_checkpoint">Add Node/Checkpoint</string>
+    <string name="undo_exit">Undo/Exit</string>
 
 </resources>
