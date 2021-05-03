@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.edit
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -15,8 +16,6 @@ import com.nujiak.recce.MainViewModel
 import com.nujiak.recce.NoFilterArrayAdapter
 import com.nujiak.recce.R
 import com.nujiak.recce.databinding.SheetSettingsBinding
-import com.nujiak.recce.fragments.MapFragment
-import com.nujiak.recce.onboarding.OnboardingActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -127,13 +126,9 @@ class SettingsSheet : BottomSheetDialogFragment() {
     }
 
     private fun onResetPreferences() {
-        viewModel.sharedPreference.edit().apply {
-            putBoolean(MapFragment.CHAINS_GUIDE_SHOWN_KEY, false)
-            putBoolean(OnboardingActivity.ONBOARDING_COMPLETED_KEY, false)
-            remove(THEME_PREF_KEY)
-            remove(ANGLE_UNIT_KEY)
-            remove(COORD_SYS_KEY)
-        }.apply()
+        viewModel.sharedPreference.edit {
+            clear()
+        }
         viewModel.chainsGuideShown = false
 
         // Restart Activity
