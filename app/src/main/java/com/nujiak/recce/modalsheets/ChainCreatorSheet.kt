@@ -139,7 +139,7 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
             // Create new chain instead of modifying old pin
             val newChain = chain.copy(
                 name = binding.newChainNameEditText.text.toString(),
-                data = chain.data,
+                nodes = chain.nodes,
                 color = COLORS.indexOf(binding.newChainColorDropdown.text.toString()),
                 group = group,
                 cyclical = binding.newChainTypeDropdown.text.toString() == getString(R.string.area),

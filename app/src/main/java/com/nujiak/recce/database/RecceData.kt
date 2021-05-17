@@ -1,20 +1,14 @@
 package com.nujiak.recce.database
 
 import android.os.Parcelable
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.nujiak.recce.utils.round
+import androidx.room.*
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.builtins.PairSerializer
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.Json
 
+/**
+ * Superclass for Pin and Chain containing the common properties.
+ */
 sealed class RecceData {
     abstract val name: String
     abstract val color: Int
@@ -24,6 +18,14 @@ sealed class RecceData {
 
 /**
  * Represents a point on the map defined by its latitude and longitude
+ *
+ * @property name Pin name
+ * @property latitude WGS84 latitude
+ * @property longitude WGS84 longitude
+ * @property color Pin color
+ * @property pinId Unique pin ID
+ * @property group Pin group
+ * @property description Pin description
  */
 @Parcelize
 @Serializable(with = PinSerializer::class)
@@ -49,14 +51,28 @@ data class Pin(
 
 ) : Parcelable, RecceData()
 
+/**
+ * Represents a chain which can be a line (route) or polygon (area). Contains a list of ChainNodes
+ * each representing a point.
+ *
+ * @property name Chain name
+ * @property nodes List of ChainNodes making up the line/polygon
+ * @property color Chain color
+ * @property chainId Unique chain ID
+ * @property group Chain group
+ * @property cyclical Whether the Chain is a polygon
+ * @property description Chain description
+ */
 @Parcelize
 @Serializable(with = ChainSerializer::class)
+@TypeConverters(ChainConverters::class)
 @Entity(tableName = "chains_table")
 data class Chain(
 
     override val name: String,
 
-    val data: String,
+    @ColumnInfo(name = "data")
+    val nodes: List<ChainNode>,
 
     override val color: Int = 0,
 
@@ -72,89 +88,71 @@ data class Chain(
     @ColumnInfo(defaultValue = "")
     override val description: String = ""
 
-) : Parcelable, RecceData()
-
-@Serializable
-private data class PinSurrogate(
-    val n: String, val lt: Double, val lg: Double,
-    val c: Int, val g: String, val d: String
-)
-
-@Serializable
-private data class ChainSurrogate(
-    val n: String, val dt: String, val c: Int,
-    val g: String, val cy: Int, val d: String
-)
-
-// Static references to serializers for encoding and decoding
-private val pinListSerializer = ListSerializer(Pin.serializer())
-private val chainListSerializer = ListSerializer(Chain.serializer())
-private val pairListsSerializer = PairSerializer(pinListSerializer, chainListSerializer)
-
-fun toPinsAndChains(shareCode: String): Pair<List<Pin>, List<Chain>>? {
-    return try {
-        Json.decodeFromString(pairListsSerializer, shareCode)
-    } catch (e: Exception) {
-        Pair(listOf(), listOf())
+) : Parcelable, RecceData() {
+    init {
+        // Set parentChain of each every node to this
+        for (node in this.nodes) {
+            node.parentChain = this
+        }
     }
 }
 
-fun toShareCode(pins: List<Pin>?, chains: List<Chain>?): String {
-    return Json.encodeToString(pairListsSerializer, Pair(pins ?: listOf(), chains ?: listOf()))
+/**
+ * Deserializes a list of ChainNodes from a String.
+ *
+ * Used in ChainConverter and for deserializing Chain data for sharing.
+ *
+ * @param data string to be deserialized
+ * @return list of ChainNodes deserialized from String
+ */
+fun deserializeNodeList(data: String) : List<ChainNode> {
+    val dataList = data.split(';')
+    val nodeList = mutableListOf<ChainNode>()
+
+    for (item in dataList) {
+        if (item.isNotBlank()) {
+            val (lat, lng, name) = item.split(',')
+            val node = ChainNode(
+                name = name,
+                position = LatLng(lat.toDouble(), lng.toDouble()),
+            )
+            nodeList.add(node)
+        }
+    }
+    return nodeList.toList()
 }
 
-private object PinSerializer : KSerializer<Pin> {
-    override val descriptor: SerialDescriptor = PinSurrogate.serializer().descriptor
+/**
+ * Serializes a list of ChainNodes to a String.
+ *
+ * Used in ChainConverter and for serializing Chain data for sharing
+ *
+ * @param list list of ChainNodes to be serialized
+ * @return string serialization of list
+ */
+fun serializeNodeList(list: List<ChainNode>) : String {
+    val newDataBuilder = StringBuilder()
 
-    override fun serialize(encoder: Encoder, value: Pin) {
-        val surrogate = PinSurrogate(
-            n = value.name,
-            lt = value.latitude.round(6),
-            lg = value.longitude.round(6),
-            c = value.color,
-            g = value.group,
-            d = value.description
-        )
-        encoder.encodeSerializableValue(PinSurrogate.serializer(), surrogate)
+    for (node in list) {
+        newDataBuilder.append(node.position.latitude)
+        newDataBuilder.append(',')
+        newDataBuilder.append(node.position.longitude)
+        newDataBuilder.append(',')
+        newDataBuilder.append(node.name.trim())
+        newDataBuilder.append(';')
     }
 
-    override fun deserialize(decoder: Decoder): Pin {
-        val surrogate = decoder.decodeSerializableValue(PinSurrogate.serializer())
-        return Pin(
-            name = surrogate.n,
-            latitude = surrogate.lt,
-            longitude = surrogate.lg,
-            color = surrogate.c,
-            group = surrogate.g,
-            description = surrogate.d
-        )
-    }
+    return newDataBuilder.toString()
 }
 
-private object ChainSerializer : KSerializer<Chain> {
-    override val descriptor: SerialDescriptor = ChainSurrogate.serializer().descriptor
+/**
+ * Android Room TypeConverter for Chain
+ */
+class ChainConverters {
 
-    override fun serialize(encoder: Encoder, value: Chain) {
-        val surrogate = ChainSurrogate(
-            n = value.name,
-            dt = value.data,
-            c = value.color,
-            g = value.group,
-            cy = if (value.cyclical) 1 else 0,
-            d = value.description
-        )
-        encoder.encodeSerializableValue(ChainSurrogate.serializer(), surrogate)
-    }
+    @TypeConverter
+    fun fromNodeList(list : List<ChainNode>) = serializeNodeList(list)
 
-    override fun deserialize(decoder: Decoder): Chain {
-        val surrogate = decoder.decodeSerializableValue(ChainSurrogate.serializer())
-        return Chain(
-            name = surrogate.n,
-            data = surrogate.dt,
-            color = surrogate.c,
-            group = surrogate.g,
-            cyclical = surrogate.cy != 0,
-            description = surrogate.d
-        )
-    }
+    @TypeConverter
+    fun toNodeList(str : String) = deserializeNodeList(str)
 }
