@@ -10,7 +10,6 @@ import com.google.maps.android.SphericalUtil
 import com.nujiak.recce.R
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
-import com.nujiak.recce.database.getNodes
 import com.nujiak.recce.databinding.PinListChainItemBinding
 import com.nujiak.recce.databinding.PinListHeaderItemBinding
 import com.nujiak.recce.databinding.PinListItemBinding
@@ -105,7 +104,7 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
         binding.pinListItemParent.setOnClickListener { onItemClick(chain) }
         binding.pinListItemParent.setOnLongClickListener { onItemLongClick(chain) }
 
-        val chainNodes = chain.getNodes()
+        val chainNodes = chain.nodes
         val checkpoints = mutableListOf<String>()
         var distance = 0.0
         for ((index, node) in chainNodes.withIndex()) {

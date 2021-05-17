@@ -3,7 +3,10 @@ package com.nujiak.recce.fragments.ruler
 import android.content.res.Resources
 import com.google.android.gms.maps.model.LatLng
 import com.nujiak.recce.R
-import com.nujiak.recce.database.*
+import com.nujiak.recce.database.Chain
+import com.nujiak.recce.database.ChainNode
+import com.nujiak.recce.database.Pin
+import com.nujiak.recce.database.RecceData
 
 fun generateRulerList(
     oldList: List<RulerItem>?,
@@ -48,7 +51,7 @@ fun generateRulerList(
 
             /* Chain */
 
-            val nodes = item.getNodes().toMutableList()
+            val nodes = item.nodes.toMutableList()
             if (!nodes.first().isCheckpoint) {
                 nodes[0] = nodes.first().copy(name = resources.getString(R.string.start))
             }

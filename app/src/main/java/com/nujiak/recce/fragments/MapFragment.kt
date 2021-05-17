@@ -582,7 +582,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             removeFocus()
             mapMgr?.moveTo(chain)
         } else {
-            focusOn(chain.getNodes()[0])
+            focusOn(chain.nodes[0])
         }
     }
 
@@ -622,7 +622,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
 
         if (checkpoint.parentChain != null) {
-            if (checkpoint.parentChain.cyclical) {
+            if (checkpoint.parentChain!!.cyclical) {
                 // Area
                 binding.areaIcon.visibility = View.VISIBLE
                 binding.routeIcon.visibility = View.INVISIBLE
@@ -632,7 +632,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 binding.routeIcon.visibility = View.VISIBLE
             }
             binding.mapCheckpointInfobar.setOnClickListener {
-                viewModel.showChainInfo(checkpoint.parentChain.chainId)
+                viewModel.showChainInfo(checkpoint.parentChain!!.chainId)
             }
         } else {
             binding.mapCheckpointInfobar.isClickable = false
@@ -972,7 +972,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun onSavePolyline() {
-        viewModel.openChainCreator(Chain("", viewModel.currentPolylinePoints.toChainDataString()))
+        viewModel.openChainCreator(Chain("", viewModel.currentPolylinePoints))
     }
 
     private fun showChainsGuide() {
@@ -1294,7 +1294,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             isShowingCheckpoint = false
             isShowingPin = false
             isShowingMyLocation = false
-            val nodes = chain.getNodes()
+            val nodes = chain.nodes
             if (chain.cyclical) {
                 // Area
                 val bounds = LatLngBounds.builder().apply {
@@ -1382,7 +1382,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
             val scale = resources.displayMetrics.density
             for (chain in allChains) {
-                val chainNodes = chain.getNodes()
+                val chainNodes = chain.nodes
                 val points = chainNodes.map { it.position }
                 if (chain.cyclical) {
                     val color =

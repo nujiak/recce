@@ -12,7 +12,6 @@ import com.google.maps.android.SphericalUtil
 import com.nujiak.recce.MainViewModel
 import com.nujiak.recce.R
 import com.nujiak.recce.database.Chain
-import com.nujiak.recce.database.getNodes
 import com.nujiak.recce.databinding.DialogChainInfoBinding
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.formatAsAreaString
@@ -80,7 +79,7 @@ class ChainInfoFragment : DialogFragment() {
                 binding.chainDescription.visibility = View.GONE
             }
 
-            val chainNodes = chain.getNodes()
+            val chainNodes = chain.nodes
             val checkpoints = mutableListOf<String>()
             var distance = 0.0
             for ((index, node) in chainNodes.withIndex()) {
