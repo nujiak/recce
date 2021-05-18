@@ -26,6 +26,14 @@
             android:gravity="end"
             android:orientation="horizontal">
 
+            <Button
+                android:id="@+id/pin_open_in"
+                style="@style/Widget.Recce.Button.TextButton.IconOnly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_baseline_open_in_new_24"
+                app:iconTint="@android:color/white" />
+            
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"

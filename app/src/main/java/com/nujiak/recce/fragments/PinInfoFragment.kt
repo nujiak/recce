@@ -2,6 +2,8 @@ package com.nujiak.recce.fragments
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -78,6 +80,19 @@ class PinInfoFragment : DialogFragment() {
                 binding.pinDescription.visibility = View.GONE
             }
 
+            binding.pinOpenIn.setOnClickListener {
+                val gmmIntentUri = Uri.parse(
+                    "geo:<${pin.latitude}>,<${pin.longitude}>?q=<${pin.latitude}>,<${pin.longitude}>(${pin.name})")
+                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                mapIntent.setPackage("com.google.android.apps.maps")
+
+                activity?.let {
+                    if (mapIntent.resolveActivity(it.packageManager) != null) {
+                        startActivity(mapIntent)
+                    }
+                }
+
+            }
             binding.pinMap.setOnClickListener {
                 viewModel.showPinOnMap(pin)
                 dismiss()
