@@ -66,8 +66,14 @@ open class Coordinate private constructor(
          * @param y northing
          * @return
          */
-        fun of(latLng: LatLng, zone: Int, band: Char,
-               eastingLetter: Char, northingLetter: Char, x: Double, y: Double,
+        fun of(
+            latLng: LatLng,
+            zone: Int,
+            band: Char,
+            eastingLetter: Char,
+            northingLetter: Char,
+            x: Double,
+            y: Double,
         ): Coordinate {
             return MgrsCoordinate(latLng, zone, band, eastingLetter, northingLetter, x, y)
         }

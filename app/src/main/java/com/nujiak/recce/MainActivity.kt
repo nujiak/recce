@@ -15,7 +15,11 @@ import android.os.Handler
 import android.os.Looper
 import android.text.InputType
 import android.util.TypedValue
-import android.view.*
+import android.view.Display
+import android.view.Menu
+import android.view.MenuItem
+import android.view.OrientationEventListener
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
@@ -24,7 +28,10 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate.*
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.appcompat.view.ActionMode
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -156,7 +163,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         bottomNavigation.menu.forEach {
-            findViewById<View>(it.itemId).apply{
+            findViewById<View>(it.itemId).apply {
                 setOnLongClickListener { callOnClick() }
                 isHapticFeedbackEnabled = false
             }
@@ -175,7 +182,6 @@ class MainActivity : AppCompatActivity() {
                 openChainCreator(chain)
             }
         })
-
 
         // Set up pin and checkpoint showing sequence
         viewModel.pinInFocus.observe(this, { switchToMap() })
@@ -263,66 +269,69 @@ class MainActivity : AppCompatActivity() {
         })
 
         // Set up Sharing
-        viewModel.shareCode.observe(this, Observer { shareCode ->
+        viewModel.shareCode.observe(
+            this,
+            Observer { shareCode ->
 
-            if (shareCode == null) {
-                return@Observer
-            }
+                if (shareCode == null) {
+                    return@Observer
+                }
 
-            val alertDialog = AlertDialog.Builder(this)
-                .setView(R.layout.dialog_share)
-                .create()
-            alertDialog.show()
+                val alertDialog = AlertDialog.Builder(this)
+                    .setView(R.layout.dialog_share)
+                    .create()
+                alertDialog.show()
 
-            alertDialog.setOnDismissListener { viewModel.resetShareCode() }
+                alertDialog.setOnDismissListener { viewModel.resetShareCode() }
 
-            val shareDescBuilder = StringBuilder()
-            viewModel.shareQuantity.let {
-                val (pinQty, chainQty) = it
-                if (pinQty != null && chainQty != null) {
-                    shareDescBuilder.apply {
-                        if (pinQty > 0) {
-                            append(resources.getQuantityString(R.plurals.pins, pinQty, pinQty))
-                            append(' ')
-                        }
-                        if (pinQty > 0 && chainQty > 0) {
-                            append('&')
-                            append(' ')
-                        }
-                        if (chainQty > 0) {
-                            append(
-                                resources.getQuantityString(
-                                    R.plurals.routes_areas,
-                                    chainQty,
-                                    chainQty
+                val shareDescBuilder = StringBuilder()
+                viewModel.shareQuantity.let {
+                    val (pinQty, chainQty) = it
+                    if (pinQty != null && chainQty != null) {
+                        shareDescBuilder.apply {
+                            if (pinQty > 0) {
+                                append(resources.getQuantityString(R.plurals.pins, pinQty, pinQty))
+                                append(' ')
+                            }
+                            if (pinQty > 0 && chainQty > 0) {
+                                append('&')
+                                append(' ')
+                            }
+                            if (chainQty > 0) {
+                                append(
+                                    resources.getQuantityString(
+                                        R.plurals.routes_areas,
+                                        chainQty,
+                                        chainQty
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
                 }
-            }
 
-            alertDialog.findViewById<TextView>(R.id.share_description)?.text =
-                shareDescBuilder.toString()
+                alertDialog.findViewById<TextView>(R.id.share_description)?.text =
+                    shareDescBuilder.toString()
 
-            alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-            val shareCodeEditText = alertDialog.findViewById<EditText>(R.id.share_string)
-            shareCodeEditText?.apply {
-                setText(shareCode)
-                typeface = Typeface.MONOSPACE
-                inputType = InputType.TYPE_NULL
-                isSingleLine = false
-                maxLines = 10
+                val shareCodeEditText = alertDialog.findViewById<EditText>(R.id.share_string)
+                shareCodeEditText?.apply {
+                    setText(shareCode)
+                    typeface = Typeface.MONOSPACE
+                    inputType = InputType.TYPE_NULL
+                    isSingleLine = false
+                    maxLines = 10
+                }
+                alertDialog.findViewById<Button>(R.id.copy)?.setOnClickListener {
+                    val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText("", shareCode)
+                    clipboard.setPrimaryClip(clip)
+                    Toast.makeText(this, getString(R.string.copied), Toast.LENGTH_SHORT).show()
+                    shareCodeEditText?.requestFocus()
+                }
             }
-            alertDialog.findViewById<Button>(R.id.copy)?.setOnClickListener {
-                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText("", shareCode)
-                clipboard.setPrimaryClip(clip)
-                Toast.makeText(this, getString(R.string.copied), Toast.LENGTH_SHORT).show()
-                shareCodeEditText?.requestFocus()
-            }
-        })
+        )
 
         // Set up Settings sequence
         viewModel.toOpenSettings.observe(this) { toOpenSettings ->
@@ -343,7 +352,6 @@ class MainActivity : AppCompatActivity() {
                 mDisplay?.let {
                     viewModel.screenRotation = it.rotation
                 }
-
             }
         }.enable()
 
@@ -385,7 +393,6 @@ class MainActivity : AppCompatActivity() {
             ChainCreatorSheet()
         chainCreatorSheet.arguments = bundle
         chainCreatorSheet.show(supportFragmentManager, chainCreatorSheet.tag)
-
     }
 
     private fun openPinInfo(pinId: Long?) {

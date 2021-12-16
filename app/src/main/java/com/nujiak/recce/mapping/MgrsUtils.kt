@@ -69,8 +69,7 @@ fun parse(mgrsString: String): Coordinate? {
     val (easting, northing) = intsFromMgrsGridString(gridString)
     val (band, eastingLtr, northingLtr) = matchGroupValues[2].toList()
 
-    return parse(matchGroupValues[1].toInt(), band,
-        eastingLtr, northingLtr, easting, northing)
+    return parse(matchGroupValues[1].toInt(), band, eastingLtr, northingLtr, easting, northing)
 }
 
 /**

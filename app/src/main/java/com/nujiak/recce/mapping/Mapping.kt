@@ -76,7 +76,7 @@ class Mapping {
             return toUtm(latLng.latitude, latLng.longitude)
         }
 
-        fun toUtm(latitude: Double, longitude: Double) : Coordinate? {
+        fun toUtm(latitude: Double, longitude: Double): Coordinate? {
             if (latitude < -80 || latitude > 84) {
                 return null
             }
@@ -118,7 +118,7 @@ class Mapping {
             return Coordinate.of(latLng, zone, band, x, y)
         }
 
-        private fun getUtmToWgs84Transform(epsgCode: Short) : CoordinateTransform {
+        private fun getUtmToWgs84Transform(epsgCode: Short): CoordinateTransform {
             if (epsgCode !in 32601..32660 && epsgCode !in 32701..32760) {
                 throw IllegalArgumentException("EPSG code is out of range for UTM: $epsgCode")
             }
@@ -131,7 +131,7 @@ class Mapping {
             return utmToWgs84Transforms[epsgCode]!!
         }
 
-        private fun getWgs84ToUtmTransform(epsgCode: Short) : CoordinateTransform {
+        private fun getWgs84ToUtmTransform(epsgCode: Short): CoordinateTransform {
             if (epsgCode !in 32601..32660 && epsgCode !in 32701..32760) {
                 throw IllegalArgumentException("EPSG code is out of range for UTM: $epsgCode")
             }
@@ -153,8 +153,14 @@ class Mapping {
             return transformFromWgs84(latitude, longitude)
         }
 
-        fun parseMgrs(zone: Int, band: Char, eastingLetter: Char,
-                      northingLetter: Char, x: Double, y: Double): Coordinate? {
+        fun parseMgrs(
+            zone: Int,
+            band: Char,
+            eastingLetter: Char,
+            northingLetter: Char,
+            x: Double,
+            y: Double
+        ): Coordinate? {
             return parse(zone, band, eastingLetter, northingLetter, x, y)
         }
 

@@ -1,15 +1,27 @@
 package com.nujiak.recce.fragments
 
-import android.animation.*
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.FloatEvaluator
+import android.animation.ObjectAnimator
+import android.animation.TypeEvaluator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.res.ColorStateList
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.*
+import android.view.HapticFeedbackConstants
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewAnimationUtils
+import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.Button
@@ -21,32 +33,60 @@ import androidx.lifecycle.Observer
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.ButtCap
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.CircleOptions
+import com.google.android.gms.maps.model.Dash
+import com.google.android.gms.maps.model.Gap
+import com.google.android.gms.maps.model.JointType
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polygon
+import com.google.android.gms.maps.model.PolygonOptions
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.maps.android.SphericalUtil
-import com.nujiak.recce.enums.AngleUnit
-import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.MainViewModel
 import com.nujiak.recce.R
-import com.nujiak.recce.enums.SharedPrefsKey
-import com.nujiak.recce.database.*
+import com.nujiak.recce.database.Chain
+import com.nujiak.recce.database.ChainNode
+import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.FragmentMapBinding
+import com.nujiak.recce.enums.AngleUnit
+import com.nujiak.recce.enums.CoordinateSystem
+import com.nujiak.recce.enums.SharedPrefsKey
 import com.nujiak.recce.livedatas.FusedLocationLiveData
-import com.nujiak.recce.utils.*
+import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
+import com.nujiak.recce.utils.PIN_VECTOR_DRAWABLE
+import com.nujiak.recce.utils.animateColor
+import com.nujiak.recce.utils.degToRad
+import com.nujiak.recce.utils.formatAsDistanceString
+import com.nujiak.recce.utils.getAngleString
+import com.nujiak.recce.utils.getGridString
+import com.nujiak.recce.utils.withAlpha
 import dagger.hilt.android.AndroidEntryPoint
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig
 import java.text.NumberFormat
-import java.util.*
+import java.util.Locale
 import kotlin.collections.HashMap
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.hypot
 
 @AndroidEntryPoint
-class MapFragment : Fragment(), OnMapReadyCallback,
+class MapFragment :
+    Fragment(),
+    OnMapReadyCallback,
     ActivityCompat.OnRequestPermissionsResultCallback {
 
     private val viewModel: MainViewModel by activityViewModels()
@@ -71,21 +111,27 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private var directionUpdateCount = 0
 
     private var isChainGiudeShowing = false
-    private val chainShowcaseView : MaterialShowcaseSequence by lazy {
+    private val chainShowcaseView: MaterialShowcaseSequence by lazy {
         // Colours needed for showcase
         val maskColour = withAlpha(
-            ContextCompat.getColor(requireContext(),
-                R.color.colorPrimaryDark), 215)
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.colorPrimaryDark
+            ),
+            215
+        )
         val white = ContextCompat.getColor(requireContext(), android.R.color.white)
 
         MaterialShowcaseSequence(activity).apply {
 
             // Set showcase configs
-            setConfig(ShowcaseConfig().apply {
-                delay = 100
-                renderOverNavigationBar = true
-                fadeDuration = 300
-            })
+            setConfig(
+                ShowcaseConfig().apply {
+                    delay = 100
+                    renderOverNavigationBar = true
+                    fadeDuration = 300
+                }
+            )
 
             // Showcase for add button
             addSequenceItem(
@@ -147,7 +193,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 if (itemView.equals(lastShowcase)) {
                     mapMgr?.cameraPosition?.target?.let {
                         mapMgr?.isShowingMyLocation = false
-                        mapMgr?.moveTo(LatLng(it.latitude+0.005, it.longitude), duration = 700)
+                        mapMgr?.moveTo(LatLng(it.latitude + 0.005, it.longitude), duration = 700)
                     }
                 }
             }
@@ -299,7 +345,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         // Set up Map Type toggle buttons
         binding.mapNormalType.setOnClickListener {
             mapMgr?.mapType = GoogleMap.MAP_TYPE_NORMAL
-
         }
         binding.mapHybridType.setOnClickListener {
             mapMgr?.mapType = GoogleMap.MAP_TYPE_HYBRID
@@ -372,8 +417,9 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
                 // Update marker if this is the first time, or if 100ms has passed since last
                 // update and difference is larger than .7 degrees
-                if (currentTime == 0L
-                    || (currentTime - lastDirectionUpdate > 100 && abs(difference) > .7)) {
+                if (currentTime == 0L ||
+                    (currentTime - lastDirectionUpdate > 100 && abs(difference) > .7)
+                ) {
 
                     directionUpdateSum = 0f
                     directionUpdateCount = 0
@@ -464,7 +510,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     onMyLocationPressed(false)
                     viewModel.fusedLocationData.removeObserver(this)
                 }
-            })
+            }
+        )
     }
 
     private fun onCameraMoveStarted(reason: Int) {
@@ -608,7 +655,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         animateColor(binding.mapCheckpointInfobar.backgroundTintList, bgColor, 150) {
             binding.mapCheckpointInfobar.backgroundTintList = ColorStateList.valueOf(it)
         }
-
     }
 
     private fun updateCheckpointInfobar(checkpoint: ChainNode) {
@@ -699,7 +745,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                         checkpointInfobar.visibility = View.INVISIBLE
                         isCheckpointInfobarVisible = false
                     }
-
                 })
                 anim.duration = 200
                 anim.start()
@@ -715,8 +760,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
         // Return with no changes if LiveMeasurement visibility is already equal to make_visible
         // or if location is not granted.
-        if (isLiveMeasurementVisible == makeVisible
-            || (makeVisible && !viewModel.isLocationGranted)
+        if (isLiveMeasurementVisible == makeVisible || (makeVisible && !viewModel.isLocationGranted)
         ) {
             return
         }
@@ -764,7 +808,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                         liveMeasurement.visibility = View.INVISIBLE
                         isLiveMeasurementVisible = false
                     }
-
                 })
                 anim.duration = 200
                 anim.start()
@@ -845,7 +888,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                         mapCompass.visibility = View.INVISIBLE
                         isMapCompassVisible = false
                     }
-
                 })
                 anim.duration = 200
                 anim.start()
@@ -938,7 +980,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     }
                 }
             }
-
         }
     }
 
@@ -980,7 +1021,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         isChainGiudeShowing = true
         chainShowcaseView.start()
     }
-
 
     private fun toggleChainControls(makeVisible: Boolean = true) {
 
@@ -1033,7 +1073,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                         chainControls.visibility = View.INVISIBLE
                         isChainControlsVisible = false
                     }
-
                 })
                 anim.duration = 200
                 anim.start()
@@ -1309,7 +1348,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     350,
                     null
                 )
-
             } else {
                 // Route
                 moveTo(nodes[0])
@@ -1432,8 +1470,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     }
                 }
             }
-
-
         }
 
         fun drawMyLocation(locationData: FusedLocationLiveData.LocationData?) {
@@ -1586,7 +1622,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     onAnimCancel = onCancel
                 )
             }
-
         }
 
         fun zoomOut() {
@@ -1613,7 +1648,6 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                     onAnimCancel = onCancel
                 )
             }
-
         }
 
         private val goToMyLocationOnFinish = {

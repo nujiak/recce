@@ -66,12 +66,11 @@ class RulerDiffCallback : DiffUtil.ItemCallback<RulerItem>() {
     }
 
     override fun areContentsTheSame(oldItem: RulerItem, newItem: RulerItem): Boolean {
-        if (oldItem is RulerItem.RulerMeasurementItem
-            && newItem is RulerItem.RulerMeasurementItem
+        if (oldItem is RulerItem.RulerMeasurementItem &&
+            newItem is RulerItem.RulerMeasurementItem
         ) {
             return false
         }
         return oldItem == newItem
     }
-
 }

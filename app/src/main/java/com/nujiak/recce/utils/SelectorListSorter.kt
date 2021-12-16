@@ -56,7 +56,6 @@ fun sortByName(
         chainMap[pinChain] = chain
     }
 
-
     val sortedList = pinChainList.apply {
         sortBy { it.name }
     }

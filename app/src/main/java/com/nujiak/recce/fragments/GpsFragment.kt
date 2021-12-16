@@ -23,7 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.PI
 import kotlin.math.cos
 
-
 @AndroidEntryPoint
 class GpsFragment : Fragment() {
 
@@ -40,7 +39,8 @@ class GpsFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
@@ -53,7 +53,7 @@ class GpsFragment : Fragment() {
             updateLocationUI(it)
         })
 
-        viewModel.rotationLiveData.observe (viewLifecycleOwner) {
+        viewModel.rotationLiveData.observe(viewLifecycleOwner) {
             lastRotationData = it
             updateCompass()
             updateOrientationUI()
@@ -126,6 +126,5 @@ class GpsFragment : Fragment() {
                 getGridString(latitude, longitude, CoordinateSystem.WGS84, resources)
             binding.gpsGrids.text = getGridString(latitude, longitude, coordSys, resources)
         }
-
     }
 }

@@ -5,10 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.nujiak.recce.enums.CoordinateSystem
-import com.nujiak.recce.enums.SortBy
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
+import com.nujiak.recce.enums.CoordinateSystem
+import com.nujiak.recce.enums.SortBy
 import com.nujiak.recce.utils.sortByGroup
 import com.nujiak.recce.utils.sortByName
 import com.nujiak.recce.utils.sortByTime
@@ -134,7 +134,6 @@ class PinAdapter(
                 submitList(newList)
             }
         }
-
     }
 }
 
@@ -147,5 +146,4 @@ class PinDiffCallback : DiffUtil.ItemCallback<SelectorItem>() {
     override fun areContentsTheSame(oldItem: SelectorItem, newItem: SelectorItem): Boolean {
         return oldItem == newItem
     }
-
 }

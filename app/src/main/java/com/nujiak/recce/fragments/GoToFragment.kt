@@ -20,9 +20,8 @@ import com.nujiak.recce.mapping.ZONE_BANDS
 import com.nujiak.recce.mapping.getUtmZoneAndBand
 import com.nujiak.recce.mapping.parse
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
+import java.util.Locale
 import kotlin.math.floor
-
 
 @AndroidEntryPoint
 class GoToFragment : DialogFragment() {
@@ -66,7 +65,6 @@ class GoToFragment : DialogFragment() {
             CoordinateSystem.WGS84 -> View.GONE
             else -> View.VISIBLE
         }
-
 
         // Set up fields' onKey listeners
         binding.newPinLatEditText.setOnKeyListener { _, _, _ ->
@@ -127,7 +125,6 @@ class GoToFragment : DialogFragment() {
                 )
             )
         }
-
 
         binding.goButton.setOnClickListener {
             onCompleted()
@@ -191,7 +188,6 @@ class GoToFragment : DialogFragment() {
             CoordinateSystem.WGS84 -> {
             }
         }
-
     }
 
     @SuppressLint("SetTextI18n")
@@ -217,7 +213,7 @@ class GoToFragment : DialogFragment() {
 
                     // TODO: Replace this workaround
                     val (zone, band) = getUtmZoneAndBand(lat, lng)
-                    binding.newPinZoneDropdown.setText("${zone}${band}", false)
+                    binding.newPinZoneDropdown.setText("$zone$band", false)
                     return
                 }
             }
@@ -245,7 +241,6 @@ class GoToFragment : DialogFragment() {
         binding.newPinZoneDropdown.setText("", false)
     }
 
-
     private fun onValidateInput() {
 
         isInputValid = true
@@ -271,16 +266,17 @@ class GoToFragment : DialogFragment() {
     private fun onCompleted() {
         onValidateInput()
 
-        if(!isInputValid) {
+        if (!isInputValid) {
             return
         }
 
         viewModel.mapGoTo(
-            LatLng(binding.newPinLatEditText.text.toString().toDoubleOrNull()!!,
-                binding.newPinLongEditText.text.toString().toDoubleOrNull()!!)
+            LatLng(
+                binding.newPinLatEditText.text.toString().toDoubleOrNull()!!,
+                binding.newPinLongEditText.text.toString().toDoubleOrNull()!!
+            )
         )
 
         dismiss()
     }
-
 }

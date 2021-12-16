@@ -1,7 +1,11 @@
 package com.nujiak.recce.database
 
 import android.os.Parcelable
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
@@ -105,7 +109,7 @@ data class Chain(
  * @param data string to be deserialized
  * @return list of ChainNodes deserialized from String
  */
-fun deserializeNodeList(data: String) : List<ChainNode> {
+fun deserializeNodeList(data: String): List<ChainNode> {
     val dataList = data.split(';')
     val nodeList = mutableListOf<ChainNode>()
 
@@ -130,7 +134,7 @@ fun deserializeNodeList(data: String) : List<ChainNode> {
  * @param list list of ChainNodes to be serialized
  * @return string serialization of list
  */
-fun serializeNodeList(list: List<ChainNode>) : String {
+fun serializeNodeList(list: List<ChainNode>): String {
     val newDataBuilder = StringBuilder()
 
     for (node in list) {
@@ -151,8 +155,8 @@ fun serializeNodeList(list: List<ChainNode>) : String {
 class ChainConverters {
 
     @TypeConverter
-    fun fromNodeList(list : List<ChainNode>) = serializeNodeList(list)
+    fun fromNodeList(list: List<ChainNode>) = serializeNodeList(list)
 
     @TypeConverter
-    fun toNodeList(str : String) = deserializeNodeList(str)
+    fun toNodeList(str: String) = deserializeNodeList(str)
 }
