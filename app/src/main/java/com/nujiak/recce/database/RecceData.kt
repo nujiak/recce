@@ -9,11 +9,11 @@ import kotlinx.serialization.Serializable
 /**
  * Superclass for Pin and Chain containing the common properties.
  */
-sealed class RecceData {
-    abstract val name: String
-    abstract val color: Int
-    abstract val group: String
-    abstract val description: String
+sealed interface RecceData {
+    val name: String
+    val color: Int
+    val group: String
+    val description: String
 }
 
 /**
@@ -49,7 +49,7 @@ data class Pin(
     @ColumnInfo(defaultValue = "")
     override val description: String = ""
 
-) : Parcelable, RecceData()
+) : Parcelable, RecceData
 
 /**
  * Represents a chain which can be a line (route) or polygon (area). Contains a list of ChainNodes
@@ -88,7 +88,7 @@ data class Chain(
     @ColumnInfo(defaultValue = "")
     override val description: String = ""
 
-) : Parcelable, RecceData() {
+) : Parcelable, RecceData {
     init {
         // Set parentChain of each every node to this
         for (node in this.nodes) {
