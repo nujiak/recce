@@ -5,6 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.nujiak.recce.enums.CoordinateSystem
+import com.nujiak.recce.enums.SortBy
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.utils.sortByGroup
@@ -31,16 +33,18 @@ class PinAdapter(
     private val onPinLongClick: (Pin) -> Boolean,
     private val onChainClick: (Chain) -> Unit,
     private val onChainLongClick: (Chain) -> Boolean,
-    private var coordSysId: Int,
+    private var coordSysId: CoordinateSystem,
     private val resources: Resources
 ) : ListAdapter<SelectorItem, RecyclerView.ViewHolder>(PinDiffCallback()) {
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
     companion object {
-        const val ITEM_VIEW_TYPE_PIN = 0
-        const val ITEM_VIEW_TYPE_CHAIN = 1
-        const val ITEM_VIEW_TYPE_HEADER = 2
+        enum class ItemViewType(val index: Int) {
+            PIN(0),
+            CHAIN(1),
+            HEADER(2),
+        }
         const val SORT_BY_GROUP = 100
         const val SORT_BY_NAME = 101
         const val SORT_BY_TIME = 102
@@ -48,17 +52,17 @@ class PinAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
-            is PinWrapper -> ITEM_VIEW_TYPE_PIN
-            is ChainWrapper -> ITEM_VIEW_TYPE_CHAIN
-            is HeaderItem -> ITEM_VIEW_TYPE_HEADER
+            is PinWrapper -> ItemViewType.PIN.index
+            is ChainWrapper -> ItemViewType.CHAIN.index
+            is HeaderItem -> ItemViewType.HEADER.index
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            ITEM_VIEW_TYPE_PIN -> PinViewHolder.from(parent)
-            ITEM_VIEW_TYPE_CHAIN -> ChainViewHolder.from(parent)
-            ITEM_VIEW_TYPE_HEADER -> HeaderViewHolder.from(parent)
+            ItemViewType.PIN.index -> PinViewHolder.from(parent)
+            ItemViewType.CHAIN.index -> ChainViewHolder.from(parent)
+            ItemViewType.HEADER.index -> HeaderViewHolder.from(parent)
             else -> throw IllegalArgumentException("Invalid viewType: $viewType")
         }
     }
@@ -88,40 +92,39 @@ class PinAdapter(
         }
     }
 
-    fun updateCoordSys(newCoordSysId: Int) {
-        coordSysId = newCoordSysId
+    fun updateCoordSys(newCoordSys: CoordinateSystem) {
+        coordSysId = newCoordSys
     }
 
     fun sortAndSubmitList(
         allPins: List<Pin>?,
         allChains: List<Chain>?,
         selectedIds: List<Long>,
-        sortBy: Int,
+        sortBy: SortBy,
         ascending: Boolean
     ) {
         adapterScope.launch {
             val newList =
                 if (allPins != null && allChains != null) {
                     when (sortBy) {
-                        SORT_BY_GROUP -> sortByGroup(
+                        SortBy.GROUP -> sortByGroup(
                             allPins,
                             allChains,
                             selectedIds
                         )
-                        SORT_BY_NAME -> sortByName(
+                        SortBy.NAME -> sortByName(
                             allPins,
                             allChains,
                             selectedIds,
                             ascending
                         )
-                        SORT_BY_TIME -> sortByTime(
+                        SortBy.TIME -> sortByTime(
                             allPins,
                             allChains,
                             selectedIds,
                             ascending,
                             resources
                         )
-                        else -> throw IllegalArgumentException("Invalid sort: $sortBy")
                     }
                 } else {
                     listOf()

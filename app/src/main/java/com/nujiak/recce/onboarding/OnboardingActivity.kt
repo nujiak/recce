@@ -16,10 +16,6 @@ class OnboardingActivity : AppCompatActivity() {
 
     private lateinit var viewpager: ViewPager2
 
-    companion object {
-        const val ONBOARDING_COMPLETED_KEY = "onboarding_complete"
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding)
@@ -35,7 +31,7 @@ class OnboardingActivity : AppCompatActivity() {
         }
 
         viewModel.changePage.observe(this, {
-            viewpager.currentItem = it
+            viewpager.currentItem = it.index
         })
 
         viewModel.endOnboarding.observe(this, { endOnboarding ->

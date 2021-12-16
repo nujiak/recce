@@ -13,6 +13,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.nujiak.recce.*
 import com.nujiak.recce.databinding.SheetSettingsBinding
+import com.nujiak.recce.enums.SharedPrefsKey
+import com.nujiak.recce.enums.ThemePreference
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -25,7 +27,7 @@ class SettingsSheet : BottomSheetDialogFragment() {
     private val angleUnits: Array<String> by lazy { resources.getStringArray(R.array.angle_units) }
     private val themePrefs: Array<String> by lazy { resources.getStringArray(R.array.theme_prefs) }
 
-    private var currentThemePrefId = THEME_PREF_AUTO
+    private var currentThemePref = ThemePreference.AUTO
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,23 +56,23 @@ class SettingsSheet : BottomSheetDialogFragment() {
         // Set up exposed dropdown menus on-click
         binding.settingsCoordsysDropdown.setOnItemClickListener { _, _, position, _ ->
             viewModel.updateCoordinateSystem(position)
-            viewModel.sharedPreference.edit().putInt(COORD_SYS_KEY, position).apply()
+            viewModel.sharedPreference.edit().putInt(SharedPrefsKey.COORDINATE_SYSTEM.key, position).apply()
         }
         binding.settingsAngleDropdown.setOnItemClickListener { _, _, position, _ ->
             viewModel.updateAngleUnit(position)
-            viewModel.sharedPreference.edit().putInt(ANGLE_UNIT_KEY, position).apply()
+            viewModel.sharedPreference.edit().putInt(SharedPrefsKey.ANGLE_UNIT.key, position).apply()
         }
         binding.settingsThemeDropdown.setOnItemClickListener { _, _, position, _ ->
-            viewModel.sharedPreference.edit().putInt(THEME_PREF_KEY, position).apply()
+            viewModel.sharedPreference.edit().putInt(SharedPrefsKey.THEME_PREF.key, position).apply()
 
             binding.settingsThemeDropdown.dismissDropDown()
-            if (position != currentThemePrefId) {
-                currentThemePrefId = position
+            if (position != currentThemePref.index) {
+                currentThemePref = ThemePreference.atIndex(position)
                 AppCompatDelegate.setDefaultNightMode(
                     when (position) {
-                        THEME_PREF_AUTO -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                        THEME_PREF_LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
-                        THEME_PREF_DARK -> AppCompatDelegate.MODE_NIGHT_YES
+                        ThemePreference.AUTO.index -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                        ThemePreference.LIGHT.index -> AppCompatDelegate.MODE_NIGHT_NO
+                        ThemePreference.DARK.index -> AppCompatDelegate.MODE_NIGHT_YES
                         else -> throw IllegalArgumentException("Invalid theme pref index: $position")
                     }
                 )
@@ -95,13 +97,13 @@ class SettingsSheet : BottomSheetDialogFragment() {
 
     private fun setUpPreferences() {
         val sharedPreferences = viewModel.sharedPreference
-        val coordSysId = sharedPreferences.getInt(COORD_SYS_KEY, 0)
+        val coordSysId = sharedPreferences.getInt(SharedPrefsKey.COORDINATE_SYSTEM.key, 0)
         binding.settingsCoordsysDropdown.setText(coordinateSystems[coordSysId], false)
-        val angleUnitId = sharedPreferences.getInt(ANGLE_UNIT_KEY, 0)
+        val angleUnitId = sharedPreferences.getInt(SharedPrefsKey.ANGLE_UNIT.key, 0)
         binding.settingsAngleDropdown.setText(angleUnits[angleUnitId], false)
-        sharedPreferences.getInt(THEME_PREF_KEY, 0).let {
-            binding.settingsThemeDropdown.setText(themePrefs[it], false)
-            currentThemePrefId = it
+        sharedPreferences.getInt(SharedPrefsKey.THEME_PREF.key, 0).let { themePrefIndex ->
+            binding.settingsThemeDropdown.setText(themePrefs[themePrefIndex], false)
+            currentThemePref = ThemePreference.atIndex(themePrefIndex)
         }
     }
 

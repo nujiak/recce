@@ -4,12 +4,8 @@ import com.nujiak.recce.mapping.Mapping
 import android.content.res.Resources
 import android.graphics.Color
 import com.google.android.gms.maps.model.LatLng
-import com.nujiak.recce.ANGLE_UNIT_ID_DEG
-import com.nujiak.recce.ANGLE_UNIT_ID_NATO_MILS
-import com.nujiak.recce.COORD_SYS_ID_KERTAU
-import com.nujiak.recce.COORD_SYS_ID_LATLNG
-import com.nujiak.recce.COORD_SYS_ID_MGRS
-import com.nujiak.recce.COORD_SYS_ID_UTM
+import com.nujiak.recce.enums.AngleUnit
+import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.R
 import java.text.NumberFormat
 import java.util.*
@@ -18,31 +14,30 @@ import kotlin.math.pow
 import kotlin.math.round
 import kotlin.math.roundToInt
 
-fun getGridString(latDeg: Double, lngDeg: Double, coordSysId: Int, resources: Resources): String {
+fun getGridString(latDeg: Double, lngDeg: Double, coordSysId: CoordinateSystem, resources: Resources): String {
     val latLng = LatLng(latDeg, lngDeg)
     return when (coordSysId) {
-        COORD_SYS_ID_UTM -> {
+        CoordinateSystem.UTM -> {
             Mapping.toUtm(latLng).toString()
         }
-        COORD_SYS_ID_MGRS -> {
+        CoordinateSystem.MGRS -> {
             Mapping.toMgrs(latLng)?.toString()
         }
-        COORD_SYS_ID_KERTAU -> {
+        CoordinateSystem.KERTAU -> {
             Mapping.toKertau1948(latLng).toString()
         }
-        COORD_SYS_ID_LATLNG -> {
+        CoordinateSystem.WGS84 -> {
             return Mapping.parseLatLng(latLng).toString()
         }
-        else -> throw IllegalArgumentException("Invalid coordinate system index: $coordSysId")
     } ?: resources.getString(R.string.not_available)
 }
 
-fun getAngleString(angleRad: Float, angleUnitId: Int, withSign: Boolean = true): String {
-    return when (angleUnitId) {
-        ANGLE_UNIT_ID_DEG -> {
+fun getAngleString(angleRad: Float, angleUnit: AngleUnit, withSign: Boolean = true): String {
+    return when (angleUnit) {
+        AngleUnit.DEGREE -> {
             "%.1f°".format(radToDeg(angleRad))
         }
-        ANGLE_UNIT_ID_NATO_MILS -> {
+        AngleUnit.NATO_MIL -> {
             if (withSign) {
                 "${if (angleRad > 0) '+' else '-'}${
                     radToNatoMils(abs(angleRad)).roundToInt().toString()
@@ -52,12 +47,8 @@ fun getAngleString(angleRad: Float, angleUnitId: Int, withSign: Boolean = true):
                 "${radToNatoMils(abs(angleRad)).roundToInt().toString().padStart(4, '0')} mils"
             }
         }
-        else -> throw IllegalArgumentException("Invalid angle unit index: $angleUnitId")
     }
 }
-
-fun getAngleString(angleRad: Double, angleUnitId: Int, withSign: Boolean = true) =
-    getAngleString(angleRad.toFloat(), angleUnitId, withSign)
 
 private val numberFormat = NumberFormat.getNumberInstance(Locale.US).apply {
     minimumFractionDigits = 1

@@ -25,10 +25,11 @@ import com.google.android.gms.maps.model.*
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.maps.android.SphericalUtil
-import com.nujiak.recce.CHAINS_GUIDE_SHOWN_KEY
-import com.nujiak.recce.MAP_TYPE_KEY
+import com.nujiak.recce.enums.AngleUnit
+import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.MainViewModel
 import com.nujiak.recce.R
+import com.nujiak.recce.enums.SharedPrefsKey
 import com.nujiak.recce.database.*
 import com.nujiak.recce.databinding.FragmentMapBinding
 import com.nujiak.recce.livedatas.FusedLocationLiveData
@@ -51,8 +52,8 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var binding: FragmentMapBinding
     private var mapMgr: MapManager? = null
-    private var coordSysId = 0
-    private var angleUnitId = 0
+    private var coordSys = CoordinateSystem.atIndex(0)
+    private var angleUnit = AngleUnit.atIndex(0)
 
     private var currentPinColor = 2
 
@@ -138,7 +139,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
                 if (itemView.equals(lastShowcase)) {
                     isChainGiudeShowing = false
                     viewModel.chainsGuideShown = true
-                    viewModel.sharedPreference.edit().putBoolean(CHAINS_GUIDE_SHOWN_KEY, true).apply()
+                    viewModel.sharedPreference.edit().putBoolean(SharedPrefsKey.CHAINS_GUIDE_SHOWN.key, true).apply()
                 }
             }
 
@@ -286,12 +287,12 @@ class MapFragment : Fragment(), OnMapReadyCallback,
 
         // Set up Coordinate System
         viewModel.coordinateSystem.observe(viewLifecycleOwner, {
-            coordSysId = it
-            updateCardGridSystem(coordSysId)
+            coordSys = it
+            updateCardGridSystem(coordSys)
             updateGrids()
         })
         viewModel.angleUnit.observe(viewLifecycleOwner, {
-            angleUnitId = it
+            angleUnit = it
             updateLiveMeasurements()
         })
 
@@ -316,7 +317,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         binding.mapCompass.setOnClickListener { mapMgr?.resetMapRotation() }
 
         viewModel.chainsGuideShown =
-            viewModel.sharedPreference.getBoolean(CHAINS_GUIDE_SHOWN_KEY, false)
+            viewModel.sharedPreference.getBoolean(SharedPrefsKey.CHAINS_GUIDE_SHOWN.key, false)
 
         return binding.root
     }
@@ -326,7 +327,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             mapMgr = MapManager(mMap)
 
             val newMapType =
-                viewModel.sharedPreference.getInt(MAP_TYPE_KEY, GoogleMap.MAP_TYPE_HYBRID)
+                viewModel.sharedPreference.getInt(SharedPrefsKey.MAP_TYPE.key, GoogleMap.MAP_TYPE_HYBRID)
             mapMgr?.mapType = newMapType
             binding.mapTypeGroup.check(
                 when (newMapType) {
@@ -479,14 +480,14 @@ class MapFragment : Fragment(), OnMapReadyCallback,
     @SuppressLint("SetTextI18n")
     private fun updateGrids(latitude: Double? = null, longitude: Double? = null) {
         if (latitude != null && longitude != null) {
-            binding.mapCurrentGrids.text = getGridString(latitude, longitude, coordSysId, resources)
+            binding.mapCurrentGrids.text = getGridString(latitude, longitude, coordSys, resources)
             updateLiveMeasurements(latitude, longitude)
         } else if (mapMgr != null && mapMgr?.isShowingPin != true) {
             // Update grids and live measurement only if not showing Pin
             val cameraTarget = mapMgr!!.cameraPosition.target
             val lat = cameraTarget.latitude
             val lng = cameraTarget.longitude
-            binding.mapCurrentGrids.text = getGridString(lat, lng, coordSysId, resources)
+            binding.mapCurrentGrids.text = getGridString(lat, lng, coordSys, resources)
             updateLiveMeasurements(lat, lng)
         }
     }
@@ -524,12 +525,12 @@ class MapFragment : Fragment(), OnMapReadyCallback,
         }
 
         binding.mapCurrentDistance.text = distance.formatAsDistanceString()
-        binding.mapCurrentDirection.text = getAngleString(degToRad(direction), angleUnitId, false)
+        binding.mapCurrentDirection.text = getAngleString(degToRad(direction).toFloat(), angleUnit, false)
     }
 
-    private fun updateCardGridSystem(coordSysId: Int) {
+    private fun updateCardGridSystem(coordSys: CoordinateSystem) {
         binding.mapGridSystem.text =
-            resources.getStringArray(R.array.coordinate_systems)[coordSysId]
+            resources.getStringArray(R.array.coordinate_systems)[coordSys.index]
     }
 
     private fun onAddPinFromMap(): Boolean {
@@ -1199,7 +1200,7 @@ class MapFragment : Fragment(), OnMapReadyCallback,
             set(value) {
                 if (field != value) {
                     map.mapType = value
-                    viewModel.sharedPreference.edit().putInt(MAP_TYPE_KEY, value).apply()
+                    viewModel.sharedPreference.edit().putInt(SharedPrefsKey.MAP_TYPE.key, value).apply()
                     field = value
                 }
             }
