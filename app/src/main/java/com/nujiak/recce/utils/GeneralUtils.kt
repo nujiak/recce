@@ -1,12 +1,16 @@
 package com.nujiak.recce.utils
 
+import com.nujiak.recce.mapping.Mapping
 import android.content.res.Resources
 import android.graphics.Color
-import com.nujiak.recce.*
-import com.nujiak.recce.mapping.getKertauGridsString
-import com.nujiak.recce.mapping.getMgrsData
-import com.nujiak.recce.mapping.getUtmData
-import com.nujiak.recce.mapping.toSingleLine
+import com.google.android.gms.maps.model.LatLng
+import com.nujiak.recce.ANGLE_UNIT_ID_DEG
+import com.nujiak.recce.ANGLE_UNIT_ID_NATO_MILS
+import com.nujiak.recce.COORD_SYS_ID_KERTAU
+import com.nujiak.recce.COORD_SYS_ID_LATLNG
+import com.nujiak.recce.COORD_SYS_ID_MGRS
+import com.nujiak.recce.COORD_SYS_ID_UTM
+import com.nujiak.recce.R
 import java.text.NumberFormat
 import java.util.*
 import kotlin.math.abs
@@ -15,24 +19,19 @@ import kotlin.math.round
 import kotlin.math.roundToInt
 
 fun getGridString(latDeg: Double, lngDeg: Double, coordSysId: Int, resources: Resources): String {
+    val latLng = LatLng(latDeg, lngDeg)
     return when (coordSysId) {
         COORD_SYS_ID_UTM -> {
-            getUtmData(
-                latDeg,
-                lngDeg
-            )?.toSingleLine(5)
+            Mapping.toUtm(latLng).toString()
         }
         COORD_SYS_ID_MGRS -> {
-            getMgrsData(latDeg, lngDeg)?.toSingleLine(includeWhitespace = true)
+            Mapping.toMgrs(latLng)?.toString()
         }
         COORD_SYS_ID_KERTAU -> {
-            getKertauGridsString(
-                latDeg,
-                lngDeg
-            )
+            Mapping.toKertau1948(latLng).toString()
         }
         COORD_SYS_ID_LATLNG -> {
-            return String.format(Locale.US, "%.6f, %.6f", latDeg, lngDeg)
+            return Mapping.parseLatLng(latLng).toString()
         }
         else -> throw IllegalArgumentException("Invalid coordinate system index: $coordSysId")
     } ?: resources.getString(R.string.not_available)
@@ -91,10 +90,6 @@ fun withAlpha(color: Int, alpha: Int): Int {
     val b = Color.blue(color)
 
     return Color.argb(alpha, r, g, b)
-}
-
-fun Float.round(decimals: Int): Float {
-    return round(this * 10f.pow(decimals.toFloat()))
 }
 
 fun Double.round(decimals: Int): Double {
