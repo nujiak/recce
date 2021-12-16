@@ -13,6 +13,7 @@ import androidx.fragment.app.activityViewModels
 import com.nujiak.recce.*
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.DialogPinInfoBinding
+import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.getGridString
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,13 +64,13 @@ class PinInfoFragment : DialogFragment() {
             }
 
             binding.pinLatLng.text =
-                getGridString(pin.latitude, pin.longitude, COORD_SYS_ID_LATLNG, resources)
+                getGridString(pin.latitude, pin.longitude, CoordinateSystem.WGS84, resources)
             binding.pinUtmGrid.text =
-                getGridString(pin.latitude, pin.longitude, COORD_SYS_ID_UTM, resources)
+                getGridString(pin.latitude, pin.longitude, CoordinateSystem.UTM, resources)
             binding.pinMgrsGrid.text =
-                getGridString(pin.latitude, pin.longitude, COORD_SYS_ID_MGRS, resources)
+                getGridString(pin.latitude, pin.longitude, CoordinateSystem.MGRS, resources)
             binding.pinKertauGrid.text =
-                getGridString(pin.latitude, pin.longitude, COORD_SYS_ID_KERTAU, resources)
+                getGridString(pin.latitude, pin.longitude, CoordinateSystem.KERTAU, resources)
 
             if (pin.description.isNotEmpty()) {
                 binding.pinDescriptionHeading.visibility = View.VISIBLE

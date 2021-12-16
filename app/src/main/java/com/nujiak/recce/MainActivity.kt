@@ -35,6 +35,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
+import com.nujiak.recce.enums.SharedPrefsKey
+import com.nujiak.recce.enums.ThemePreference
 import com.nujiak.recce.fragments.ChainInfoFragment
 import com.nujiak.recce.fragments.GoToFragment
 import com.nujiak.recce.fragments.PinInfoFragment
@@ -42,7 +44,6 @@ import com.nujiak.recce.modalsheets.ChainCreatorSheet
 import com.nujiak.recce.modalsheets.PinCreatorSheet
 import com.nujiak.recce.modalsheets.SettingsSheet
 import com.nujiak.recce.onboarding.OnboardingActivity
-import com.nujiak.recce.onboarding.OnboardingActivity.Companion.ONBOARDING_COMPLETED_KEY
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -81,19 +82,18 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Run Onboarding
-        if (!viewModel.sharedPreference.getBoolean(ONBOARDING_COMPLETED_KEY, false)) {
+        if (!viewModel.sharedPreference.getBoolean(SharedPrefsKey.ONBOARDING_COMPLETED.key, false)) {
             startActivity(Intent(this, OnboardingActivity::class.java))
             finish()
         }
 
         // Set app theme (auto/light/dark)
-        viewModel.sharedPreference.getInt(THEME_PREF_KEY, 0).let {
+        viewModel.sharedPreference.getInt(SharedPrefsKey.THEME_PREF.key, 0).let {
             setDefaultNightMode(
-                when (it) {
-                    THEME_PREF_AUTO -> MODE_NIGHT_FOLLOW_SYSTEM
-                    THEME_PREF_LIGHT -> MODE_NIGHT_NO
-                    THEME_PREF_DARK -> MODE_NIGHT_YES
-                    else -> throw IllegalArgumentException("Invalid theme pref index: $it")
+                when (ThemePreference.atIndex(it)) {
+                    ThemePreference.AUTO -> MODE_NIGHT_FOLLOW_SYSTEM
+                    ThemePreference.LIGHT -> MODE_NIGHT_NO
+                    ThemePreference.DARK -> MODE_NIGHT_YES
                 }
             )
         }
