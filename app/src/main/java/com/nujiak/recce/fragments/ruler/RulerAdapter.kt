@@ -3,27 +3,31 @@ package com.nujiak.recce.fragments.ruler
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.nujiak.recce.enums.AngleUnit
+import com.nujiak.recce.enums.CoordinateSystem
 
-const val ITEM_VIEW_TYPE_PIN = 0
-const val ITEM_VIEW_TYPE_MEASUREMENT = 1
-const val ITEM_VIEW_TYPE_EMPTY = 2
+private enum class RulerItemViewType(val index: Int) {
+    PIN(0),
+    MEASUREMENT(1),
+    EMPTY(2),
+}
 
-class RulerAdapter(private var coordSysId: Int, private var angleUnitId: Int) :
+class RulerAdapter(private var coordSys: CoordinateSystem, private var angleUnit: AngleUnit) :
     androidx.recyclerview.widget.ListAdapter<RulerItem, RecyclerView.ViewHolder>(RulerDiffCallback()) {
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
-            is RulerItem.RulerPointItem -> ITEM_VIEW_TYPE_PIN
-            is RulerItem.RulerMeasurementItem -> ITEM_VIEW_TYPE_MEASUREMENT
-            is RulerItem.RulerEmptyItem -> ITEM_VIEW_TYPE_EMPTY
+            is RulerItem.RulerPointItem -> RulerItemViewType.PIN.index
+            is RulerItem.RulerMeasurementItem -> RulerItemViewType.MEASUREMENT.index
+            is RulerItem.RulerEmptyItem -> RulerItemViewType.EMPTY.index
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            ITEM_VIEW_TYPE_PIN -> RulerPinViewHolder.from(parent)
-            ITEM_VIEW_TYPE_MEASUREMENT -> RulerMeasurementViewHolder.from(parent)
-            ITEM_VIEW_TYPE_EMPTY -> RulerEmptyViewHolder.from(parent)
+            RulerItemViewType.PIN.index -> RulerPinViewHolder.from(parent)
+            RulerItemViewType.MEASUREMENT.index -> RulerMeasurementViewHolder.from(parent)
+            RulerItemViewType.EMPTY.index -> RulerEmptyViewHolder.from(parent)
             else -> throw IllegalArgumentException("Invalid viewType")
         }
     }
@@ -31,26 +35,26 @@ class RulerAdapter(private var coordSysId: Int, private var angleUnitId: Int) :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is RulerPinViewHolder -> {
-                holder.bind(getItem(position) as RulerItem.RulerPointItem, coordSysId)
+                holder.bind(getItem(position) as RulerItem.RulerPointItem, coordSys)
             }
             is RulerMeasurementViewHolder -> holder.bind(
                 getItem(position) as RulerItem.RulerMeasurementItem,
-                angleUnitId
+                angleUnit
             )
             is RulerEmptyViewHolder -> holder.bind()
         }
     }
 
-    fun updateCoordSys(newCoordSysId: Int) {
-        if (coordSysId != newCoordSysId) {
-            coordSysId = newCoordSysId
+    fun updateCoordSys(newCoordSys: CoordinateSystem) {
+        if (coordSys != newCoordSys) {
+            coordSys = newCoordSys
             notifyDataSetChanged()
         }
     }
 
-    fun updateAngleUnit(newAngleUnitId: Int) {
-        if (angleUnitId != newAngleUnitId) {
-            angleUnitId = newAngleUnitId
+    fun updateAngleUnit(newAngleUnit: AngleUnit) {
+        if (angleUnit != newAngleUnit) {
+            angleUnit = newAngleUnit
             notifyDataSetChanged()
         }
     }
