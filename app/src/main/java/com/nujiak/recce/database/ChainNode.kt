@@ -31,7 +31,7 @@ data class ChainNode(
             return false
         }
         return this.name == other.name &&
-                this.position == other.position &&
-                this.parentChain === other.parentChain
+            this.position == other.position &&
+            this.parentChain === other.parentChain
     }
 }

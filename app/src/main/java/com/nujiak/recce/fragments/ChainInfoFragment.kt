@@ -112,7 +112,6 @@ class ChainInfoFragment : DialogFragment() {
                 binding.areaIcon.visibility = View.INVISIBLE
                 binding.routeIcon.visibility = View.VISIBLE
             }
-
         }
     }
 }

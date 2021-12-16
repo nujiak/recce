@@ -11,7 +11,10 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.nujiak.recce.*
+import com.nujiak.recce.MainActivity
+import com.nujiak.recce.MainViewModel
+import com.nujiak.recce.NoFilterArrayAdapter
+import com.nujiak.recce.R
 import com.nujiak.recce.databinding.SheetSettingsBinding
 import com.nujiak.recce.enums.SharedPrefsKey
 import com.nujiak.recce.enums.ThemePreference
@@ -23,7 +26,7 @@ class SettingsSheet : BottomSheetDialogFragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var binding: SheetSettingsBinding
     private val coordinateSystems: Array<String>
-            by lazy { resources.getStringArray(R.array.coordinate_systems) }
+        by lazy { resources.getStringArray(R.array.coordinate_systems) }
     private val angleUnits: Array<String> by lazy { resources.getStringArray(R.array.angle_units) }
     private val themePrefs: Array<String> by lazy { resources.getStringArray(R.array.theme_prefs) }
 
@@ -117,6 +120,5 @@ class SettingsSheet : BottomSheetDialogFragment() {
         val intent = Intent(context, MainActivity::class.java)
         startActivity(intent)
         requireActivity().finish()
-
     }
 }

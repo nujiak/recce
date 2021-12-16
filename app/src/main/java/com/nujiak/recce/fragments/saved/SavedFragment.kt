@@ -18,14 +18,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.MainViewModel
 import com.nujiak.recce.R
-import com.nujiak.recce.enums.SharedPrefsKey
-import com.nujiak.recce.enums.SortBy
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.FragmentSavedBinding
+import com.nujiak.recce.enums.CoordinateSystem
+import com.nujiak.recce.enums.SharedPrefsKey
+import com.nujiak.recce.enums.SortBy
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter
 
@@ -40,7 +40,8 @@ class SavedFragment : Fragment() {
     private var sortAscending = false
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
@@ -64,18 +65,12 @@ class SavedFragment : Fragment() {
                     PinAdapter.Companion.ItemViewType.CHAIN.index -> 2
                     PinAdapter.Companion.ItemViewType.HEADER.index -> 2
                     else -> throw IllegalArgumentException(
-                        "Invalid viewType: ${
-                            pinAdapter.getItemViewType(
-                                position
-                            )
-                        }"
+                        "Invalid viewType: ${pinAdapter.getItemViewType(position)}"
                     )
                 }
             }
-
         }
         binding.pinRecyclerview.layoutManager = gridLayoutManager
-
 
         // Observe for changes to pins and chains
         viewModel.allPins.observe(viewLifecycleOwner, { allPins ->

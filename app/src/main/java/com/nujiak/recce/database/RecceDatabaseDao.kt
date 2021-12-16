@@ -49,5 +49,4 @@ interface RecceDatabaseDao {
 
     @Query("SELECT * FROM chains_table ORDER BY chainId DESC")
     fun getAllChains(): LiveData<List<Chain>>
-
 }

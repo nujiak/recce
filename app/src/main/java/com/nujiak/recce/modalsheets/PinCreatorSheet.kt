@@ -18,12 +18,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.MainViewModel
 import com.nujiak.recce.NoFilterArrayAdapter
 import com.nujiak.recce.R
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.SheetPinCreatorBinding
+import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.mapping.Mapping
 import com.nujiak.recce.mapping.ZONE_BANDS
 import com.nujiak.recce.mapping.getUtmZoneAndBand
@@ -32,7 +32,7 @@ import com.nujiak.recce.utils.PIN_CARD_DARK_BACKGROUNDS
 import com.nujiak.recce.utils.animateColor
 import com.nujiak.recce.utils.wrapLngDeg
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
+import java.util.Locale
 import kotlin.math.floor
 
 @AndroidEntryPoint
@@ -141,7 +141,6 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             state = BottomSheetBehavior.STATE_EXPANDED
             peekHeight = (resources.displayMetrics.density * 144).toInt()
         }
-
 
         return binding.root
     }
@@ -356,7 +355,6 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             CoordinateSystem.WGS84 -> {
             }
         }
-
     }
 
     @SuppressLint("SetTextI18n")
@@ -381,7 +379,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
 
                     // TODO: Replace this workaround
                     val (zone, band) = getUtmZoneAndBand(lat, lng)
-                    binding.newPinZoneDropdown.setText("${zone}${band}", false)
+                    binding.newPinZoneDropdown.setText("$zone$band", false)
                     return
                 }
             }
@@ -461,7 +459,6 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                 activity?.window?.navigationBarColor = intermediateColor // Set navigation bar color
             }
         }
-
     }
 
     override fun onStart() {

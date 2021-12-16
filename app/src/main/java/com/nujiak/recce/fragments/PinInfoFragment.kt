@@ -10,7 +10,8 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import com.nujiak.recce.*
+import com.nujiak.recce.MainViewModel
+import com.nujiak.recce.R
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.DialogPinInfoBinding
 import com.nujiak.recce.enums.CoordinateSystem
@@ -83,7 +84,8 @@ class PinInfoFragment : DialogFragment() {
 
             binding.pinOpenIn.setOnClickListener {
                 val gmmIntentUri = Uri.parse(
-                    "geo:<${pin.latitude}>,<${pin.longitude}>?q=<${pin.latitude}>,<${pin.longitude}>(${pin.name})")
+                    "geo:<${pin.latitude}>,<${pin.longitude}>?q=<${pin.latitude}>,<${pin.longitude}>(${pin.name})"
+                )
                 val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
                 mapIntent.setPackage("com.google.android.apps.maps")
 
@@ -92,7 +94,6 @@ class PinInfoFragment : DialogFragment() {
                         startActivity(mapIntent)
                     }
                 }
-
             }
             binding.pinMap.setOnClickListener {
                 viewModel.showPinOnMap(pin)
@@ -102,7 +103,6 @@ class PinInfoFragment : DialogFragment() {
                 viewModel.openPinCreator(pin)
                 dismiss()
             }
-
         }
     }
 }

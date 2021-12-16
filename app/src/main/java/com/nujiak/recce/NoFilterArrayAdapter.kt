@@ -27,6 +27,5 @@ class NoFilterArrayAdapter<T>(context: Context, resource: Int, val items: List<T
         override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
             notifyDataSetChanged()
         }
-
     }
 }

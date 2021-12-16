@@ -7,13 +7,13 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.maps.android.SphericalUtil
-import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.R
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.PinListChainItemBinding
 import com.nujiak.recce.databinding.PinListHeaderItemBinding
 import com.nujiak.recce.databinding.PinListItemBinding
+import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.formatAsAreaString
 import com.nujiak.recce.utils.formatAsDistanceString

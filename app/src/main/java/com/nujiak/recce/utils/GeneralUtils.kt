@@ -1,14 +1,14 @@
 package com.nujiak.recce.utils
 
-import com.nujiak.recce.mapping.Mapping
 import android.content.res.Resources
 import android.graphics.Color
 import com.google.android.gms.maps.model.LatLng
+import com.nujiak.recce.R
 import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
-import com.nujiak.recce.R
+import com.nujiak.recce.mapping.Mapping
 import java.text.NumberFormat
-import java.util.*
+import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.round
@@ -40,8 +40,8 @@ fun getAngleString(angleRad: Float, angleUnit: AngleUnit, withSign: Boolean = tr
         AngleUnit.NATO_MIL -> {
             if (withSign) {
                 "${if (angleRad > 0) '+' else '-'}${
-                    radToNatoMils(abs(angleRad)).roundToInt().toString()
-                        .padStart(4, '0')
+                radToNatoMils(abs(angleRad)).roundToInt().toString()
+                    .padStart(4, '0')
                 } mils"
             } else {
                 "${radToNatoMils(abs(angleRad)).roundToInt().toString().padStart(4, '0')} mils"
