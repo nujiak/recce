@@ -9,11 +9,16 @@ import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.gms.maps.model.LatLng
-import com.nujiak.recce.*
+import com.nujiak.recce.MainViewModel
+import com.nujiak.recce.NoFilterArrayAdapter
+import com.nujiak.recce.R
 import com.nujiak.recce.databinding.DialogGoToBinding
 import com.nujiak.recce.enums.CoordinateSystem
-import com.nujiak.recce.mapping.*
 import com.nujiak.recce.mapping.Coordinate
+import com.nujiak.recce.mapping.Mapping
+import com.nujiak.recce.mapping.ZONE_BANDS
+import com.nujiak.recce.mapping.getUtmZoneAndBand
+import com.nujiak.recce.mapping.parse
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import kotlin.math.floor
@@ -168,12 +173,16 @@ class GoToFragment : DialogFragment() {
                 }
             }
             CoordinateSystem.KERTAU -> {
-                val easting = binding.newPinEastingEditText.text.toString()
-                val northing = binding.newPinNorthingEditText.text.toString()
-                if (easting.isBlank() || northing.isBlank()) {
+                val easting = binding.newPinEastingEditText.text.toString().toDoubleOrNull()
+                val northing = binding.newPinNorthingEditText.text.toString().toDoubleOrNull()
+
+                if (easting == null || northing == null) {
+                    binding.newPinLatEditText.setText("")
+                    binding.newPinLongEditText.setText("")
                     return
                 }
-                val coord = Mapping.parseKertau1948(easting.toDouble(), northing.toDouble())
+
+                val coord = Mapping.parseKertau1948(easting, northing)
                 val latLng = coord.latLng
                 // Lat Lng are valid and kertau grids were within bounds
                 binding.newPinLatEditText.setText("%.6f".format(Locale.US, latLng.latitude))
