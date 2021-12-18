@@ -9,13 +9,19 @@ import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.gms.maps.model.LatLng
-import com.nujiak.recce.*
+import com.nujiak.recce.MainViewModel
+import com.nujiak.recce.NoFilterArrayAdapter
+import com.nujiak.recce.R
 import com.nujiak.recce.databinding.DialogGoToBinding
-import com.nujiak.recce.mapping.*
+import com.nujiak.recce.enums.CoordinateSystem
+import com.nujiak.recce.mapping.Coordinate
+import com.nujiak.recce.mapping.Mapping
+import com.nujiak.recce.mapping.ZONE_BANDS
+import com.nujiak.recce.mapping.getUtmZoneAndBand
+import com.nujiak.recce.mapping.parse
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
+import java.util.Locale
 import kotlin.math.floor
-
 
 @AndroidEntryPoint
 class GoToFragment : DialogFragment() {
@@ -23,7 +29,7 @@ class GoToFragment : DialogFragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var binding: DialogGoToBinding
 
-    private var coordSys = 0
+    private var coordSys = CoordinateSystem.atIndex(0)
     private var isInputValid = false
 
     var initialLatLng: LatLng? = null
@@ -40,7 +46,7 @@ class GoToFragment : DialogFragment() {
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         // Fetch coordinate system setting
-        coordSys = viewModel.coordinateSystem.value ?: 0
+        coordSys = viewModel.coordinateSystem.value ?: CoordinateSystem.atIndex(0)
 
         setUp()
 
@@ -56,10 +62,9 @@ class GoToFragment : DialogFragment() {
     private fun setUp() {
 
         binding.newPinCustomGridsGroup.visibility = when (coordSys) {
-            COORD_SYS_ID_LATLNG -> View.GONE
+            CoordinateSystem.WGS84 -> View.GONE
             else -> View.VISIBLE
         }
-
 
         // Set up fields' onKey listeners
         binding.newPinLatEditText.setOnKeyListener { _, _, _ ->
@@ -74,7 +79,7 @@ class GoToFragment : DialogFragment() {
         }
 
         // Set up zone dropdown for UTM, or else hide the dropdown
-        if (coordSys == COORD_SYS_ID_UTM) {
+        if (coordSys == CoordinateSystem.UTM) {
             binding.newPinZoneDropdown.setOnItemClickListener { _, _, _, _ ->
                 updateLatLng()
             }
@@ -83,7 +88,7 @@ class GoToFragment : DialogFragment() {
         }
 
         // Set up easting/northing EditTexts for relevant coordinate systems
-        if (coordSys == COORD_SYS_ID_UTM || coordSys == COORD_SYS_ID_KERTAU) {
+        if (coordSys == CoordinateSystem.UTM || coordSys == CoordinateSystem.KERTAU) {
             binding.newPinEastingEditText.setOnKeyListener { _, _, _ ->
                 updateLatLng()
                 false
@@ -95,7 +100,7 @@ class GoToFragment : DialogFragment() {
         }
 
         // Set up MGRS String EditText for MGRS
-        if (coordSys == COORD_SYS_ID_MGRS) {
+        if (coordSys == CoordinateSystem.MGRS) {
             binding.newPinMgrsEditText.setOnKeyListener { _, _, _ ->
                 updateLatLng()
                 false
@@ -106,11 +111,10 @@ class GoToFragment : DialogFragment() {
 
         binding.newPinGridSystem.text = getString(
             when (coordSys) {
-                COORD_SYS_ID_UTM -> R.string.utm
-                COORD_SYS_ID_MGRS -> R.string.mgrs
-                COORD_SYS_ID_KERTAU -> R.string.kertau
-                COORD_SYS_ID_LATLNG -> R.string.lat_lng
-                else -> throw IllegalArgumentException("Invalid coordinate system id: $coordSys")
+                CoordinateSystem.UTM -> R.string.utm
+                CoordinateSystem.MGRS -> R.string.mgrs
+                CoordinateSystem.KERTAU -> R.string.kertau
+                CoordinateSystem.WGS84 -> R.string.lat_lng
             }
         )
         context?.let {
@@ -122,7 +126,6 @@ class GoToFragment : DialogFragment() {
             )
         }
 
-
         binding.goButton.setOnClickListener {
             onCompleted()
         }
@@ -131,22 +134,17 @@ class GoToFragment : DialogFragment() {
     @SuppressLint("SetTextI18n")
     private fun updateLatLng() {
         when (coordSys) {
-            COORD_SYS_ID_UTM -> {
+            CoordinateSystem.UTM -> {
                 val zoneBand = binding.newPinZoneDropdown.text.toString()
                 val easting = binding.newPinEastingEditText.text.toString()
                 val northing = binding.newPinNorthingEditText.text.toString()
                 if (!zoneBand.isBlank() && !easting.isBlank() && !northing.isBlank()) {
                     val zone = zoneBand.slice(if (zoneBand.length == 3) 0..1 else 0..0).toInt()
-                    val band = zoneBand.slice(if (zoneBand.length == 3) 2..2 else 1..1)
-                    val (lat, lng) =
-                        getLatLngFromUtm(
-                            UtmData(
-                                easting.toDouble(),
-                                northing.toDouble(),
-                                zone,
-                                band.single()
-                            )
-                        )
+                    val band = zoneBand[(if (zoneBand.length == 3) 2 else 1)]
+
+                    val utmCoord = Mapping.parseUtm(zone, band, easting.toDouble(), northing.toDouble())
+                    val lat = utmCoord?.latLng?.latitude ?: Double.NaN
+                    val lng = utmCoord?.latLng?.longitude ?: Double.NaN
 
                     if (!lat.isNaN() && lat < 90 && lat > -90 && !lng.isNaN()) {
                         // Lat and Lng are valid numbers
@@ -159,39 +157,37 @@ class GoToFragment : DialogFragment() {
                     }
                 }
             }
-            COORD_SYS_ID_MGRS -> {
-                val mgrsData = parseMgrsFrom(binding.newPinMgrsEditText.text.toString())
-                val latLng = mgrsData?.toUtmData()?.toLatLng()
+            CoordinateSystem.MGRS -> {
+                val mgrsCoord = parse(binding.newPinMgrsEditText.text.toString())
+                val latLng = mgrsCoord?.latLng
 
                 if (latLng != null) {
-                    binding.newPinLatEditText.setText("%.6f".format(Locale.US, latLng.first))
-                    binding.newPinLongEditText.setText("%.6f".format(Locale.US, latLng.second))
+                    binding.newPinLatEditText.setText("%.6f".format(Locale.US, latLng.latitude))
+                    binding.newPinLongEditText.setText("%.6f".format(Locale.US, latLng.longitude))
                 } else {
                     binding.newPinLatEditText.setText("")
                     binding.newPinLongEditText.setText("")
                 }
             }
-            COORD_SYS_ID_KERTAU -> {
-                val easting = binding.newPinEastingEditText.text.toString()
-                val northing = binding.newPinNorthingEditText.text.toString()
+            CoordinateSystem.KERTAU -> {
+                val easting = binding.newPinEastingEditText.text.toString().toDoubleOrNull()
+                val northing = binding.newPinNorthingEditText.text.toString().toDoubleOrNull()
 
-                if (!easting.isBlank() && !northing.isBlank()) {
-                    val latLngPair =
-                        getLatLngFromKertau(
-                            easting.toDouble(),
-                            northing.toDouble()
-                        )
-                    // Lat Lng are valid and kertau grids were within bounds
-                    val (lat, lng) = latLngPair
-                    binding.newPinLatEditText.setText("%.6f".format(Locale.US, lat))
-                    binding.newPinLongEditText.setText("%.6f".format(Locale.US, lng))
+                if (easting == null || northing == null) {
+                    binding.newPinLatEditText.setText("")
+                    binding.newPinLongEditText.setText("")
+                    return
                 }
-            }
-            COORD_SYS_ID_LATLNG -> {
-            }
-            else -> throw IllegalArgumentException("Invalid coordinate system id: $coordSys")
-        }
 
+                val coord = Mapping.parseKertau1948(easting, northing)
+                val latLng = coord.latLng
+                // Lat Lng are valid and kertau grids were within bounds
+                binding.newPinLatEditText.setText("%.6f".format(Locale.US, latLng.latitude))
+                binding.newPinLongEditText.setText("%.6f".format(Locale.US, latLng.longitude))
+            }
+            CoordinateSystem.WGS84 -> {
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -206,40 +202,33 @@ class GoToFragment : DialogFragment() {
             return
         }
 
+        val latLng = LatLng(lat, lng)
         when (coordSys) {
-            COORD_SYS_ID_UTM -> {
-                val utmData = getUtmData(lat, lng)
+            CoordinateSystem.UTM -> {
+                val utmData = Mapping.toUtm(latLng)
                 utmData?.let {
                     // UTM data is valid, set texts then return
                     binding.newPinEastingEditText.setText(floor(it.x).toInt().toString())
                     binding.newPinNorthingEditText.setText(floor(it.y).toInt().toString())
-                    binding.newPinZoneDropdown.setText("${it.zone}${it.band}", false)
+
+                    // TODO: Replace this workaround
+                    val (zone, band) = getUtmZoneAndBand(lat, lng)
+                    binding.newPinZoneDropdown.setText("$zone$band", false)
                     return
                 }
             }
-            COORD_SYS_ID_MGRS -> {
-                binding.newPinMgrsEditText.setText(
-                    getMgrsData(lat, lng)?.toSingleLine(includeWhitespace = true)
-                )
+            CoordinateSystem.MGRS -> {
+                binding.newPinMgrsEditText.setText(Mapping.toMgrs(lat, lng).toString())
                 return
             }
-            COORD_SYS_ID_KERTAU -> {
-                val kertauData =
-                    getKertauGrids(
-                        lat,
-                        lng
-                    )
-                if (kertauData != null) {
-                    // Kertau data is valid, set texts then return
-                    val (easting, northing) = kertauData
-                    binding.newPinEastingEditText.setText(floor(easting).toInt().toString())
-                    binding.newPinNorthingEditText.setText(floor(northing).toInt().toString())
-                    return
-                }
+            CoordinateSystem.KERTAU -> {
+                val kertauCoordinate = Mapping.toKertau1948(Coordinate.of(latLng))
+                binding.newPinEastingEditText.setText(floor(kertauCoordinate.x).toInt().toString())
+                binding.newPinNorthingEditText.setText(floor(kertauCoordinate.y).toInt().toString())
+                return
             }
-            COORD_SYS_ID_LATLNG -> {
+            CoordinateSystem.WGS84 -> {
             }
-            else -> throw IllegalArgumentException("Invalid coordinate system id: $coordSys")
         }
         // Grids are not valid for current coordinate system (out of bounds),
         // wipe zone, easting and northing fields
@@ -251,7 +240,6 @@ class GoToFragment : DialogFragment() {
         binding.newPinNorthingEditText.setText("")
         binding.newPinZoneDropdown.setText("", false)
     }
-
 
     private fun onValidateInput() {
 
@@ -278,16 +266,17 @@ class GoToFragment : DialogFragment() {
     private fun onCompleted() {
         onValidateInput()
 
-        if(!isInputValid) {
+        if (!isInputValid) {
             return
         }
 
         viewModel.mapGoTo(
-            LatLng(binding.newPinLatEditText.text.toString().toDoubleOrNull()!!,
-                binding.newPinLongEditText.text.toString().toDoubleOrNull()!!)
+            LatLng(
+                binding.newPinLatEditText.text.toString().toDoubleOrNull()!!,
+                binding.newPinLongEditText.text.toString().toDoubleOrNull()!!
+            )
         )
 
         dismiss()
     }
-
 }

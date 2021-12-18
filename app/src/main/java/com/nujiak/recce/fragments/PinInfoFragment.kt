@@ -10,9 +10,11 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import com.nujiak.recce.*
+import com.nujiak.recce.MainViewModel
+import com.nujiak.recce.R
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.DialogPinInfoBinding
+import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.getGridString
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,13 +65,13 @@ class PinInfoFragment : DialogFragment() {
             }
 
             binding.pinLatLng.text =
-                getGridString(pin.latitude, pin.longitude, COORD_SYS_ID_LATLNG, resources)
+                getGridString(pin.latitude, pin.longitude, CoordinateSystem.WGS84, resources)
             binding.pinUtmGrid.text =
-                getGridString(pin.latitude, pin.longitude, COORD_SYS_ID_UTM, resources)
+                getGridString(pin.latitude, pin.longitude, CoordinateSystem.UTM, resources)
             binding.pinMgrsGrid.text =
-                getGridString(pin.latitude, pin.longitude, COORD_SYS_ID_MGRS, resources)
+                getGridString(pin.latitude, pin.longitude, CoordinateSystem.MGRS, resources)
             binding.pinKertauGrid.text =
-                getGridString(pin.latitude, pin.longitude, COORD_SYS_ID_KERTAU, resources)
+                getGridString(pin.latitude, pin.longitude, CoordinateSystem.KERTAU, resources)
 
             if (pin.description.isNotEmpty()) {
                 binding.pinDescriptionHeading.visibility = View.VISIBLE
@@ -82,7 +84,8 @@ class PinInfoFragment : DialogFragment() {
 
             binding.pinOpenIn.setOnClickListener {
                 val gmmIntentUri = Uri.parse(
-                    "geo:<${pin.latitude}>,<${pin.longitude}>?q=<${pin.latitude}>,<${pin.longitude}>(${pin.name})")
+                    "geo:<${pin.latitude}>,<${pin.longitude}>?q=<${pin.latitude}>,<${pin.longitude}>(${pin.name})"
+                )
                 val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
                 mapIntent.setPackage("com.google.android.apps.maps")
 
@@ -91,7 +94,6 @@ class PinInfoFragment : DialogFragment() {
                         startActivity(mapIntent)
                     }
                 }
-
             }
             binding.pinMap.setOnClickListener {
                 viewModel.showPinOnMap(pin)
@@ -101,7 +103,6 @@ class PinInfoFragment : DialogFragment() {
                 viewModel.openPinCreator(pin)
                 dismiss()
             }
-
         }
     }
 }

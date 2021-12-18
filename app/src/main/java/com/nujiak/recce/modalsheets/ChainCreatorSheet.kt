@@ -199,7 +199,6 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
             setOnClickListener {
                 viewModel.hideKeyboardFromView(binding.root)
             }
-
         }
 
         binding.newChainGroupDropdown.apply {
@@ -215,7 +214,6 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
                     )
                 }
             }
-
         }
     }
 

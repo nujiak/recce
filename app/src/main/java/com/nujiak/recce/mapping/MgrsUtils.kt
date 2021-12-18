@@ -1,6 +1,6 @@
 package com.nujiak.recce.mapping
 
-import java.util.*
+import com.google.android.gms.maps.model.LatLng
 import kotlin.math.floor
 import kotlin.math.pow
 
@@ -10,54 +10,6 @@ import kotlin.math.pow
 private fun String.filterWhitespaces() = this.replace("\\s".toRegex(), "")
 
 /**
- * Encapsulates the data of a point in MGRS
- *
- * @property zone UTM zone of the point
- * @property band UTM latitude band of the point
- * @property eastingLetter MGRS easting letter denoting 100,000m square
- * @property northingLetter MGRS northing letter denoting 100,000m square
- * @property x Easting of the point
- * @property y Northing of the point
- */
-data class MgrsData(
-    val zone: Int,
-    val band: Char,
-    val eastingLetter: Char,
-    val northingLetter: Char,
-    val x: Double,
-    val y: Double
-)
-
-/**
- * Extension function to print MgrsData as a single-line string
- *
- * @param precision Number of digits per axes
- * @param includeWhitespace Whether to insert a space to segment the string
- *
- * @return Single-line string of MGRS
- *
- * @throws IllegalArgumentException if precision is not larger than 0
- */
-fun MgrsData.toSingleLine(precision: Int = 5, includeWhitespace: Boolean = false): String {
-    if (precision <= 0) {
-        throw IllegalArgumentException("Precision must be more than 0: $precision)")
-    }
-    val x = this.x * 10.0.pow(precision - 5)
-    val y = this.y * 10.0.pow(precision - 5)
-    return this.let {
-        "${it.zone.toString().padStart(2, '0')}${it.band}${it.eastingLetter}${it.northingLetter}" +
-                "${if (includeWhitespace) " " else ""}${
-                    x.toInt().toString().padStart(precision, '0')
-                }" +
-                "${if (includeWhitespace) " " else ""}${
-                    y.toInt().toString().padStart(precision, '0')
-                }"
-    }
-}
-
-fun MgrsData.toUtmData() = getUtmFromMgrs(this)
-
-/**
  * Regex matching the MGRS format with all whitespaces trimmed
  *
  * Example of match: "48NUG123456123456"
@@ -65,8 +17,9 @@ fun MgrsData.toUtmData() = getUtmFromMgrs(this)
 private val mgrsRegex = Regex("(^\\d{1,2})(\\w{3})(\\d{1,12})$")
 
 /**
- * Takes a string containing an even number of numerical digits, splits it into 2 numbers
- * and adjusts the decimal point of each number to have 5 digits before the dp
+ * Splits a string of numerical digits into 2 decimals.
+ *
+ * This adjusts the decimal point of each number to have 5 digits before the decimal point.
  *
  * E.g "1054" -> Pair(10000.0, 54000.0)
  *     "4003204992" -> Pair(40032.0, 4992.0)
@@ -96,59 +49,80 @@ private fun intsFromMgrsGridString(gridStr: String): Pair<Double, Double> {
 }
 
 /**
- * Uses regex to parse and segment an MGRS string
+ * Parses and segments a MGRS string
  *
  * @param mgrsString MGRS String
  * @return MgrsData containing the data of the point in MGRS
  */
-fun parseMgrsFrom(mgrsString: String): MgrsData? {
+fun parse(mgrsString: String): Coordinate? {
     val matchResult =
-        mgrsRegex.find(mgrsString.filterWhitespaces().toUpperCase(Locale.getDefault()))
-    if (matchResult != null) {
-        val matchGroupValues = matchResult.groupValues
+        mgrsRegex.find(mgrsString.filterWhitespaces().uppercase())
 
-        val gridString = matchGroupValues[3]
-        if (gridString.length % 2 != 0) {
-            return null
-        }
-        val (easting, northing) = intsFromMgrsGridString(gridString)
-        val (band, eastingLtr, northingLtr) = matchGroupValues[2].toList()
-        return MgrsData(
-            matchGroupValues[1].toInt(),
-            band,
-            eastingLtr,
-            northingLtr,
-            easting,
-            northing
-        )
-    } else {
+    matchResult ?: return null
+
+    val matchGroupValues = matchResult.groupValues
+
+    val gridString = matchGroupValues[3]
+    if (gridString.length % 2 != 0) {
         return null
     }
+    val (easting, northing) = intsFromMgrsGridString(gridString)
+    val (band, eastingLtr, northingLtr) = matchGroupValues[2].toList()
+
+    return parse(matchGroupValues[1].toInt(), band, eastingLtr, northingLtr, easting, northing)
 }
 
-/*
- Arrays of MGRS Easting Letters as defined by both lettering schemes AA and AL. The ending integer
- denotes |Z| % 3 where Z is the UTM zone.
+/**
+ * MGRS Easting letters according to both AA and AL lettering schemes.
  */
-private val eastingLetters1 = arrayOf('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H')
-private val eastingLetters2 = arrayOf('J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R')
-private val eastingLetters0 = arrayOf('S', 'T', 'U', 'V', 'X', 'W', 'Y', 'Z')
-
-/*
- Arrays of MGRS Northing Letters according to lettering scheme AA. The odd/even refers to
- the parity of the UTM zone.
- */
-private val aaNorthingLettersOdd = arrayOf(
-    'A', 'B', 'C', 'D', 'E',
-    'F', 'G', 'H', 'J', 'K',
-    'L', 'M', 'N', 'P', 'Q',
-    'R', 'S', 'T', 'U', 'V'
+private val columnLetters = arrayOf(
+    arrayOf('S', 'T', 'U', 'V', 'X', 'W', 'Y', 'Z'),
+    arrayOf('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'),
+    arrayOf('J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R'),
 )
-private val aaNorthingLettersEven = arrayOf(
-    'F', 'G', 'H', 'J', 'K',
-    'L', 'M', 'N', 'P', 'Q',
-    'R', 'S', 'T', 'U', 'V',
-    'A', 'B', 'C', 'D', 'E'
+
+/**
+ * MGRS Northing Letters according to the AA lettering scheme.
+ */
+private val rowLetters = arrayOf(
+    arrayOf(
+        'F', 'G', 'H', 'J', 'K',
+        'L', 'M', 'N', 'P', 'Q',
+        'R', 'S', 'T', 'U', 'V',
+        'A', 'B', 'C', 'D', 'E'
+    ),
+    arrayOf(
+        'A', 'B', 'C', 'D', 'E',
+        'F', 'G', 'H', 'J', 'K',
+        'L', 'M', 'N', 'P', 'Q',
+        'R', 'S', 'T', 'U', 'V'
+    ),
+)
+
+/**
+ * A list of possible yBands associated with a MGRS band.
+ */
+private val Y_BANDS = mapOf(
+    'C' to arrayOf(1, 0),
+    'D' to arrayOf(1, 0),
+    'E' to arrayOf(1),
+    'F' to arrayOf(2, 1),
+    'G' to arrayOf(2),
+    'H' to arrayOf(3, 2),
+    'J' to arrayOf(3),
+    'K' to arrayOf(4, 3),
+    'L' to arrayOf(4),
+    'M' to arrayOf(4, 4),
+    'N' to arrayOf(0),
+    'P' to arrayOf(0),
+    'Q' to arrayOf(0, 1),
+    'R' to arrayOf(1),
+    'S' to arrayOf(1, 2),
+    'T' to arrayOf(2),
+    'U' to arrayOf(2, 3),
+    'V' to arrayOf(3),
+    'W' to arrayOf(3, 4),
+    'X' to arrayOf(3, 4)
 )
 
 /**
@@ -157,166 +131,127 @@ private val aaNorthingLettersEven = arrayOf(
  * This function follows section 11.13 of <<The Universal Grids and the Transverse Mercator and Polar
  * Stereographic Map Projections>>.
  *
- * @param latDeg Latitude in degrees
- * @return Char of the corresponding MGRS latitude band
+ * @param latitude Latitude in degrees
+ * @return [Char] of the corresponding MGRS latitude band
  */
-private fun getMgrsBand(latDeg: Double): Char {
-    return when (floor(latDeg / 8).toInt()) {
-        -11 -> 'C'
-        -10 -> 'C'
-        -9 -> 'D'
-        -8 -> 'E'
-        -7 -> 'F'
-        -6 -> 'G'
-        -5 -> 'H'
-        -4 -> 'J'
-        -3 -> 'K'
-        -2 -> 'L'
-        -1 -> 'M'
-        0 -> 'N'
-        1 -> 'P'
-        2 -> 'Q'
-        3 -> 'R'
-        4 -> 'S'
-        5 -> 'T'
-        6 -> 'U'
-        7 -> 'V'
-        8 -> 'W'
-        9 -> 'X'
-        10 -> 'X'
-        else -> throw IllegalArgumentException("lat is outside UTM bounds: $latDeg")
+fun getMgrsBand(latitude: Double): Char {
+    return when {
+        latitude < -80 -> throw IllegalArgumentException("Latitude must be between -80 and 84: $latitude")
+        latitude < -72 -> 'C'
+        latitude < -64 -> 'D'
+        latitude < -56 -> 'E'
+        latitude < -48 -> 'F'
+        latitude < -40 -> 'G'
+        latitude < -32 -> 'H'
+        latitude < -24 -> 'J'
+        latitude < -16 -> 'K'
+        latitude < -8 -> 'L'
+        latitude < 0 -> 'M'
+        latitude < 8 -> 'N'
+        latitude < 16 -> 'P'
+        latitude < 24 -> 'Q'
+        latitude < 32 -> 'R'
+        latitude < 40 -> 'S'
+        latitude < 48 -> 'T'
+        latitude < 56 -> 'U'
+        latitude < 64 -> 'V'
+        latitude < 72 -> 'W'
+        latitude < 84 -> 'X'
+        else -> throw IllegalArgumentException("Latitude must be between -80 and 84: $latitude")
     }
 }
 
 /**
- * Returns a MgrsData corresponding to a point in UTM.
+ * Returns the MGRS column letter for a given easting
  *
- * @param utmData UtmData of a point
- *
- * @return MgrsData containing the data of the point if the point lies within the area of usage
- *         of UTM (-80 <= latDeg <= 84)
- * @return null if the point lies outside the area of usage of UTM
+ * @param x
+ * @param utmZone
+ * @return MGRS column letter for the given easting
  */
-fun getMgrsData(utmData: UtmData?): MgrsData? {
-    utmData ?: return null
-
-    val eastingConversion = floor(utmData.x / 100000).toInt()
-    val northingConversion = floor((utmData.y % 2000000) / 100000).toInt()
-
-    val eastingLetter = when (utmData.zone % 3) {
-        1 -> eastingLetters1[eastingConversion - 1]
-        2 -> eastingLetters2[eastingConversion - 1]
-        else -> eastingLetters0[eastingConversion - 1]
-    }
-
-    val northingLetter = when (utmData.zone % 2) {
-        1 -> aaNorthingLettersOdd[northingConversion]
-        else -> aaNorthingLettersEven[northingConversion]
-    }
-
-    val lat = utmData.toLatLng().first
-    val band = getMgrsBand(lat)
-
-    val x = utmData.x % 100000
-    val y = utmData.y % 100000
-
-    return MgrsData(
-        zone = utmData.zone,
-        band = band,
-        eastingLetter = eastingLetter,
-        northingLetter = northingLetter,
-        x = x,
-        y = y
-    )
+private fun getMgrsColumnLetter(x: Double, utmZone: Int): Char {
+    val eastingConversion = floor(x / 100000).toInt()
+    return columnLetters[utmZone % 3][eastingConversion - 1]
 }
 
 /**
- * Same as [getMgrsData] but takes in WGS 84 latitude and longitude.
+ * Returns the MGRS row letter for a given northing
  *
- * @param latDeg Latitude in degrees
- * @param lngDeg Longitude in degrees
+ * @param y
+ * @param utmZone
+ * @return MGRS row letter for the given northing
  */
-fun getMgrsData(latDeg: Double, lngDeg: Double): MgrsData? {
-    return getMgrsData(getUtmData(latDeg, lngDeg))
+private fun getMgrsRowLetter(y: Double, utmZone: Int): Char {
+    val northingConversion = floor((y % 2000000) / 100000).toInt()
+    return rowLetters[utmZone % 2][northingConversion]
 }
 
 /**
- * Same as [getMgrsData] but takes in a pair of Doubles as WGS 84  latitude and longitude.
+ * Parses MGRS details into a [Coordinate]
  *
- * @param latLng Latitude and longitude in degrees as a Pair of Doubles
+ * @param mgrsZone
+ * @param mgrsBand
+ * @param columnLetter
+ * @param rowLetter
+ * @param x
+ * @param y
+ * @return [Coordinate] representing the location in MGRS
  */
-fun getMgrsData(latLng: Pair<Double, Double>?): MgrsData? {
-    latLng ?: return null
-    return getMgrsData(latLng.first, latLng.second)
-}
+fun parse(mgrsZone: Int, mgrsBand: Char, columnLetter: Char, rowLetter: Char, x: Double, y: Double): Coordinate? {
 
-/*
- A list of possible yBands associated with a MGRS band.
- */
-private val Y_BANDS = mapOf(
-    'C' to arrayOf(1, 0),
-    'D' to arrayOf(1, 0),
-    'E' to arrayOf(1, 1),
-    'F' to arrayOf(2, 1),
-    'G' to arrayOf(2, 2),
-    'H' to arrayOf(3, 2),
-    'J' to arrayOf(3, 3),
-    'K' to arrayOf(4, 3),
-    'L' to arrayOf(4, 4),
-    'M' to arrayOf(4, 4),
-    'N' to arrayOf(0, 0),
-    'P' to arrayOf(0, 0),
-    'Q' to arrayOf(0, 1),
-    'R' to arrayOf(1, 1),
-    'S' to arrayOf(1, 2),
-    'T' to arrayOf(2, 2),
-    'U' to arrayOf(2, 3),
-    'V' to arrayOf(3, 3),
-    'W' to arrayOf(3, 4),
-    'X' to arrayOf(3, 4)
-)
+    val utmBand = if (mgrsBand in "NPQRSTUVWX") UtmBand.NORTH else UtmBand.SOUTH
 
-/**
- * Returns a UtmData corresponding to a given MgrsData
- *
- * @param mgrsData MgrsData of a point
- * @return UtmData corresponding to the point
- * @return null if [mgrsData] is null
- */
-fun getUtmFromMgrs(mgrsData: MgrsData?): UtmData? {
-    mgrsData ?: return null
-
-    val isNorth = "NPQRSTUVWX".contains(mgrsData.band)
-
-    val xLetter = when (mgrsData.zone % 3) {
-        1 -> eastingLetters1.indexOf(mgrsData.eastingLetter) + 1
-        2 -> eastingLetters2.indexOf(mgrsData.eastingLetter) + 1
-        else -> eastingLetters0.indexOf(mgrsData.eastingLetter) + 1
+    val xLetter = columnLetters[mgrsZone % 3].indexOf(columnLetter) + 1
+    if (xLetter <= 0) {
+        // Invalid column letter
+        return null
     }
-    if (xLetter == -1) {
-        throw IllegalArgumentException("MGRS band is invalid: ${mgrsData.band}")
-    }
-    val yLetter = when (mgrsData.zone % 2) {
-        0 -> aaNorthingLettersEven.indexOf(mgrsData.northingLetter)
-        else -> aaNorthingLettersOdd.indexOf(mgrsData.northingLetter)
-    }
+
+    val yLetter = rowLetters[mgrsZone % 2].indexOf(rowLetter)
     if (yLetter == -1) {
-        throw IllegalArgumentException("MGRS zone is invalid: ${mgrsData.zone}")
+        // Invalid row letter
+        return null
     }
 
-    val x = 100000 * xLetter + mgrsData.x
-    val yPrelim = 100000 * yLetter + mgrsData.y
+    val utmX = 100000 * xLetter + x
+    val yPrelim = 100000 * yLetter + y
 
-    for (yBand in requireNotNull(Y_BANDS[mgrsData.band])) {
-        val utmData = UtmData(
-            x = x,
-            y = 2000000 * yBand + yPrelim,
-            zone = mgrsData.zone,
-            band = if (isNorth) NORTH_BAND else SOUTH_BAND
-        )
-        if (getMgrsBand(utmData.toLatLng().first) == mgrsData.band) {
-            return utmData
+    for (yBand in requireNotNull(Y_BANDS[mgrsBand])) {
+        val utmCoord = Mapping.parseUtm(mgrsZone, utmBand, utmX, 2000000 * yBand + yPrelim) ?: continue
+        val derivedBand = getMgrsBand(utmCoord.latLng.latitude)
+        if (derivedBand == mgrsBand) {
+            return Coordinate.of(utmCoord.latLng, mgrsZone, mgrsBand, columnLetter, rowLetter, x, y)
         }
     }
-    throw Exception("No suitable y_band was found")
+    return null
+}
+
+/**
+ * Returns a [Coordinate] representing a WGS 84 coordinate in MGRS
+ *
+ * @param latitude
+ * @param longitude
+ * @return [Coordinate] representing the location in MGRS
+ */
+fun transformFromWgs84(latitude: Double, longitude: Double): Coordinate? {
+
+    if (latitude < -84 || latitude > 84) {
+        return null
+    }
+
+    // Convert to UTM
+    val utmCoord = Mapping.toUtm(latitude, longitude) ?: return null
+    val (utmZone, utmBand) = getUtmZoneAndBand(latitude, longitude)
+
+    // Use UTM zone and easting/northing to get the MGRS column/row letters
+    val columnLetter = getMgrsColumnLetter(utmCoord.x, utmZone)
+    val rowLetter = getMgrsRowLetter(utmCoord.y, utmZone)
+
+    // Use the WGS 84 latitude to find the MGRS band
+    val band = getMgrsBand(latitude)
+
+    // Find (x mod 10000) and (y mod 100000)
+    val x = utmCoord.x % 100000
+    val y = utmCoord.y % 100000
+
+    return Coordinate.of(LatLng(latitude, longitude), utmZone, band, columnLetter, rowLetter, x, y)
 }

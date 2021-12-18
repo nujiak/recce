@@ -13,6 +13,7 @@ import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.PinListChainItemBinding
 import com.nujiak.recce.databinding.PinListHeaderItemBinding
 import com.nujiak.recce.databinding.PinListItemBinding
+import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.formatAsAreaString
 import com.nujiak.recce.utils.formatAsDistanceString
@@ -33,7 +34,7 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
         item: PinWrapper,
         onItemClick: (Pin) -> Unit,
         onItemLongClick: (Pin) -> Boolean,
-        coordSysId: Int
+        coordSys: CoordinateSystem
     ) {
         val pin = item.pin
         if (pin.group != "") {
@@ -45,10 +46,10 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
         binding.pinName.text = pin.name
 
         binding.pinGridSystem.text =
-            binding.root.resources.getStringArray(R.array.coordinate_systems)[coordSysId]
+            binding.root.resources.getStringArray(R.array.coordinate_systems)[coordSys.index]
 
         binding.pinGrid.text =
-            getGridString(pin.latitude, pin.longitude, coordSysId, binding.root.resources)
+            getGridString(pin.latitude, pin.longitude, coordSys, binding.root.resources)
 
         val context = binding.root.context
         val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[pin.color])
