@@ -1,13 +1,14 @@
-<p align="center">
+<h1 align="center">
   <img src="app/src/main/ic_launcher-playstore.png" width=80/>
-</p>
-<h1 align="center"><b><i>Recce</b></i></h1>
+
+  <b><i>Recce</b></i>
+</h1>
 
 *Recce* is a *Map Planning and Navigation* app for Android. It supports 4 commonly-used geographic/projected coordinate systems (see [Supported GCS/PCS](#supported-gcspcs)) and offers coordinate transformations in real-time.
 
-# Features
+## Features
 
-## 🗺️ Map
+### 🗺️ Map
 
 <p align="center">
 <img src="docs/screenshots/map.png" height = 512>
@@ -17,7 +18,7 @@
 
 There are 3 map types available: *Normal*, *Satellite* and *Hybrid*. The Map also allows you to save points and plot routes and regions.
 
-## 📍 Saved Pins
+### 📍 Saved Pins
 
 <p align="center">
 <img src="docs/screenshots/saved.png" height = 512>
@@ -25,7 +26,7 @@ There are 3 map types available: *Normal*, *Satellite* and *Hybrid*. The Map als
 
 The points, routes, and areas saved from the Map can be grouped, sorted and coloured to help organise your collection of points-of-interests.
 
-## 🛰️ GPS
+### 🛰️ GPS
 
 <p align="center">
 <img src="docs/screenshots/gps.png" height = 512>
@@ -33,7 +34,7 @@ The points, routes, and areas saved from the Map can be grouped, sorted and colo
 
 The GPS page gives you convenient access to the coordinates of your current location, as well as a 3D compass with pitch, yaw, and roll for orientation.
 
-## 📐 Ruler
+### 📐 Ruler
 
 <p align="center">
 <img src="docs/screenshots/ruler.png" height = 512>
@@ -41,7 +42,7 @@ The GPS page gives you convenient access to the coordinates of your current loca
 
 Saved points and routes can be added to the Ruler to compute cumulative and point-to-point direction and distance.
 
-## Supported GCS/PCS
+### Supported GCS/PCS
 
 *Recce* offers the following GCS/PCS for displaying and inputting grids:
 1. **WGS 84 (EPSG:4326)**. As used by Google Maps for coordinates.
@@ -51,9 +52,9 @@ Saved points and routes can be added to the Ruler to compute cumulative and poin
 
 Since *Recce* uses `Proj4J`, new systems can be added easily in the future (see [Libraries](#libraries))
 
-# Installation
+## Installation
 
-## Google Play Store
+### Google Play Store
 
 The most convenient method to install and start using *Recce* is by installing from the Google Play Store.
 
@@ -63,7 +64,7 @@ The most convenient method to install and start using *Recce* is by installing f
 
 <sup>Google Play and the Google Play logo are trademarks of Google LLC.<sup>
 
-## Building
+### Building
 
 You can clone this repository and import into Android Studio.
 
@@ -74,9 +75,9 @@ Alternatively, you can create a new project directly in Android Studio by going 
 
 **⚠️ Note: You will need to provide a Google Maps API key for the Google Maps SDK to work properly** (see [Google Maps API Key](#google-maps-api-key)).
 
-# Configuration
+## Configuration
 
-## Google Maps API Key
+### Google Maps API Key
 
 You will need to provide a Google Maps API Key in order to use the Google Maps SDK. Follow the instructions on [Using API Keys](https://developers.google.com/maps/documentation/android-sdk/get-api-key) under the section *Creating API keys* to obtain an API key.
 
@@ -90,7 +91,7 @@ Create a string entry in `app/src/main/res/values/secrets.xml` with the name `go
 ```
 `YOUR_API_KEY_HERE` should be replaced with your API key obtained from Google Cloud Console.
 
-# Contributing
+## Contributing
 
 You can contribute to *Recce* through the following workflow:
 
@@ -102,7 +103,7 @@ You can contribute to *Recce* through the following workflow:
 6. Open a Pull Request and make sure that it passes all checks.
 
 
-# Libraries
+## Libraries
 
 *Recce* uses the following libraries:
 
