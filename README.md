@@ -2,7 +2,7 @@
 
   [![MegaLinter](https://github.com/nujiak/recce/workflows/MegaLinter/badge.svg)](https://github.com/nujiak/recce/actions?query=workflow%3AMegaLinter)
 
-  <img src="app/src/main/ic_launcher-playstore.png" width=80/>
+  <img src="app/src/main/ic_launcher-playstore.png" width=160/>
 
   <b><i>Recce</b></i>
 </h1>
