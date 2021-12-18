@@ -29,7 +29,7 @@ jobs:
         id: ml
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.github.io/flavors/
-        uses: megalinter/megalinter@v5
+        uses: megalinter/megalinter/flavors/java@v5
         env:
           # All available variables are described in documentation
           # https://megalinter.github.io/configuration/
@@ -37,7 +37,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # ADD YOUR CUSTOM ENV VARIABLES HERE OR DEFINE THEM IN A FILE .mega-linter.yml AT THE ROOT OF YOUR REPOSITORY
           DISABLE: COPYPASTE,SPELL,JSON
-          DISABLE_LINTERS: JSON_PRETTIER
+          DISABLE_LINTERS: YAML_PRETTIER
 
       # Upload MegaLinter artifacts
       - name: Archive production artifacts

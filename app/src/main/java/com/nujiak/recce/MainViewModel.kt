@@ -11,13 +11,27 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.google.android.gms.maps.model.LatLng
-import com.nujiak.recce.database.*
+import com.nujiak.recce.database.Chain
+import com.nujiak.recce.database.ChainNode
+import com.nujiak.recce.database.Pin
+import com.nujiak.recce.database.RecceData
+import com.nujiak.recce.database.RecceDatabaseDao
+import com.nujiak.recce.database.toPinsAndChains
+import com.nujiak.recce.database.toShareCode
+import com.nujiak.recce.enums.AngleUnit
+import com.nujiak.recce.enums.CoordinateSystem
+import com.nujiak.recce.enums.SharedPrefsKey
 import com.nujiak.recce.fragments.ruler.RulerItem
 import com.nujiak.recce.fragments.ruler.generateRulerList
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.livedatas.RotationLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -228,27 +242,33 @@ class MainViewModel @Inject constructor(
         _chainToAdd.value = null
     }
 
-
     /**
      * Preferences variables and functions
      */
-    private val _coordinateSystem = MutableLiveData(sharedPreference.getInt(COORD_SYS_KEY, 0))
-    val coordinateSystem: LiveData<Int>
+    private val _coordinateSystem = MutableLiveData(CoordinateSystem.atIndex(sharedPreference.getInt(SharedPrefsKey.COORDINATE_SYSTEM.key, 0)))
+    val coordinateSystem: LiveData<CoordinateSystem>
         get() = _coordinateSystem
 
-    fun updateCoordinateSystem(coordSysId: Int) {
-        if (coordSysId != _coordinateSystem.value) {
-            _coordinateSystem.value = coordSysId
+    fun updateCoordinateSystem(coordSysIndex: Int) {
+        val coordSys = CoordinateSystem.atIndex(coordSysIndex)
+        if (coordSys != _coordinateSystem.value) {
+            _coordinateSystem.value = coordSys
         }
     }
 
-    private val _angleUnit = MutableLiveData(sharedPreference.getInt(ANGLE_UNIT_KEY, 0))
-    val angleUnit: LiveData<Int>
+    private val _angleUnit =
+        MutableLiveData(
+            AngleUnit.atIndex(
+                sharedPreference.getInt(SharedPrefsKey.ANGLE_UNIT.key, 0)
+            )
+        )
+    val angleUnit: LiveData<AngleUnit>
         get() = _angleUnit
 
-    fun updateAngleUnit(angleUnitId: Int) {
-        if (angleUnitId != _angleUnit.value) {
-            _angleUnit.value = angleUnitId
+    fun updateAngleUnit(angleUnitIndex: Int) {
+        val angleUnit = AngleUnit.atIndex(angleUnitIndex)
+        if (angleUnit != _angleUnit.value) {
+            _angleUnit.value = angleUnit
         }
     }
 
@@ -353,7 +373,6 @@ class MainViewModel @Inject constructor(
     val selectionChanged: LiveData<Boolean>
         get() = _selectionChanged
 
-
     fun enterSelectionMode() {
         _isInSelectionMode.value = true
     }
@@ -400,7 +419,6 @@ class MainViewModel @Inject constructor(
         val lastMultiDeletedPins = allPins.value?.filter { it.pinId in pinIdsToDelete }
         val lastMultiDeletedChains = allChains.value?.filter { it.chainId in chainIdsToDelete }
 
-
         _lastMultiDeletedItems.value = Pair(lastMultiDeletedPins, lastMultiDeletedChains)
 
         exitSelectionMode()
@@ -419,7 +437,6 @@ class MainViewModel @Inject constructor(
                 chains?.forEach { chain -> addChain(chain) }
             }
         }
-
     }
 
     private val _shareCode = MutableLiveData<String>()

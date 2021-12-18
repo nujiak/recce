@@ -20,17 +20,12 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.nujiak.recce.MainViewModel
 import com.nujiak.recce.R
-import com.nujiak.recce.SORT_ASCENDING_KEY
-import com.nujiak.recce.SORT_BY_KEY
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.FragmentSavedBinding
-import com.nujiak.recce.fragments.saved.PinAdapter.Companion.ITEM_VIEW_TYPE_CHAIN
-import com.nujiak.recce.fragments.saved.PinAdapter.Companion.ITEM_VIEW_TYPE_HEADER
-import com.nujiak.recce.fragments.saved.PinAdapter.Companion.ITEM_VIEW_TYPE_PIN
-import com.nujiak.recce.fragments.saved.PinAdapter.Companion.SORT_BY_GROUP
-import com.nujiak.recce.fragments.saved.PinAdapter.Companion.SORT_BY_NAME
-import com.nujiak.recce.fragments.saved.PinAdapter.Companion.SORT_BY_TIME
+import com.nujiak.recce.enums.CoordinateSystem
+import com.nujiak.recce.enums.SharedPrefsKey
+import com.nujiak.recce.enums.SortBy
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter
 
@@ -41,11 +36,12 @@ class SavedFragment : Fragment() {
     private lateinit var binding: FragmentSavedBinding
     private lateinit var pinAdapter: PinAdapter
 
-    private var sortBy = SORT_BY_GROUP
+    private var sortBy = SortBy.GROUP
     private var sortAscending = false
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
@@ -57,7 +53,7 @@ class SavedFragment : Fragment() {
             { pin -> onPinLongClick(pin) },
             { chain -> onChainClick(chain) },
             { chain -> onChainLongClick(chain) },
-            viewModel.coordinateSystem.value ?: 0,
+            viewModel.coordinateSystem.value ?: CoordinateSystem.atIndex(0),
             resources
         )
         binding.pinRecyclerview.adapter = pinAdapter
@@ -65,22 +61,16 @@ class SavedFragment : Fragment() {
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return when (pinAdapter.getItemViewType(position)) {
-                    ITEM_VIEW_TYPE_PIN -> 1
-                    ITEM_VIEW_TYPE_CHAIN -> 2
-                    ITEM_VIEW_TYPE_HEADER -> 2
+                    PinAdapter.Companion.ItemViewType.PIN.index -> 1
+                    PinAdapter.Companion.ItemViewType.CHAIN.index -> 2
+                    PinAdapter.Companion.ItemViewType.HEADER.index -> 2
                     else -> throw IllegalArgumentException(
-                        "Invalid viewType: ${
-                            pinAdapter.getItemViewType(
-                                position
-                            )
-                        }"
+                        "Invalid viewType: ${pinAdapter.getItemViewType(position)}"
                     )
                 }
             }
-
         }
         binding.pinRecyclerview.layoutManager = gridLayoutManager
-
 
         // Observe for changes to pins and chains
         viewModel.allPins.observe(viewLifecycleOwner, { allPins ->
@@ -133,8 +123,8 @@ class SavedFragment : Fragment() {
         })
 
         // Fetch sorting parameters
-        sortBy = viewModel.sharedPreference.getInt(SORT_BY_KEY, sortBy)
-        sortAscending = viewModel.sharedPreference.getBoolean(SORT_ASCENDING_KEY, sortAscending)
+        sortBy = SortBy.atIndex(viewModel.sharedPreference.getInt(SharedPrefsKey.SORT_BY.key, sortBy.index))
+        sortAscending = viewModel.sharedPreference.getBoolean(SharedPrefsKey.SORT_ASCENDING.key, sortAscending)
 
         // Set up FAB
         binding.pinFab.setMenuListener(object : SimpleMenuListenerAdapter() {
@@ -161,31 +151,31 @@ class SavedFragment : Fragment() {
                     true
                 }
                 R.id.sort_by_alphabetical_asc -> {
-                    sortBy = SORT_BY_NAME
+                    sortBy = SortBy.NAME
                     sortAscending = true
                     onSortList()
                     true
                 }
                 R.id.sort_by_alphabetical_dsc -> {
-                    sortBy = SORT_BY_NAME
+                    sortBy = SortBy.NAME
                     sortAscending = false
                     onSortList()
                     true
                 }
                 R.id.sort_by_time_asc -> {
-                    sortBy = SORT_BY_TIME
+                    sortBy = SortBy.TIME
                     sortAscending = true
                     onSortList()
                     true
                 }
                 R.id.sort_by_time_dsc -> {
-                    sortBy = SORT_BY_TIME
+                    sortBy = SortBy.TIME
                     sortAscending = false
                     onSortList()
                     true
                 }
                 R.id.sort_by_group -> {
-                    sortBy = SORT_BY_GROUP
+                    sortBy = SortBy.GROUP
                     onSortList()
                     true
                 }
@@ -243,8 +233,8 @@ class SavedFragment : Fragment() {
 
     private fun onSortList() {
         viewModel.sharedPreference.edit()
-            .putInt(SORT_BY_KEY, sortBy)
-            .putBoolean(SORT_ASCENDING_KEY, sortAscending)
+            .putInt(SharedPrefsKey.SORT_BY.key, sortBy.index)
+            .putBoolean(SharedPrefsKey.SORT_ASCENDING.key, sortAscending)
             .apply()
         refreshList()
         binding.pinRecyclerview.smoothScrollToPosition(0)

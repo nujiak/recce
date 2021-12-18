@@ -8,10 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.nujiak.recce.COORD_SYS_ID_LATLNG
 import com.nujiak.recce.MainViewModel
 import com.nujiak.recce.R
 import com.nujiak.recce.databinding.FragmentGpsBinding
+import com.nujiak.recce.enums.AngleUnit
+import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.livedatas.RotationLiveData
 import com.nujiak.recce.utils.formatAsDistanceString
@@ -22,7 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.PI
 import kotlin.math.cos
 
-
 @AndroidEntryPoint
 class GpsFragment : Fragment() {
 
@@ -32,14 +32,15 @@ class GpsFragment : Fragment() {
     private var lastRotationData: RotationLiveData.RotationData? = null
     private var lastLocationData: FusedLocationLiveData.LocationData? = null
 
-    private var coordSysId = 0
-    private var angleUnitId = 0
+    private var coordSys = CoordinateSystem.atIndex(0)
+    private var angleUnit = AngleUnit.atIndex(0)
 
     private var lastUpdated = System.currentTimeMillis()
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
@@ -52,20 +53,20 @@ class GpsFragment : Fragment() {
             updateLocationUI(it)
         })
 
-        viewModel.rotationLiveData.observe (viewLifecycleOwner) {
+        viewModel.rotationLiveData.observe(viewLifecycleOwner) {
             lastRotationData = it
             updateCompass()
             updateOrientationUI()
         }
         // Observe for preferences changes
         viewModel.coordinateSystem.observe(viewLifecycleOwner, {
-            coordSysId = it
+            coordSys = it
             binding.gpsGridSystem.text =
-                resources.getStringArray(R.array.coordinate_systems)[coordSysId]
+                resources.getStringArray(R.array.coordinate_systems)[coordSys.index]
             updateLocationUI()
         })
         viewModel.angleUnit.observe(viewLifecycleOwner, {
-            angleUnitId = it
+            angleUnit = it
             updateOrientationUI()
         })
 
@@ -88,9 +89,9 @@ class GpsFragment : Fragment() {
             aziRad += 2 * PI.toFloat()
         }
 
-        binding.gpsAzimuth.text = getAngleString(aziRad, angleUnitId, false)
-        binding.gpsPitch.text = getAngleString(-pitRad, angleUnitId, true)
-        binding.gpsRoll.text = getAngleString(rolRad, angleUnitId, true)
+        binding.gpsAzimuth.text = getAngleString(aziRad, angleUnit, false)
+        binding.gpsPitch.text = getAngleString(-pitRad, angleUnit, true)
+        binding.gpsRoll.text = getAngleString(rolRad, angleUnit, true)
         lastUpdated = currentTime
     }
 
@@ -122,9 +123,8 @@ class GpsFragment : Fragment() {
             binding.gpsAccuracy.text = "±" + accuracy.formatAsDistanceString()
             binding.gpsAltitude.text = altitude.formatAsDistanceString()
             binding.gpsLatLng.text =
-                getGridString(latitude, longitude, COORD_SYS_ID_LATLNG, resources)
-            binding.gpsGrids.text = getGridString(latitude, longitude, coordSysId, resources)
+                getGridString(latitude, longitude, CoordinateSystem.WGS84, resources)
+            binding.gpsGrids.text = getGridString(latitude, longitude, coordSys, resources)
         }
-
     }
 }

@@ -88,8 +88,12 @@ object PinSerializer : KSerializer<Pin> {
      */
     @Serializable
     private data class PinSurrogate(
-        val n: String, val lt: Double, val lg: Double,
-        val c: Int, val g: String, val d: String
+        val n: String,
+        val lt: Double,
+        val lg: Double,
+        val c: Int,
+        val g: String,
+        val d: String
     )
 }
 
@@ -138,8 +142,11 @@ object ChainSerializer : KSerializer<Chain> {
      */
     @Serializable
     private data class ChainSurrogate(
-        val n: String, val dt: String, val c: Int,
-        val g: String, val cy: Int, val d: String
+        val n: String,
+        val dt: String,
+        val c: Int,
+        val g: String,
+        val cy: Int,
+        val d: String
     )
 }
-
