@@ -3,9 +3,7 @@
 </p>
 <h1 align="center"><b><i>Recce</b></i></h1>
 
-*Recce* is a *Map Planning and Navigation* app for Android. It supports 4 commonly-used geographic/projected coordinate systems (see [Supported GCS/PCS](#supported-gcspcs)) and offers coordinate transformations in real-time. 
-
-
+*Recce* is a *Map Planning and Navigation* app for Android. It supports 4 commonly-used geographic/projected coordinate systems (see [Supported GCS/PCS](#supported-gcspcs)) and offers coordinate transformations in real-time.
 
 # Features
 
@@ -33,7 +31,7 @@ The points, routes, and areas saved from the Map can be grouped, sorted and colo
 <img src="docs/screenshots/gps.png" height = 512>
 </p>
 
-The GPS page gives you convenient access to the coordinates of your current location, as well as a 3D compass with pitch, yaw, and roll for orientation. 
+The GPS page gives you convenient access to the coordinates of your current location, as well as a 3D compass with pitch, yaw, and roll for orientation.
 
 ## 📐 Ruler
 
@@ -41,12 +39,12 @@ The GPS page gives you convenient access to the coordinates of your current loca
 <img src="docs/screenshots/ruler.png" height = 512>
 </p>
 
-Saved points and routes can be added to the Ruler to compute cumulative and point-to-point direction and distance. 
+Saved points and routes can be added to the Ruler to compute cumulative and point-to-point direction and distance.
 
 ## Supported GCS/PCS
 
 *Recce* offers the following GCS/PCS for displaying and inputting grids:
-1. **WGS 84 (EPSG:4326)**. As used by Google Maps for coordinates. 
+1. **WGS 84 (EPSG:4326)**. As used by Google Maps for coordinates.
 2. **Universal Traverse Mercator (UTM)**. Automatic zone/band detection and conversion.
 3. **Military Grid Reference System (MGRS)**. Only for UTM coverage, does not include UPS. Automatic zone, band, row letter and column letter detection and conversion.
 4. **Kertau 1948**
@@ -80,7 +78,7 @@ Alternatively, you can create a new project directly in Android Studio by going 
 
 ## Google Maps API Key
 
-You will need to provide a Google Maps API Key in order to use the Google Maps SDK. Follow the instructions on [Using API Keys](https://developers.google.com/maps/documentation/android-sdk/get-api-key) under the section *Creating API keys* to obtain an API key. 
+You will need to provide a Google Maps API Key in order to use the Google Maps SDK. Follow the instructions on [Using API Keys](https://developers.google.com/maps/documentation/android-sdk/get-api-key) under the section *Creating API keys* to obtain an API key.
 
 Create a string entry in `app/src/main/res/values/secrets.xml` with the name `google_maps_api_key`. You may have to create the file if it does not exist. Your `secrets.xml` should look like the following:
 
