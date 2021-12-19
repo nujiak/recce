@@ -23,6 +23,8 @@ import com.nujiak.recce.utils.formatAsDistanceString
 import com.nujiak.recce.utils.getDp
 import com.nujiak.recce.utils.getGridString
 
+private const val STROKE_SIZE_DP: Float = 1f
+
 class PinViewHolder private constructor(private val binding: PinListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
@@ -59,7 +61,7 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
         val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[pin.color])
         binding.pinName.setTextColor(color)
         binding.pinListItemParent.strokeColor = color
-        (binding.pinGroup.background as GradientDrawable).setStroke(getDp(context.resources, 1f).toInt(), color)
+        (binding.pinGroup.background as GradientDrawable).setStroke(getDp(context.resources, STROKE_SIZE_DP).toInt(), color)
 
         binding.pinListItemParent.setOnClickListener { onItemClick(pin) }
         binding.pinListItemParent.setOnLongClickListener { onItemLongClick(pin) }
@@ -100,17 +102,18 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
             binding.chainGroup.text = chain.group
             binding.chainGroup.visibility = View.VISIBLE
         } else {
-            binding.chainGroup.visibility = View.INVISIBLE
+            binding.chainGroup.visibility = View.GONE
         }
         binding.chainName.text = chain.name
 
         val context = binding.root.context
         val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[chain.color])
-        binding.pinListItemParent.setCardBackgroundColor(color)
-        binding.chainGroup.setTextColor(color)
+        binding.pinListChainItemParent.strokeColor = color
+        binding.chainName.setTextColor(color)
+        (binding.chainGroup.background as GradientDrawable).setStroke(getDp(context.resources, STROKE_SIZE_DP).toInt(), color)
 
-        binding.pinListItemParent.setOnClickListener { onItemClick(chain) }
-        binding.pinListItemParent.setOnLongClickListener { onItemLongClick(chain) }
+        binding.pinListChainItemParent.setOnClickListener { onItemClick(chain) }
+        binding.pinListChainItemParent.setOnLongClickListener { onItemLongClick(chain) }
 
         val chainNodes = chain.nodes
         val checkpoints = mutableListOf<String>()
@@ -136,14 +139,20 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
             binding.chainDistance.text =
                 SphericalUtil.computeArea(chainNodes.map { it.position }).formatAsAreaString()
             binding.chainDistanceDesc.text = binding.root.resources.getString(R.string.area)
-            binding.areaIcon.visibility = View.VISIBLE
+            binding.areaIcon.apply {
+                visibility = View.VISIBLE
+                imageTintList = ColorStateList.valueOf(color)
+            }
             binding.routeIcon.visibility = View.INVISIBLE
         } else {
             // Route
             binding.chainDistance.text = distance.formatAsDistanceString()
             binding.chainDistanceDesc.text = binding.root.resources.getString(R.string.distance)
             binding.areaIcon.visibility = View.INVISIBLE
-            binding.routeIcon.visibility = View.VISIBLE
+            binding.routeIcon.apply {
+                visibility = View.VISIBLE
+                imageTintList = ColorStateList.valueOf(color)
+            }
         }
 
         if (item.selectionIndex >= 0) {
