@@ -3,6 +3,7 @@ package com.nujiak.recce.fragments.saved
 import android.app.AlertDialog
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -15,6 +16,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -57,19 +59,7 @@ class SavedFragment : Fragment() {
             resources
         )
         binding.pinRecyclerview.adapter = pinAdapter
-        val gridLayoutManager = GridLayoutManager(context, 2)
-        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return when (pinAdapter.getItemViewType(position)) {
-                    PinAdapter.Companion.ItemViewType.PIN.index -> 1
-                    PinAdapter.Companion.ItemViewType.CHAIN.index -> 2
-                    PinAdapter.Companion.ItemViewType.HEADER.index -> 2
-                    else -> throw IllegalArgumentException(
-                        "Invalid viewType: ${pinAdapter.getItemViewType(position)}"
-                    )
-                }
-            }
-        }
+        val gridLayoutManager = StaggeredGridLayoutManager(2, Configuration.ORIENTATION_PORTRAIT)
         binding.pinRecyclerview.layoutManager = gridLayoutManager
 
         // Observe for changes to pins and chains

@@ -87,3 +87,16 @@ fun Double.round(decimals: Int): Double {
     val magnitude = 10.0.pow(decimals.toDouble())
     return round(this * magnitude) / magnitude
 }
+
+/**
+ * Converts a length in dp to pixels
+ *
+ * TODO: Use this for all conversions from dp to px
+ *
+ * @param dps length in dp
+ * @param res
+ * @return length in pixel
+ */
+fun getDp(res: Resources, dps: Float): Float {
+    return res.displayMetrics.density * dps + 0.5f
+}

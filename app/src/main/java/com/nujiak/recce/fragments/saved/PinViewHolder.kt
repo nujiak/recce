@@ -1,12 +1,15 @@
 package com.nujiak.recce.fragments.saved
 
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.maps.android.SphericalUtil
+import com.google.maps.android.heatmaps.Gradient
 import com.nujiak.recce.R
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
@@ -17,6 +20,7 @@ import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.formatAsAreaString
 import com.nujiak.recce.utils.formatAsDistanceString
+import com.nujiak.recce.utils.getDp
 import com.nujiak.recce.utils.getGridString
 
 class PinViewHolder private constructor(private val binding: PinListItemBinding) :
@@ -41,7 +45,7 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
             binding.pinGroup.text = pin.group
             binding.pinGroup.visibility = View.VISIBLE
         } else {
-            binding.pinGroup.visibility = View.INVISIBLE
+            binding.pinGroup.visibility = View.GONE
         }
         binding.pinName.text = pin.name
 
@@ -53,8 +57,9 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
 
         val context = binding.root.context
         val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[pin.color])
-        binding.pinListItemParent.setCardBackgroundColor(color)
-        binding.pinGroup.setTextColor(color)
+        binding.pinName.setTextColor(color)
+        binding.pinListItemParent.strokeColor = color
+        (binding.pinGroup.background as GradientDrawable).setStroke(getDp(context.resources, 1f).toInt(), color)
 
         binding.pinListItemParent.setOnClickListener { onItemClick(pin) }
         binding.pinListItemParent.setOnLongClickListener { onItemLongClick(pin) }
@@ -64,9 +69,11 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
             binding.pinSelectedIndex.text = (item.selectionIndex + 1).toString()
             binding.pinSelectedIndex.setTextColor(color)
             binding.selectionShade.visibility = View.VISIBLE
+            binding.pinListItemParent.cardElevation = 0f
         } else {
             binding.pinSelectedIndex.visibility = View.INVISIBLE
             binding.selectionShade.visibility = View.GONE
+            binding.pinListItemParent.cardElevation = getDp(context.resources, 8f)
         }
     }
 }
