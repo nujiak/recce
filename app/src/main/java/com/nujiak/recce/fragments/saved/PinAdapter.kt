@@ -71,7 +71,7 @@ class PinAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         // Set item to take up the full span if it is a chain or header (not a pin)
         val layoutParams = holder.itemView.layoutParams as StaggeredGridLayoutManager.LayoutParams
-        layoutParams.isFullSpan = holder !is PinViewHolder
+        layoutParams.isFullSpan = holder is HeaderViewHolder
 
         when (holder) {
             is PinViewHolder -> {
