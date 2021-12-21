@@ -53,15 +53,11 @@ class PinInfoFragment : DialogFragment() {
     }
 
     private fun update(pin: Pin) {
-        if (dialog == null) {
-            return
-        }
         binding.pinName.text = pin.name
 
         // Color elements
         ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[pin.color]).let { color ->
             binding.pinName.setTextColor(color)
-            binding.pinEdit.setTextColor(color)
             binding.root.strokeColor = color
             (binding.pinGroup.background as GradientDrawable).setStroke(resources.dpToPx(1f).toInt(), color)
 
@@ -71,10 +67,7 @@ class PinInfoFragment : DialogFragment() {
             (binding.pinEdit as MaterialButton).iconTint = colorStateList
         }
 
-
-        dialog?.let { dialog ->
-            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        }
+        dialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         if (pin.group.isBlank()) {
             binding.pinGroup.visibility = View.GONE
