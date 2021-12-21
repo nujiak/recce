@@ -19,7 +19,7 @@ import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.formatAsAreaString
 import com.nujiak.recce.utils.formatAsDistanceString
-import com.nujiak.recce.utils.getDp
+import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.getGridString
 
 private const val STROKE_SIZE_DP: Float = 1f
@@ -61,7 +61,7 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
         val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[pin.color])
         binding.pinName.setTextColor(color)
         binding.pinListItemParent.strokeColor = color
-        (binding.pinGroup.background as GradientDrawable).setStroke(getDp(context.resources, STROKE_SIZE_DP).toInt(), color)
+        (binding.pinGroup.background as GradientDrawable).setStroke(context.resources.dpToPx(STROKE_SIZE_DP).toInt(), color)
 
         binding.pinListItemParent.setOnClickListener { onItemClick(pin) }
         binding.pinListItemParent.setOnLongClickListener { onItemLongClick(pin) }
@@ -72,12 +72,12 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
             binding.pinSelectedIndex.setTextColor(color)
             binding.selectionShade.visibility = View.VISIBLE
             binding.pinListItemParent.cardElevation = 0f
-            binding.pinListItemParent.strokeWidth = getDp(context.resources, STROKE_SIZE_SELECTED_DP).toInt()
+            binding.pinListItemParent.strokeWidth = context.resources.dpToPx(STROKE_SIZE_SELECTED_DP).toInt()
         } else {
             binding.pinSelectedIndex.visibility = View.INVISIBLE
             binding.selectionShade.visibility = View.GONE
-            binding.pinListItemParent.cardElevation = getDp(context.resources, 8f)
-            binding.pinListItemParent.strokeWidth = getDp(context.resources, STROKE_SIZE_DP).toInt()
+            binding.pinListItemParent.cardElevation = context.resources.dpToPx(8f)
+            binding.pinListItemParent.strokeWidth = context.resources.dpToPx(STROKE_SIZE_DP).toInt()
         }
     }
 }
@@ -112,7 +112,7 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
         val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[chain.color])
         binding.pinListChainItemParent.strokeColor = color
         binding.chainName.setTextColor(color)
-        (binding.chainGroup.background as GradientDrawable).setStroke(getDp(context.resources, STROKE_SIZE_DP).toInt(), color)
+        (binding.chainGroup.background as GradientDrawable).setStroke(context.resources.dpToPx(STROKE_SIZE_DP).toInt(), color)
 
         binding.pinListChainItemParent.setOnClickListener { onItemClick(chain) }
         binding.pinListChainItemParent.setOnLongClickListener { onItemLongClick(chain) }
@@ -163,12 +163,12 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
             binding.chainSelectedIndex.text = (item.selectionIndex + 1).toString()
             binding.selectionShade.visibility = View.VISIBLE
             binding.pinListChainItemParent.cardElevation = 0f
-            binding.pinListChainItemParent.strokeWidth = getDp(context.resources, STROKE_SIZE_SELECTED_DP).toInt()
+            binding.pinListChainItemParent.strokeWidth = context.resources.dpToPx(STROKE_SIZE_SELECTED_DP).toInt()
         } else {
             binding.chainSelectedIndex.visibility = View.INVISIBLE
             binding.selectionShade.visibility = View.GONE
-            binding.pinListChainItemParent.cardElevation = getDp(context.resources, 8f)
-            binding.pinListChainItemParent.strokeWidth = getDp(context.resources, STROKE_SIZE_DP).toInt()
+            binding.pinListChainItemParent.cardElevation = context.resources.dpToPx(8f)
+            binding.pinListChainItemParent.strokeWidth = context.resources.dpToPx(STROKE_SIZE_DP).toInt()
         }
     }
 }

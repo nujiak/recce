@@ -30,6 +30,7 @@ import com.nujiak.recce.mapping.getUtmZoneAndBand
 import com.nujiak.recce.utils.COLORS
 import com.nujiak.recce.utils.PIN_CARD_DARK_BACKGROUNDS
 import com.nujiak.recce.utils.animateColor
+import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.wrapLngDeg
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
@@ -139,7 +140,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         // Expand bottom sheet fully
         (dialog as BottomSheetDialog).behavior.apply {
             state = BottomSheetBehavior.STATE_EXPANDED
-            peekHeight = (resources.displayMetrics.density * 144).toInt()
+            peekHeight = (resources.dpToPx(144f)).toInt()
         }
 
         return binding.root

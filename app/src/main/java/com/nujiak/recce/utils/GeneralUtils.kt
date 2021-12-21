@@ -2,6 +2,7 @@ package com.nujiak.recce.utils
 
 import android.content.res.Resources
 import android.graphics.Color
+import android.util.TypedValue
 import com.google.android.gms.maps.model.LatLng
 import com.nujiak.recce.R
 import com.nujiak.recce.enums.AngleUnit
@@ -89,14 +90,11 @@ fun Double.round(decimals: Int): Double {
 }
 
 /**
- * Converts a length in dp to pixels
- *
- * TODO: Use this for all conversions from dp to px
+ * Converts a length in dp to screen pixels
  *
  * @param dps length in dp
- * @param res
- * @return length in pixel
+ * @return length in screen pixel
  */
-fun getDp(res: Resources, dps: Float): Float {
-    return res.displayMetrics.density * dps + 0.5f
+fun Resources.dpToPx(dp:Float): Float {
+    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, this.displayMetrics)
 }

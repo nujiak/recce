@@ -19,7 +19,7 @@ import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.DialogPinInfoBinding
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
-import com.nujiak.recce.utils.getDp
+import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.getGridString
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -63,7 +63,7 @@ class PinInfoFragment : DialogFragment() {
             binding.pinName.setTextColor(color)
             binding.pinEdit.setTextColor(color)
             binding.root.strokeColor = color
-            (binding.pinGroup.background as GradientDrawable).setStroke(getDp(resources, 1f).toInt(), color)
+            (binding.pinGroup.background as GradientDrawable).setStroke(resources.dpToPx(1f).toInt(), color)
 
             val colorStateList = ColorStateList.valueOf(color)
             (binding.pinOpenIn as MaterialButton).iconTint = colorStateList

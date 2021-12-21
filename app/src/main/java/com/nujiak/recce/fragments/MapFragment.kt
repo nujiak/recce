@@ -70,6 +70,7 @@ import com.nujiak.recce.utils.animateColor
 import com.nujiak.recce.utils.degToRad
 import com.nujiak.recce.utils.formatAsDistanceString
 import com.nujiak.recce.utils.getAngleString
+import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.getGridString
 import com.nujiak.recce.utils.withAlpha
 import dagger.hilt.android.AndroidEntryPoint
@@ -1342,7 +1343,7 @@ class MapFragment :
                         include(node.position)
                     }
                 }.build()
-                val padding = 64 * resources.displayMetrics.density
+                val padding = resources.dpToPx(64f)
                 map.animateCamera(
                     CameraUpdateFactory.newLatLngBounds(bounds, padding.toInt()),
                     350,
@@ -1419,7 +1420,6 @@ class MapFragment :
             polygonsMap.keys.forEach { it.remove() }
             polygonsMap.clear()
 
-            val scale = resources.displayMetrics.density
             for (chain in allChains) {
                 val chainNodes = chain.nodes
                 val points = chainNodes.map { it.position }
@@ -1430,7 +1430,7 @@ class MapFragment :
                     points.forEach { polygonOptions.add(it) }
                     polygonOptions.apply {
                         strokeColor(color)
-                        strokeWidth(2 * scale)
+                        strokeWidth(8f)
                         fillColor(withAlpha(color, 50))
                         strokeJointType(JointType.ROUND)
                         clickable(true)
@@ -1446,7 +1446,7 @@ class MapFragment :
                                 requireContext(),
                                 PIN_CARD_BACKGROUNDS[chain.color]
                             )
-                        width = 4 * scale
+                        width = resources.dpToPx(4f)
                         jointType = JointType.ROUND
                         startCap = ButtCap()
                         endCap = startCap
@@ -1554,13 +1554,12 @@ class MapFragment :
                 }
                 polylineOptions.add(map.cameraPosition.target)
                 currentPolyline = map.addPolyline(polylineOptions)
-                val scale = resources.displayMetrics.density
                 currentPolyline?.apply {
                     pattern = listOf(
-                        Dash(8 * scale),
-                        Gap(4 * scale)
+                        Dash(resources.dpToPx(8f)),
+                        Gap(resources.dpToPx(8f))
                     )
-                    width = 6 * scale
+                    width = resources.dpToPx(6f)
                     color = ContextCompat.getColor(requireContext(), R.color.colorPrimaryLight)
                     jointType = JointType.ROUND
                     endCap = ButtCap()
