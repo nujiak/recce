@@ -159,9 +159,11 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
             binding.chainSelectedIndex.setTextColor(color)
             binding.chainSelectedIndex.text = (item.selectionIndex + 1).toString()
             binding.selectionShade.visibility = View.VISIBLE
+            binding.pinListChainItemParent.cardElevation = 0f
         } else {
             binding.chainSelectedIndex.visibility = View.INVISIBLE
             binding.selectionShade.visibility = View.GONE
+            binding.pinListChainItemParent.cardElevation = getDp(context.resources, 8f)
         }
     }
 }
