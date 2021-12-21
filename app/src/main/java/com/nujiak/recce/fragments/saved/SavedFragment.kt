@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -27,6 +28,7 @@ import com.nujiak.recce.databinding.FragmentSavedBinding
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.enums.SharedPrefsKey
 import com.nujiak.recce.enums.SortBy
+import com.nujiak.recce.utils.spToPx
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter
 
@@ -58,7 +60,8 @@ class SavedFragment : Fragment() {
             resources
         )
         binding.pinRecyclerview.adapter = pinAdapter
-        val gridLayoutManager = StaggeredGridLayoutManager(2, Configuration.ORIENTATION_PORTRAIT)
+        val gridLayoutManager = StaggeredGridLayoutManager(getSpanCount(), Configuration.ORIENTATION_PORTRAIT)
+        gridLayoutManager.gapStrategy =StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
         binding.pinRecyclerview.layoutManager = gridLayoutManager
 
         // Observe for changes to pins and chains
@@ -182,6 +185,16 @@ class SavedFragment : Fragment() {
         })
 
         return binding.root
+    }
+
+    /**
+     * Calculates the span count by dividing the screen width by the width of each item
+     *
+     * @return
+     */
+    private fun getSpanCount(): Int {
+        val count = (resources.displayMetrics.widthPixels / resources.spToPx(196f)).toInt()
+        return if (count > 0) count else 1
     }
 
     private fun onPinClick(pin: Pin) {
