@@ -17,9 +17,9 @@ import com.nujiak.recce.databinding.PinListHeaderItemBinding
 import com.nujiak.recce.databinding.PinListItemBinding
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
+import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.formatAsAreaString
 import com.nujiak.recce.utils.formatAsDistanceString
-import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.getGridString
 
 private const val STROKE_SIZE_DP: Float = 2f

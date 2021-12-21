@@ -95,7 +95,7 @@ fun Double.round(decimals: Int): Double {
  * @param dp length in dp
  * @return length in screen pixel
  */
-fun Resources.dpToPx(dp:Float): Float {
+fun Resources.dpToPx(dp: Float): Float {
     return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, this.displayMetrics)
 }
 
@@ -105,6 +105,6 @@ fun Resources.dpToPx(dp:Float): Float {
  * @param sp length in sp
  * @return length in screen pixel
  */
-fun Resources.spToPx(sp:Float): Float {
+fun Resources.spToPx(sp: Float): Float {
     return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, this.displayMetrics)
 }

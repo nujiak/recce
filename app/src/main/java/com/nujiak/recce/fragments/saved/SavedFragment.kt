@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -61,7 +60,7 @@ class SavedFragment : Fragment() {
         )
         binding.pinRecyclerview.adapter = pinAdapter
         val gridLayoutManager = StaggeredGridLayoutManager(getSpanCount(), Configuration.ORIENTATION_PORTRAIT)
-        gridLayoutManager.gapStrategy =StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
+        gridLayoutManager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
         binding.pinRecyclerview.layoutManager = gridLayoutManager
 
         // Observe for changes to pins and chains

@@ -68,9 +68,9 @@ import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.PIN_VECTOR_DRAWABLE
 import com.nujiak.recce.utils.animateColor
 import com.nujiak.recce.utils.degToRad
+import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.formatAsDistanceString
 import com.nujiak.recce.utils.getAngleString
-import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.getGridString
 import com.nujiak.recce.utils.withAlpha
 import dagger.hilt.android.AndroidEntryPoint
