@@ -23,6 +23,7 @@ import com.nujiak.recce.utils.getDp
 import com.nujiak.recce.utils.getGridString
 
 private const val STROKE_SIZE_DP: Float = 1f
+private const val STROKE_SIZE_SELECTED_DP: Float = 4f
 
 class PinViewHolder private constructor(private val binding: PinListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
@@ -71,10 +72,12 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
             binding.pinSelectedIndex.setTextColor(color)
             binding.selectionShade.visibility = View.VISIBLE
             binding.pinListItemParent.cardElevation = 0f
+            binding.pinListItemParent.strokeWidth = getDp(context.resources, STROKE_SIZE_SELECTED_DP).toInt()
         } else {
             binding.pinSelectedIndex.visibility = View.INVISIBLE
             binding.selectionShade.visibility = View.GONE
             binding.pinListItemParent.cardElevation = getDp(context.resources, 8f)
+            binding.pinListItemParent.strokeWidth = getDp(context.resources, STROKE_SIZE_DP).toInt()
         }
     }
 }
@@ -160,10 +163,12 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
             binding.chainSelectedIndex.text = (item.selectionIndex + 1).toString()
             binding.selectionShade.visibility = View.VISIBLE
             binding.pinListChainItemParent.cardElevation = 0f
+            binding.pinListChainItemParent.strokeWidth = getDp(context.resources, STROKE_SIZE_SELECTED_DP).toInt()
         } else {
             binding.chainSelectedIndex.visibility = View.INVISIBLE
             binding.selectionShade.visibility = View.GONE
             binding.pinListChainItemParent.cardElevation = getDp(context.resources, 8f)
+            binding.pinListChainItemParent.strokeWidth = getDp(context.resources, STROKE_SIZE_DP).toInt()
         }
     }
 }
