@@ -22,7 +22,7 @@ import com.nujiak.recce.utils.formatAsDistanceString
 import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.getGridString
 
-private const val STROKE_SIZE_DP: Float = 1f
+private const val STROKE_SIZE_DP: Float = 2f
 private const val STROKE_SIZE_SELECTED_DP: Float = 4f
 
 class PinViewHolder private constructor(private val binding: PinListItemBinding) :

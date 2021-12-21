@@ -57,7 +57,7 @@ class ChainInfoFragment : DialogFragment() {
         ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[chain.color]).let { color ->
             binding.pinName.setTextColor(color)
             binding.root.strokeColor = color
-            (binding.pinGroup.background as GradientDrawable).setStroke(resources.dpToPx(1f).toInt(), color)
+            (binding.pinGroup.background as GradientDrawable).setStroke(resources.dpToPx(2f).toInt(), color)
 
             val colorStateList = ColorStateList.valueOf(color)
             (binding.pinMap as MaterialButton).iconTint = colorStateList
