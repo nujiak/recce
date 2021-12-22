@@ -163,7 +163,7 @@
         tools:visibility="visible">
 
         <TextView
-            android:id="@+id/map_checkpoint_chain"
+            android:id="@+id/map_poi_infobar"
             style="@style/TextAppearance.MaterialComponents.Headline6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
