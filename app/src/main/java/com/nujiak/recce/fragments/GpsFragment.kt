@@ -15,10 +15,12 @@ import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.livedatas.RotationLiveData
+import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.formatAsDistanceString
 import com.nujiak.recce.utils.getAngleString
 import com.nujiak.recce.utils.getGridString
 import com.nujiak.recce.utils.radToDeg
+import com.nujiak.recce.utils.spToPx
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.PI
 import kotlin.math.cos
@@ -70,6 +72,11 @@ class GpsFragment : Fragment() {
             updateOrientationUI()
         })
 
+        // Change the layout column count depending on the screen width
+        resources.displayMetrics.widthPixels.let { screenWidth ->
+            binding.gpsParent.columnCount =
+                if (screenWidth / 2 > resources.dpToPx(288f) && screenWidth / 2 > resources.spToPx(288f)) 2 else 1
+        }
         return binding.root
     }
 
