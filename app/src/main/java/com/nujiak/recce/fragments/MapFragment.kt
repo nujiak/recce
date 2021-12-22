@@ -15,6 +15,7 @@ import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.HapticFeedbackConstants
@@ -644,17 +645,30 @@ class MapFragment :
         binding.mapCheckpointChain.text = name
         binding.mapCheckpointChain.isSelected = true
 
-        val bgColor =
-            if (colorId != null) {
-                ContextCompat.getColor(
-                    requireContext(), PIN_CARD_BACKGROUNDS[colorId]
-                )
-            } else {
-                ContextCompat.getColor(requireContext(), android.R.color.black)
-            }
+        val color = if (colorId != null) {
+                ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[colorId])
+        } else {
+            ContextCompat.getColor(requireContext(), android.R.color.black)
+        }
 
-        animateColor(binding.mapCheckpointInfobar.backgroundTintList, bgColor, 150) {
-            binding.mapCheckpointInfobar.backgroundTintList = ColorStateList.valueOf(it)
+        val currentColor: Int? = binding.mapCheckpointChain.tag as Int?
+
+        if (currentColor == null) {
+            binding.mapCheckpointChain.tag = color
+            binding.mapCheckpointChain.setTextColor(color)
+            val colorStateList = ColorStateList.valueOf(color)
+            binding.mapCheckpointInfobar.setStrokeColor(colorStateList)
+            binding.areaIcon.imageTintList = colorStateList
+            binding.routeIcon.imageTintList = colorStateList
+        } else {
+            binding.mapCheckpointInfobar.setStrokeColor(ColorStateList.valueOf(color))
+            animateColor(currentColor, color, 150) {
+                binding.mapCheckpointChain.tag = it
+                binding.mapCheckpointChain.setTextColor(it)
+                val colorStateList = ColorStateList.valueOf(it)
+                binding.areaIcon.imageTintList = colorStateList
+                binding.routeIcon.imageTintList = colorStateList
+            }
         }
     }
 

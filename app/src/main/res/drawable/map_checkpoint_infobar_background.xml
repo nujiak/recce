@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="?colorControlHighlight">
-    <item>
-        <shape>
-            <solid android:color="#FFFFFF" />
-            <corners
-                android:bottomLeftRadius="32dp"
-                android:bottomRightRadius="32dp" />
-        </shape>
-    </item>
-</ripple>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" >
+    <solid android:color="?attr/colorSurface" />
+    <corners
+        android:radius="32dp" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/tagGreen" />
+</shape>
