@@ -75,7 +75,7 @@ class GpsFragment : Fragment() {
         // Change the layout column count depending on the screen width
         resources.displayMetrics.widthPixels.let { screenWidth ->
             binding.gpsParent.columnCount =
-                if (screenWidth / 2 > resources.dpToPx(288f) && screenWidth / 2 > resources.spToPx(288f)) 2 else 1
+                if (screenWidth / 2 > resources.dpToPx(288f) && screenWidth / 2 > resources.spToPx(344f)) 2 else 1
         }
         return binding.root
     }

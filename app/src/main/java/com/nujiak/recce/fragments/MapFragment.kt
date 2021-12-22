@@ -15,7 +15,6 @@ import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.HapticFeedbackConstants
@@ -646,7 +645,7 @@ class MapFragment :
         binding.mapCheckpointChain.isSelected = true
 
         val color = if (colorId != null) {
-                ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[colorId])
+            ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[colorId])
         } else {
             ContextCompat.getColor(requireContext(), android.R.color.black)
         }
