@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/tagBackground" />
+    <solid android:color="@android:color/transparent"/>
+    <stroke android:color="@color/tagRed" android:width="1dp"/>
     <corners
-        android:bottomLeftRadius="@dimen/tiny_padding"
-        android:bottomRightRadius="@dimen/tiny_padding"
-        android:topLeftRadius="@dimen/tiny_padding"
-        android:topRightRadius="@dimen/tiny_padding"/>
+        android:bottomLeftRadius="@dimen/large_padding"
+        android:bottomRightRadius="@dimen/large_padding"/>
 </shape>

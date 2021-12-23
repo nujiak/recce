@@ -10,7 +10,8 @@
     app:cardCornerRadius="16dp"
     app:cardElevation="1dp"
     app:cardPreventCornerOverlap="true"
-    tools:cardBackgroundColor="@color/tagRed">
+    app:strokeWidth="2dp"
+    tools:strokeColor="@color/tagRed">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,41 +32,19 @@
                 style="@style/Widget.Recce.Button.TextButton.IconOnly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_baseline_open_in_new_24"
-                app:iconTint="@android:color/white" />
+                app:icon="@drawable/ic_baseline_open_in_new_24" />
 
-            <FrameLayout
+            <Space
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
-
-                <TextView
-                    android:id="@+id/pin_group"
-                    style="@style/Theme.Recce.Tags"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="@drawable/tag_background"
-                    android:elevation="0dp"
-                    android:ellipsize="end"
-                    android:gravity="center"
-                    android:maxWidth="100sp"
-                    android:maxLines="1"
-                    android:paddingStart="@dimen/tiny_padding"
-                    android:paddingEnd="@dimen/tiny_padding"
-                    android:textAllCaps="true"
-                    android:textStyle="bold"
-                    tools:text="Buildings"
-                    tools:textColor="#000000" />
-            </FrameLayout>
+                android:layout_weight="1"/>
 
             <Button
                 android:id="@+id/pin_map"
                 style="@style/Widget.Recce.Button.TextButton.IconOnly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_map_white_24dp"
-                app:iconTint="@android:color/white" />
+                app:icon="@drawable/ic_map_white_24dp" />
 
             <Button
                 android:id="@+id/pin_edit"
@@ -73,8 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                app:icon="@drawable/ic_baseline_edit_24"
-                app:iconTint="@android:color/white" />
+                app:icon="@drawable/ic_baseline_edit_24" />
         </LinearLayout>
 
 
@@ -85,12 +63,9 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="bottom"
-            android:lines="2"
-            android:maxLines="2"
-            android:paddingStart="@dimen/large_padding"
-            android:paddingTop="@dimen/small_padding"
-            android:paddingEnd="@dimen/large_padding"
-            android:paddingBottom="@dimen/small_padding"
+            android:layout_marginStart="@dimen/large_padding"
+            android:layout_marginEnd="@dimen/large_padding"
+            android:textColor="?android:attr/textColorPrimary"
             tools:text="Name" />
 
         <ScrollView
@@ -100,7 +75,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/pin_background_lower"
                 android:orientation="vertical">
 
 
@@ -112,7 +86,8 @@
                     android:text="@string/description"
                     android:layout_marginStart="@dimen/large_padding"
                     android:layout_marginTop="@dimen/small_padding"
-                    android:layout_marginEnd="@dimen/large_padding" />
+                    android:layout_marginEnd="@dimen/large_padding"
+                    android:textColor="?android:attr/textColorPrimary" />
 
                 <TextView
                     android:id="@+id/pin_description"
@@ -121,7 +96,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/large_padding"
                     android:layout_marginEnd="@dimen/large_padding"
-                    tools:text="Description of the pin" />
+                    tools:text="Description of the pin"
+                    android:textColor="?android:attr/textColorPrimary" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -131,7 +107,8 @@
                     android:paddingStart="@dimen/large_padding"
                     android:paddingTop="@dimen/small_padding"
                     android:paddingEnd="@dimen/large_padding"
-                    android:paddingBottom="@dimen/small_padding"
+                    android:paddingBottom="@dimen/large_padding"
+                    android:textColor="?android:attr/textColorPrimary"
                     tools:ignore="RtlSymmetry">
 
                     <LinearLayout
@@ -145,6 +122,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/lat_lng"
+                            android:textColor="?android:attr/textColorPrimary"
                             app:fontFamily="@font/open_sans" />
 
                         <TextView
@@ -154,6 +132,7 @@
                             android:layout_height="wrap_content"
                             android:ellipsize="none"
                             android:singleLine="true"
+                            android:textColor="?android:attr/textColorPrimary"
                             tools:text="1.363566 103.245243" />
 
                         <TextView
@@ -162,6 +141,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/small_padding"
                             android:text="@string/mgrs"
+                            android:textColor="?android:attr/textColorPrimary"
                             app:fontFamily="@font/open_sans" />
 
                         <TextView
@@ -169,6 +149,7 @@
                             style="@style/TextAppearance.Recce.Number"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textColor="?android:attr/textColorPrimary"
                             tools:text="395930 503850" />
                     </LinearLayout>
 
@@ -183,6 +164,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/utm"
+                            android:textColor="?android:attr/textColorPrimary"
                             app:fontFamily="@font/open_sans" />
 
                         <TextView
@@ -190,6 +172,7 @@
                             style="@style/TextAppearance.Recce.Number"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textColor="?android:attr/textColorPrimary"
                             tools:text="395930 503850" />
 
 
@@ -199,6 +182,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/small_padding"
                             android:text="@string/kertau"
+                            android:textColor="?android:attr/textColorPrimary"
                             app:fontFamily="@font/open_sans" />
 
                         <TextView
@@ -206,10 +190,26 @@
                             style="@style/TextAppearance.Recce.Number"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textColor="?android:attr/textColorPrimary"
                             tools:text="395930 503850" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
+        <TextView
+            android:id="@+id/pin_group"
+            style="@style/Theme.Recce.Tags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/tag_background"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingTop="@dimen/tiny_padding"
+            android:paddingBottom="@dimen/tiny_padding"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textStyle="italic"
+            tools:backgroundTint="@color/tagRed"
+            tools:text="Buildings"/>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

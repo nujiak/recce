@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.enums.CoordinateSystem
@@ -68,26 +69,19 @@ class PinAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        // Set item to take up the full span if it is a chain or header (not a pin)
+        val layoutParams = holder.itemView.layoutParams as StaggeredGridLayoutManager.LayoutParams
+        layoutParams.isFullSpan = holder is HeaderViewHolder
+
         when (holder) {
             is PinViewHolder -> {
-                holder.bind(
-                    getItem(position) as PinWrapper,
-                    onPinClick,
-                    onPinLongClick,
-                    coordSysId
-                )
+                holder.bind(getItem(position) as PinWrapper, onPinClick, onPinLongClick, coordSysId)
             }
             is ChainViewHolder -> {
-                holder.bind(
-                    getItem(position) as ChainWrapper,
-                    onChainClick,
-                    onChainLongClick
-                )
+                holder.bind(getItem(position) as ChainWrapper, onChainClick, onChainLongClick)
             }
             is HeaderViewHolder -> {
-                holder.bind(
-                    getItem(position) as HeaderItem
-                )
+                holder.bind(getItem(position) as HeaderItem)
             }
         }
     }

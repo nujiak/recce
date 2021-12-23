@@ -47,7 +47,8 @@ class RulerPinViewHolder private constructor(private val binding: RulerPinItemBi
 
         val context = binding.root.context
         val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[rulerPointItem.colorId])
-        binding.rulerPinItemCardView.setCardBackgroundColor(color)
+        binding.rulerPinItemCardView.strokeColor = color
+        binding.rulerPinName.setTextColor(color)
     }
 }
 

@@ -2,6 +2,7 @@ package com.nujiak.recce.utils
 
 import android.content.res.Resources
 import android.graphics.Color
+import android.util.TypedValue
 import com.google.android.gms.maps.model.LatLng
 import com.nujiak.recce.R
 import com.nujiak.recce.enums.AngleUnit
@@ -86,4 +87,24 @@ fun withAlpha(color: Int, alpha: Int): Int {
 fun Double.round(decimals: Int): Double {
     val magnitude = 10.0.pow(decimals.toDouble())
     return round(this * magnitude) / magnitude
+}
+
+/**
+ * Converts a length in dp to screen pixels
+ *
+ * @param dp length in dp
+ * @return length in screen pixel
+ */
+fun Resources.dpToPx(dp: Float): Float {
+    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, this.displayMetrics)
+}
+
+/**
+ * Converts a length in sp to screen pixels
+ *
+ * @param sp length in sp
+ * @return length in screen pixel
+ */
+fun Resources.spToPx(sp: Float): Float {
+    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, this.displayMetrics)
 }

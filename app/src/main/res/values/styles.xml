@@ -48,7 +48,7 @@
     </style>
 
     <style name="Theme.Recce.Tags" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="fontFamily">@font/open_sans_extrabold</item>
+        <item name="fontFamily">@font/open_sans</item>
     </style>
 
     <style name="ThemeOverlay.Recce.ActionBar" parent="ThemeOverlay.MaterialComponents.ActionBar">
@@ -93,7 +93,7 @@
         <item name="colorOnPrimary">@color/colorPrimary</item>
     </style>
 
-    <style name="TextAppearance.Recce.PinName" parent="TextAppearance.MaterialComponents.Headline5">
+    <style name="TextAppearance.Recce.PinName" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="android:textColor">@android:color/white</item>
     </style>
 
