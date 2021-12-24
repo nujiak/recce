@@ -10,6 +10,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.ChainNode
@@ -445,26 +446,36 @@ class MainViewModel @Inject constructor(
         _shareCode.value = null
     }
 
+    /**
+     * Filters the selected pins and chains for sharing
+     */
     fun onShareSelectedPins() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val pinIdsToShare = mutableListOf<Long>()
+            val chainIdsToShare = mutableListOf<Long>()
 
-        val pinIdsToShare = mutableListOf<Long>()
-        val chainIdsToShare = mutableListOf<Long>()
-
-        for (id in selectedIds) {
-            if (id > 0) {
-                pinIdsToShare.add(id)
-            } else {
-                chainIdsToShare.add(-id)
+            for (id in selectedIds) {
+                if (id > 0) {
+                    pinIdsToShare.add(id)
+                } else {
+                    chainIdsToShare.add(-id)
+                }
             }
+
+            val pinsToShare = allPins.value?.filter { it.pinId in pinIdsToShare }
+            val chainsToShare = allChains.value?.filter { it.chainId in chainIdsToShare }
+
+            shareQuantity = Pair(pinsToShare?.size, chainsToShare?.size)
+            _shareCode.value = toShareCode(pinsToShare, chainsToShare)
         }
-
-        val pinsToShare = allPins.value?.filter { it.pinId in pinIdsToShare }
-        val chainsToShare = allChains.value?.filter { it.chainId in chainIdsToShare }
-
-        shareQuantity = Pair(pinsToShare?.size, chainsToShare?.size)
-        _shareCode.value = toShareCode(pinsToShare, chainsToShare)
     }
 
+    /**
+     * Parses the share code input and adds parsed [Pin]s and [Chain]s to the database
+     *
+     * @param shareCode
+     * @return
+     */
     fun processShareCode(shareCode: String): Boolean {
         val pair = toPinsAndChains(shareCode)
         return if (pair != null && !(pair.first.isEmpty() && pair.second.isEmpty())) {
