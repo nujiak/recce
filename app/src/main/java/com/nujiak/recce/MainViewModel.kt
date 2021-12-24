@@ -27,9 +27,7 @@ import com.nujiak.recce.fragments.ruler.generateRulerList
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.livedatas.RotationLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -42,9 +40,6 @@ class MainViewModel @Inject constructor(
     application: Application
 ) :
     AndroidViewModel(application) {
-
-    private val viewModelJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     var screenRotation = 0
         set(newRotation) {
@@ -65,16 +60,16 @@ class MainViewModel @Inject constructor(
     fun addPin(pin: Pin) =
         runBlocking { lastAddedId = insert(pin) } // Blocking to allow pinId to return
 
-    fun updatePin(pin: Pin) = uiScope.launch { update(pin) }
-    fun deletePin(pin: Pin) = uiScope.launch { deletePin(pin.pinId) }
+    fun updatePin(pin: Pin) = viewModelScope.launch { update(pin) }
+    fun deletePin(pin: Pin) = viewModelScope.launch { deletePin(pin.pinId) }
 
     fun addChain(chain: Chain) =
         runBlocking { lastAddedId = insert(chain) }
 
-    fun updateChain(chain: Chain) = uiScope.launch { update(chain) }
-    fun deleteChain(chain: Chain) = uiScope.launch { deleteChain(chain.chainId) }
+    fun updateChain(chain: Chain) = viewModelScope.launch { update(chain) }
+    fun deleteChain(chain: Chain) = viewModelScope.launch { deleteChain(chain.chainId) }
     private fun addPinsAndChains(pins: List<Pin>, chains: List<Chain>) {
-        uiScope.launch {
+        viewModelScope.launch {
             pins.forEach { addPin(it) }
             chains.forEach { addChain(it) }
         }
@@ -421,7 +416,7 @@ class MainViewModel @Inject constructor(
 
         exitSelectionMode()
 
-        uiScope.launch {
+        viewModelScope.launch {
             pinIdsToDelete.forEach { pinId -> deletePin(pinId) }
             chainIdsToDelete.forEach { chainId -> deleteChain(chainId) }
         }
@@ -429,7 +424,7 @@ class MainViewModel @Inject constructor(
 
     fun onRestoreLastDeletedPins() {
         lastMultiDeletedItems.value?.let {
-            uiScope.launch {
+            viewModelScope.launch {
                 val (pins, chains) = it
                 pins?.forEach { pin -> addPin(pin) }
                 chains?.forEach { chain -> addChain(chain) }
@@ -512,13 +507,5 @@ class MainViewModel @Inject constructor(
 
     private suspend fun deleteChain(chainId: Long) = withContext(Dispatchers.IO) {
         database.deleteChain(chainId)
-    }
-
-    /**
-     * Override's ViewModel onCleared() to stop any ongoing coroutine database operations
-     */
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
     }
 }
