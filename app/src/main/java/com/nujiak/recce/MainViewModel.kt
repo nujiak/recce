@@ -89,8 +89,8 @@ class MainViewModel @Inject constructor(
     val isLocPermGranted: LiveData<Boolean>
         get() = _isLocPermGranted
 
-    private val _hideKeyboardFromThisView = MutableLiveData<View>(null)
-    val hideKeyboardFromThisView: LiveData<View>
+    private val _hideKeyboardFromThisView = MutableLiveData<View?>(null)
+    val hideKeyboardFromThisView: LiveData<View?>
         get() = _hideKeyboardFromThisView
 
     fun hideKeyboardFromView(view: View) {
@@ -109,27 +109,11 @@ class MainViewModel @Inject constructor(
     val rotationLiveData = RotationLiveData(application, screenRotation)
 
     /**
-     * LiveData to hold pin to be added, MainActivity observes this
-     * to start PinCreatorSheet
-     */
-    private val _pinToAdd = MutableLiveData<Pin>()
-    val pinToAdd: LiveData<Pin>
-        get() = _pinToAdd
-
-    /**
-     * LiveData to hold chain to be added, MainActivity observes this
-     * to start ChainCreatorSheet
-     */
-    private val _chainToAdd = MutableLiveData<Chain>()
-    val chainToAdd: LiveData<Chain>
-        get() = _chainToAdd
-
-    /**
      * LiveData to hold pin to be shown as a PinInfoFragment dialog,
      * MainActivity observes this to start PinInfoFragment
      */
-    private val _pinToShowInfo = MutableLiveData<Long>()
-    val pinToShowInfo: LiveData<Long>
+    private val _pinToShowInfo = MutableLiveData<Long?>()
+    val pinToShowInfo: LiveData<Long?>
         get() = _pinToShowInfo
 
     fun showPinInfo(pinId: Long?) {
@@ -142,8 +126,8 @@ class MainViewModel @Inject constructor(
      * LiveData to hold chain to be shown as a ChainInfoFragment dialog,
      * MainActivity observes this to start ChainInfoFragment
      */
-    private val _chainToShowInfo = MutableLiveData<Long>()
-    val chainToShowInfo: LiveData<Long>
+    private val _chainToShowInfo = MutableLiveData<Long?>()
+    val chainToShowInfo: LiveData<Long?>
         get() = _chainToShowInfo
 
     fun showChainInfo(chainId: Long?) {
@@ -172,8 +156,8 @@ class MainViewModel @Inject constructor(
      * LiveData to hold Boolean on whether to open Go To dialog.
      * MainActivity observes this to start GoToFragment
      */
-    private val _toOpenGoTo = MutableLiveData<LatLng>(null)
-    val toOpenGoTo: LiveData<LatLng>
+    private val _toOpenGoTo = MutableLiveData<LatLng?>(null)
+    val toOpenGoTo: LiveData<LatLng?>
         get() = _toOpenGoTo
 
     fun openGoTo(currentLat: Double, currentLng: Double) {
@@ -184,12 +168,8 @@ class MainViewModel @Inject constructor(
         _toOpenGoTo.value = null
     }
 
-    /**
-     * LiveData to hold chain to be shown as a ChainInfoFragment dialog,
-     * MainActivity observes this to start ChainInfoFragment
-     */
-    private val _mapGoTo = MutableLiveData<LatLng>()
-    val mapGoTo: LiveData<LatLng>
+    private val _mapGoTo = MutableLiveData<LatLng?>()
+    val mapGoTo: LiveData<LatLng?>
         get() = _mapGoTo
 
     fun mapGoTo(latLng: LatLng) {
@@ -200,9 +180,18 @@ class MainViewModel @Inject constructor(
         _mapGoTo.value = null
     }
 
-    /**
+    /*
      * Pin Creator
      */
+
+    /**
+     * LiveData to hold pin to be added, MainActivity observes this
+     * to start PinCreatorSheet
+     */
+    private val _pinToAdd = MutableLiveData<Pin?>()
+    val pinToAdd: LiveData<Pin?>
+        get() = _pinToAdd
+
     fun openPinCreator(pin: Pin?) {
         _pinToAdd.value = pin ?: Pin("", 0.0, 0.0)
         _pinToAdd.value = null // Reset to null
@@ -231,9 +220,17 @@ class MainViewModel @Inject constructor(
         return groups
     }
 
-    /**
+    /*
      * Chain Creator
      */
+
+    /**
+     * LiveData to hold chain to be added, MainActivity observes this
+     * to start ChainCreatorSheet
+     */
+    private val _chainToAdd = MutableLiveData<Chain?>()
+    val chainToAdd: LiveData<Chain?>
+        get() = _chainToAdd
 
     fun openChainCreator(chain: Chain) {
         _chainToAdd.value = chain
@@ -439,8 +436,8 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private val _shareCode = MutableLiveData<String>()
-    val shareCode: LiveData<String>
+    private val _shareCode = MutableLiveData<String?>()
+    val shareCode: LiveData<String?>
         get() = _shareCode
     var shareQuantity = Pair<Int?, Int?>(0, 0)
 
