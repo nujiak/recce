@@ -63,7 +63,7 @@
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/colorPrimaryLight"
                     android:textColor="@color/textColorLight"
-                    android:text="@string/kertau_full" />
+                    android:text="@string/kertau" />
 
                 <RadioButton
                     android:id="@+id/onboarding_radio_latlng"

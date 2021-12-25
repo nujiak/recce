@@ -16,8 +16,7 @@
     <string name="coordinate_system">Coordinate System</string>
     <string name="angle_unit">Angle Unit</string>
     <string name="utm" translatable="false">UTM</string>
-    <string name="kertau" translatable="false">Kertau (RSO)</string>
-    <string name="kertau_full" translatable="false">Kertau (RSO) / RSO Malaya (m)</string>
+    <string name="kertau" translatable="false">Kertau 1948</string>
     <string name="mgrs" translatable="false">MGRS</string>
     <string name="nato_mils" translatable="false">NATO mils</string>
     <string name="degrees" translatable="false">Degrees</string>
