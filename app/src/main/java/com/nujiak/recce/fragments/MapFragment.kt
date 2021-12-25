@@ -62,7 +62,6 @@ import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.FragmentMapBinding
 import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
-import com.nujiak.recce.enums.SharedPrefsKey
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.livedatas.RotationLiveData
 import com.nujiak.recce.mapping.component1
@@ -186,7 +185,6 @@ class MapFragment :
                 if (itemView.equals(lastShowcase)) {
                     isChainGuideShowing = false
                     viewModel.chainsGuideShown = true
-                    viewModel.sharedPreference.edit().putBoolean(SharedPrefsKey.CHAINS_GUIDE_SHOWN.key, true).apply()
                 }
             }
 
@@ -361,9 +359,6 @@ class MapFragment :
         // Set up Map rotation reset
         binding.mapCompass.setOnClickListener { mapMgr?.resetMapRotation() }
 
-        viewModel.chainsGuideShown =
-            viewModel.sharedPreference.getBoolean(SharedPrefsKey.CHAINS_GUIDE_SHOWN.key, false)
-
         return binding.root
     }
 
@@ -371,8 +366,7 @@ class MapFragment :
         if (mMap != null) {
             mapMgr = MapManager(mMap)
 
-            val newMapType =
-                viewModel.sharedPreference.getInt(SharedPrefsKey.MAP_TYPE.key, GoogleMap.MAP_TYPE_HYBRID)
+            val newMapType = viewModel.mapType
             mapMgr?.changeMapType(newMapType)
             binding.mapTypeGroup.check(
                 when (newMapType) {
@@ -1290,7 +1284,7 @@ class MapFragment :
             if (this.mapType != mapType) {
                 map.mapType = mapType
                 this.mapType = mapType
-                viewModel.sharedPreference.edit().putInt(SharedPrefsKey.MAP_TYPE.key, mapType).apply()
+                viewModel.mapType = mapType
             }
         }
 

@@ -25,7 +25,6 @@ import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.FragmentSavedBinding
 import com.nujiak.recce.enums.CoordinateSystem
-import com.nujiak.recce.enums.SharedPrefsKey
 import com.nujiak.recce.enums.SortBy
 import com.nujiak.recce.utils.spToPx
 import dagger.hilt.android.AndroidEntryPoint
@@ -114,8 +113,8 @@ class SavedFragment : Fragment() {
         })
 
         // Fetch sorting parameters
-        sortBy = SortBy.atIndex(viewModel.sharedPreference.getInt(SharedPrefsKey.SORT_BY.key, sortBy.index))
-        sortAscending = viewModel.sharedPreference.getBoolean(SharedPrefsKey.SORT_ASCENDING.key, sortAscending)
+        sortBy = viewModel.sortBy
+        sortAscending = viewModel.sortAscending
 
         // Set up FAB
         binding.pinFab.setMenuListener(object : SimpleMenuListenerAdapter() {
@@ -233,10 +232,9 @@ class SavedFragment : Fragment() {
     }
 
     private fun onSortList() {
-        viewModel.sharedPreference.edit()
-            .putInt(SharedPrefsKey.SORT_BY.key, sortBy.index)
-            .putBoolean(SharedPrefsKey.SORT_ASCENDING.key, sortAscending)
-            .apply()
+        viewModel.sortBy = sortBy
+        viewModel.sortAscending = sortAscending
+
         refreshList()
         binding.pinRecyclerview.smoothScrollToPosition(0)
     }

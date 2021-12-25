@@ -5,12 +5,15 @@ import android.app.Application
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.view.View
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.ChainNode
@@ -22,6 +25,8 @@ import com.nujiak.recce.database.toShareCode
 import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.enums.SharedPrefsKey
+import com.nujiak.recce.enums.SortBy
+import com.nujiak.recce.enums.ThemePreference
 import com.nujiak.recce.fragments.ruler.RulerItem
 import com.nujiak.recce.fragments.ruler.generateRulerList
 import com.nujiak.recce.livedatas.FusedLocationLiveData
@@ -45,7 +50,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val database: RecceDatabaseDao,
-    val sharedPreference: SharedPreferences,
+    private val sharedPreference: SharedPreferences,
     application: Application
 ) :
     AndroidViewModel(application) {
@@ -64,7 +69,76 @@ class MainViewModel @Inject constructor(
     /**
      * Whether the chain guide has been shown before
      */
-    var chainsGuideShown = false // Used in MapFragment
+    var chainsGuideShown: Boolean
+        get() = sharedPreference.getBoolean(SharedPrefsKey.CHAINS_GUIDE_SHOWN.key, false)
+        set(value) {
+            sharedPreference.edit {
+                putBoolean(SharedPrefsKey.CHAINS_GUIDE_SHOWN.key, value)
+            }
+        }
+
+    /**
+     * Current app theme
+     */
+    var theme: ThemePreference
+        get() {
+            val index = sharedPreference.getInt(SharedPrefsKey.THEME_PREF.key, ThemePreference.AUTO.index)
+            return ThemePreference.atIndex(index)
+        }
+        set(value) {
+            // Commit new theme preference to shared preferences
+            sharedPreference.edit {
+                putInt(SharedPrefsKey.THEME_PREF.key, value.index)
+            }
+
+            val nightMode = when (value) {
+                ThemePreference.AUTO -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                ThemePreference.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
+                ThemePreference.DARK -> AppCompatDelegate.MODE_NIGHT_YES
+            }
+
+            // Set app theme
+            AppCompatDelegate.setDefaultNightMode(nightMode)
+        }
+
+    /**
+     * Order to sort the [Pin]s and [Chain]s by in Saved
+     */
+    var sortBy: SortBy
+        get() {
+            val index = this.sharedPreference.getInt(SharedPrefsKey.SORT_BY.key, SortBy.GROUP.index)
+            return SortBy.atIndex(index)
+        }
+        set(value) = this.sharedPreference.edit {
+            putInt(SharedPrefsKey.SORT_BY.key, value.index)
+        }
+
+    /**
+     * Whether to sort the [Pin]s and [Chain]s in Saved in ascending order
+     */
+    var sortAscending: Boolean
+        get() = this.sharedPreference.getBoolean(SharedPrefsKey.SORT_ASCENDING.key, true)
+        set(value) = this.sharedPreference.edit {
+           putBoolean(SharedPrefsKey.SORT_ASCENDING.key, value)
+       }
+
+    /**
+     * Whether Onboarding has been completed
+     */
+    var isOnboardingCompleted: Boolean
+        get() = this.sharedPreference.getBoolean(SharedPrefsKey.ONBOARDING_COMPLETED.key, false)
+        set(value) = this.sharedPreference.edit {
+            putBoolean(SharedPrefsKey.ONBOARDING_COMPLETED.key, value)
+        }
+
+    /**
+     * Map type
+     */
+    var mapType: Int
+        get() = this.sharedPreference.getInt(SharedPrefsKey.MAP_TYPE.key, GoogleMap.MAP_TYPE_HYBRID)
+        set(value) = this.sharedPreference.edit {
+            putInt(SharedPrefsKey.MAP_TYPE.key, value)
+        }
 
     /**
      * [LiveData] for all pins fetched from the database
@@ -443,13 +517,13 @@ class MainViewModel @Inject constructor(
     /**
      * Update the coordinate system used
      *
-     * @param coordSysIndex index of the coordinate system in [CoordinateSystem] to be switched to
+     * @param coordSys
      */
-    fun updateCoordinateSystem(coordSysIndex: Int) {
-        val coordSys = CoordinateSystem.atIndex(coordSysIndex)
+    fun updateCoordinateSystem(coordSys: CoordinateSystem) {
         if (coordSys != _coordinateSystem.value) {
             _coordinateSystem.value = coordSys
         }
+        this.sharedPreference.edit().putInt(SharedPrefsKey.COORDINATE_SYSTEM.key, coordSys.index).apply()
     }
 
     /**
@@ -469,12 +543,14 @@ class MainViewModel @Inject constructor(
     /**
      * Updates the angle unit used
      *
-     * @param angleUnitIndex index of the angle unit in [AngleUnit] to be used
+     * @param angleUnit
      */
-    fun updateAngleUnit(angleUnitIndex: Int) {
-        val angleUnit = AngleUnit.atIndex(angleUnitIndex)
+    fun updateAngleUnit(angleUnit: AngleUnit) {
         if (angleUnit != _angleUnit.value) {
             _angleUnit.value = angleUnit
+        }
+        this.sharedPreference.edit {
+            putInt(SharedPrefsKey.ANGLE_UNIT.key, angleUnit.index)
         }
     }
 
@@ -821,6 +897,15 @@ class MainViewModel @Inject constructor(
 
             shareQuantity = Pair(pinsToShare?.size, chainsToShare?.size)
             _shareCode.value = toShareCode(pinsToShare, chainsToShare)
+        }
+    }
+
+    /**
+     * Clears all shared preferences entries
+     */
+    fun clearSharedPreferences() {
+        this.sharedPreference.edit {
+            clear()
         }
     }
 

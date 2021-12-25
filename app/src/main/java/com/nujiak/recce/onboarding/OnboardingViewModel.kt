@@ -7,13 +7,11 @@ import androidx.lifecycle.ViewModel
 import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.enums.SharedPrefsKey
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class OnboardingViewModel : ViewModel() {
-
-    companion object {
-    }
-
-    lateinit var sharedPreference: SharedPreferences
+@HiltViewModel
+class OnboardingViewModel @Inject constructor(private val sharedPreference: SharedPreferences) : ViewModel() {
 
     private val _changePage = MutableLiveData(OnboardingPage.TITLE)
     val changePage: LiveData<OnboardingPage>
