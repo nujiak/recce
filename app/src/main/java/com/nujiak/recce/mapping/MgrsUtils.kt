@@ -1,6 +1,7 @@
 package com.nujiak.recce.mapping
 
 import com.google.android.gms.maps.model.LatLng
+import com.nujiak.recce.enums.CoordinateSystem
 import kotlin.math.floor
 import kotlin.math.pow
 
@@ -239,7 +240,7 @@ fun transformFromWgs84(latitude: Double, longitude: Double): Coordinate? {
     }
 
     // Convert to UTM
-    val utmCoord = Mapping.toUtm(latitude, longitude) ?: return null
+    val utmCoord = Mapping.transformTo(CoordinateSystem.UTM, LatLng(latitude, longitude)) ?: return null
     val (utmZone, utmBand) = getUtmZoneAndBand(latitude, longitude)
 
     // Use UTM zone and easting/northing to get the MGRS column/row letters

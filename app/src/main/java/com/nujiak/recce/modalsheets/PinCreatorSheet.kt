@@ -24,6 +24,7 @@ import com.nujiak.recce.R
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.SheetPinCreatorBinding
 import com.nujiak.recce.enums.CoordinateSystem
+import com.nujiak.recce.mapping.Coordinate
 import com.nujiak.recce.mapping.Mapping
 import com.nujiak.recce.mapping.ZONE_BANDS
 import com.nujiak.recce.mapping.getUtmZoneAndBand
@@ -370,29 +371,26 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             return
         }
 
+        val coordinate = Mapping.transformTo(coordSys, LatLng(lat, lng)) ?: return
+
         when (coordSys) {
             CoordinateSystem.UTM -> {
-                val utmData = Mapping.toUtm(lat, lng)
-                utmData?.let {
-                    // UTM data is valid, set texts then return
-                    binding.newPinEastingEditText.setText(floor(it.x).toInt().toString())
-                    binding.newPinNorthingEditText.setText(floor(it.y).toInt().toString())
+                // UTM data is valid, set texts then return
+                binding.newPinEastingEditText.setText(floor(coordinate.x).toInt().toString())
+                binding.newPinNorthingEditText.setText(floor(coordinate.y).toInt().toString())
 
-                    // TODO: Replace this workaround
-                    val (zone, band) = getUtmZoneAndBand(lat, lng)
-                    binding.newPinZoneDropdown.setText("$zone$band", false)
-                    return
-                }
+                // TODO: Replace this workaround
+                val (zone, band) = getUtmZoneAndBand(lat, lng)
+                binding.newPinZoneDropdown.setText("$zone$band", false)
+                return
             }
             CoordinateSystem.MGRS -> {
-                binding.newPinMgrsEditText.setText(Mapping.toMgrs(lat, lng).toString())
+                binding.newPinMgrsEditText.setText(Coordinate.toString())
                 return
             }
             CoordinateSystem.KERTAU -> {
-                val latLng = LatLng(lat, lng)
-                val kertauCoordinate = Mapping.toKertau1948(latLng)
-                binding.newPinEastingEditText.setText(floor(kertauCoordinate.x).toInt().toString())
-                binding.newPinNorthingEditText.setText(floor(kertauCoordinate.y).toInt().toString())
+                binding.newPinEastingEditText.setText(floor(coordinate.x).toInt().toString())
+                binding.newPinNorthingEditText.setText(floor(coordinate.y).toInt().toString())
                 return
             }
             CoordinateSystem.WGS84 -> {

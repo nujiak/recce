@@ -1,6 +1,7 @@
 package com.nujiak.recce.mapping
 
 import com.google.android.gms.maps.model.LatLng
+import com.nujiak.recce.enums.CoordinateSystem
 import org.locationtech.proj4j.CRSFactory
 import org.locationtech.proj4j.CoordinateReferenceSystem
 import org.locationtech.proj4j.CoordinateTransform
@@ -44,11 +45,44 @@ class Mapping {
 
     companion object {
 
+        /**
+         * Transforms a WGS 84 coordinate to a coordinate system in [CoordinateSystem]
+         *
+         * @param coordinateSystem
+         * @param latLng
+         * @return
+         */
+        fun transformTo(coordinateSystem: CoordinateSystem, latLng: LatLng): Coordinate? {
+            return when (coordinateSystem) {
+                CoordinateSystem.WGS84 -> Coordinate.of(latLng)
+                CoordinateSystem.UTM -> toUtm(latLng)
+                CoordinateSystem.MGRS -> toMgrs(latLng)
+                CoordinateSystem.KERTAU -> toKertau1948(latLng)
+            }
+        }
+
+        /**
+         * Transforms a [Coordinate] to another in the [coordinateSystem]
+         *
+         * @param coordinateSystem
+         * @param coordinate
+         * @return
+         */
+        fun transformTo(coordinateSystem: CoordinateSystem, coordinate: Coordinate): Coordinate? {
+            return transformTo(coordinateSystem, coordinate.latLng)
+        }
+
+        /**
+         * Converts a [LatLng] to a [Coordinate] representing the same location
+         *
+         * @param latLng
+         * @return
+         */
         fun parseLatLng(latLng: LatLng): Coordinate {
             return Coordinate.of(latLng)
         }
 
-        fun toKertau1948(latLng: LatLng): Coordinate {
+        private fun toKertau1948(latLng: LatLng): Coordinate {
             val sourceCoord = latLng.toProjCoordinate()
             val resultCoord = ProjCoordinate()
 
@@ -57,10 +91,13 @@ class Mapping {
             return Coordinate.of(latLng, resultCoord.x, resultCoord.y)
         }
 
-        fun toKertau1948(coord: Coordinate): Coordinate {
-            return this.toKertau1948(coord.latLng)
-        }
-
+        /**
+         * Parses Kertau 1948 easting and northing into a [Coordinate]
+         *
+         * @param x easting
+         * @param y northing
+         * @return
+         */
         fun parseKertau1948(x: Double, y: Double): Coordinate {
             val sourceCoord = ProjCoordinate(x, y)
             val resultCoord = ProjCoordinate()
@@ -72,11 +109,11 @@ class Mapping {
             return Coordinate.of(latLng, x, y)
         }
 
-        fun toUtm(latLng: LatLng): Coordinate? {
+        private fun toUtm(latLng: LatLng): Coordinate? {
             return toUtm(latLng.latitude, latLng.longitude)
         }
 
-        fun toUtm(latitude: Double, longitude: Double): Coordinate? {
+        private fun toUtm(latitude: Double, longitude: Double): Coordinate? {
             if (latitude < -80 || latitude > 84) {
                 return null
             }
@@ -92,6 +129,15 @@ class Mapping {
             return Coordinate.of(LatLng(latitude, longitude), zone, band, resultCoord.x, resultCoord.y)
         }
 
+        /**
+         * Parses UTM data into a [Coordinate]
+         *
+         * @param zone
+         * @param band
+         * @param x easting
+         * @param y northing
+         * @return
+         */
         fun parseUtm(zone: Int, band: Char, x: Double, y: Double): Coordinate? {
             val utmBand = when (band) {
                 'N' -> UtmBand.NORTH
@@ -101,6 +147,15 @@ class Mapping {
             return parseUtm(zone, utmBand, x, y)
         }
 
+        /**
+         * Parses UTM data into a [Coordinate]
+         *
+         * @param zone
+         * @param band
+         * @param x easting
+         * @param y northing
+         * @return
+         */
         fun parseUtm(zone: Int, band: UtmBand, x: Double, y: Double): Coordinate? {
             val sourceCoord = ProjCoordinate(x, y)
             val resultCoord = ProjCoordinate()
@@ -145,14 +200,25 @@ class Mapping {
             return wgs84ToUtmTransforms[epsgCode]!!
         }
 
-        fun toMgrs(latLng: LatLng): Coordinate? {
+        private fun toMgrs(latLng: LatLng): Coordinate? {
             return toMgrs(latLng.latitude, latLng.longitude)
         }
 
-        fun toMgrs(latitude: Double, longitude: Double): Coordinate? {
+        private fun toMgrs(latitude: Double, longitude: Double): Coordinate? {
             return transformFromWgs84(latitude, longitude)
         }
 
+        /**
+         * Parses MGRS data in a [Coordinate]
+         *
+         * @param zone
+         * @param band
+         * @param eastingLetter
+         * @param northingLetter
+         * @param x
+         * @param y
+         * @return
+         */
         fun parseMgrs(
             zone: Int,
             band: Char,
@@ -164,6 +230,12 @@ class Mapping {
             return parse(zone, band, eastingLetter, northingLetter, x, y)
         }
 
+        /**
+         * Parses an MGRS string into a [Coordinate]
+         *
+         * @param mgrsString
+         * @return
+         */
         fun parseMgrs(mgrsString: String): Coordinate? {
             return parse(mgrsString)
         }

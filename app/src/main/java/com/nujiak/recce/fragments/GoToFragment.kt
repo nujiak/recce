@@ -14,7 +14,6 @@ import com.nujiak.recce.NoFilterArrayAdapter
 import com.nujiak.recce.R
 import com.nujiak.recce.databinding.DialogGoToBinding
 import com.nujiak.recce.enums.CoordinateSystem
-import com.nujiak.recce.mapping.Coordinate
 import com.nujiak.recce.mapping.Mapping
 import com.nujiak.recce.mapping.ZONE_BANDS
 import com.nujiak.recce.mapping.getUtmZoneAndBand
@@ -203,28 +202,26 @@ class GoToFragment : DialogFragment() {
         }
 
         val latLng = LatLng(lat, lng)
+        val coordinate = Mapping.transformTo(coordSys, latLng) ?: return
+
         when (coordSys) {
             CoordinateSystem.UTM -> {
-                val utmData = Mapping.toUtm(latLng)
-                utmData?.let {
-                    // UTM data is valid, set texts then return
-                    binding.newPinEastingEditText.setText(floor(it.x).toInt().toString())
-                    binding.newPinNorthingEditText.setText(floor(it.y).toInt().toString())
+                // UTM data is valid, set texts then return
+                binding.newPinEastingEditText.setText(floor(coordinate.x).toInt().toString())
+                binding.newPinNorthingEditText.setText(floor(coordinate.y).toInt().toString())
 
-                    // TODO: Replace this workaround
-                    val (zone, band) = getUtmZoneAndBand(lat, lng)
-                    binding.newPinZoneDropdown.setText("$zone$band", false)
-                    return
-                }
+                // TODO: Replace this workaround
+                val (zone, band) = getUtmZoneAndBand(lat, lng)
+                binding.newPinZoneDropdown.setText("$zone$band", false)
+                return
             }
             CoordinateSystem.MGRS -> {
-                binding.newPinMgrsEditText.setText(Mapping.toMgrs(lat, lng).toString())
+                binding.newPinMgrsEditText.setText(coordinate.toString())
                 return
             }
             CoordinateSystem.KERTAU -> {
-                val kertauCoordinate = Mapping.toKertau1948(Coordinate.of(latLng))
-                binding.newPinEastingEditText.setText(floor(kertauCoordinate.x).toInt().toString())
-                binding.newPinNorthingEditText.setText(floor(kertauCoordinate.y).toInt().toString())
+                binding.newPinEastingEditText.setText(floor(coordinate.x).toInt().toString())
+                binding.newPinNorthingEditText.setText(floor(coordinate.y).toInt().toString())
                 return
             }
             CoordinateSystem.WGS84 -> {
