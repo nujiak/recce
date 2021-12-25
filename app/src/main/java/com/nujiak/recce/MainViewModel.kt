@@ -123,8 +123,8 @@ class MainViewModel @Inject constructor(
     var sortAscending: Boolean
         get() = this.sharedPreference.getBoolean(SharedPrefsKey.SORT_ASCENDING.key, true)
         set(value) = this.sharedPreference.edit {
-           putBoolean(SharedPrefsKey.SORT_ASCENDING.key, value)
-       }
+            putBoolean(SharedPrefsKey.SORT_ASCENDING.key, value)
+        }
 
     /**
      * Whether Onboarding has been completed
@@ -226,8 +226,7 @@ class MainViewModel @Inject constructor(
             AngleUnit.NATO_MIL -> {
                 if (withSign) {
                     "${if (angleRad > 0) '+' else '-'}${
-                        radToNatoMils(abs(angleRad)).roundToInt().toString()
-                            .padStart(4, '0')
+                    radToNatoMils(abs(angleRad)).roundToInt().toString().padStart(4, '0')
                     } mils"
                 } else {
                     "${radToNatoMils(abs(angleRad)).roundToInt().toString().padStart(4, '0')} mils"

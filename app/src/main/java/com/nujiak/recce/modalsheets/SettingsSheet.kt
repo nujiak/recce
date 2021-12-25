@@ -94,7 +94,6 @@ class SettingsSheet : BottomSheetDialogFragment() {
 
         val themePrefId = viewModel.theme.index
         binding.settingsThemeDropdown.setText(themePrefs[themePrefId], false)
-
     }
 
     private fun onResetPreferences() {
