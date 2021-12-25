@@ -6,7 +6,7 @@ apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'kotlinx-serialization'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion '30.0.2'
 
     compileOptions {
@@ -54,7 +54,7 @@ android {
 
 dependencies {
     def room_version = '2.3.0'
-    def lifecycle_version = '2.3.1'
+    def lifecycle_version = '2.4.0'
     def hilt_version = '2.32-alpha'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])

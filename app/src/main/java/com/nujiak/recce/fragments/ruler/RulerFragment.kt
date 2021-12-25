@@ -9,7 +9,6 @@ import androidx.fragment.app.activityViewModels
 import com.nujiak.recce.MainViewModel
 import com.nujiak.recce.R
 import com.nujiak.recce.databinding.FragmentRulerBinding
-import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -31,7 +30,8 @@ class RulerFragment : Fragment() {
         // Set up RecyclerView
         val rulerAdapter = RulerAdapter(
             viewModel.coordinateSystem.value ?: CoordinateSystem.atIndex(0),
-            viewModel.angleUnit.value ?: AngleUnit.atIndex(0)
+            viewModel::formatAsAngle,
+            viewModel::formatAsGrids,
         )
         binding.rulerList.adapter = rulerAdapter
         viewModel.rulerList.observe(viewLifecycleOwner, {
@@ -46,7 +46,7 @@ class RulerFragment : Fragment() {
             rulerAdapter.updateCoordSys(it)
         })
         viewModel.angleUnit.observe(viewLifecycleOwner, {
-            rulerAdapter.updateAngleUnit(it)
+            rulerAdapter.notifyDataSetChanged()
         })
 
         binding.rulerTopAppBar.setOnMenuItemClickListener {

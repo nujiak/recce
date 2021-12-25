@@ -1,6 +1,5 @@
 package com.nujiak.recce.onboarding
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
@@ -11,18 +10,18 @@ import androidx.viewpager2.widget.ViewPager2
 import com.nujiak.recce.MainActivity
 import com.nujiak.recce.R
 import com.nujiak.recce.fragments.ruler.RulerFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class OnboardingActivity : AppCompatActivity() {
 
     private lateinit var viewpager: ViewPager2
 
+    val viewModel: OnboardingViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding)
-
-        val viewModel: OnboardingViewModel by viewModels()
-        viewModel.sharedPreference =
-            getSharedPreferences("com.nujiak.recce", Context.MODE_PRIVATE)
 
         viewpager = findViewById(R.id.onboarding_viewpager)
         viewpager.apply {
