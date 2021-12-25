@@ -82,7 +82,14 @@ class Mapping {
             return Coordinate.of(latLng)
         }
 
-        private fun toKertau1948(latLng: LatLng): Coordinate {
+        private fun toKertau1948(latLng: LatLng): Coordinate? {
+
+            with(latLng) {
+                if (latitude < 1.12 || latitude > 6.72 || longitude < 99.59 || longitude > 104.6) {
+                    return null
+                }
+            }
+
             val sourceCoord = latLng.toProjCoordinate()
             val resultCoord = ProjCoordinate()
 
