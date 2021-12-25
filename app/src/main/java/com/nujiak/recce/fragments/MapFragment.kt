@@ -71,7 +71,6 @@ import com.nujiak.recce.utils.animateColor
 import com.nujiak.recce.utils.degToRad
 import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.formatAsDistanceString
-import com.nujiak.recce.utils.getGridString
 import com.nujiak.recce.utils.withAlpha
 import dagger.hilt.android.AndroidEntryPoint
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence
@@ -464,12 +463,12 @@ class MapFragment :
     @SuppressLint("SetTextI18n")
     private fun updateGrids(latitude: Double? = null, longitude: Double? = null) {
         if (latitude != null && longitude != null) {
-            binding.mapCurrentGrids.text = getGridString(latitude, longitude, coordSys, resources)
+            binding.mapCurrentGrids.text = viewModel.formatAsGrids(latitude, longitude)
             updateLiveMeasurements(latitude, longitude)
         } else if (mapMgr != null) {
             // Update grids and live measurement only if not showing Pin
             val (lat, lng) = mapMgr?.getCameraTarget() ?: return
-            binding.mapCurrentGrids.text = getGridString(lat, lng, coordSys, resources)
+            binding.mapCurrentGrids.text = viewModel.formatAsGrids(lat, lng)
             updateLiveMeasurements(lat, lng)
         }
     }

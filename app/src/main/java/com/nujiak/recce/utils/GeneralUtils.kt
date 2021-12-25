@@ -3,32 +3,10 @@ package com.nujiak.recce.utils
 import android.content.res.Resources
 import android.graphics.Color
 import android.util.TypedValue
-import com.google.android.gms.maps.model.LatLng
-import com.nujiak.recce.R
-import com.nujiak.recce.enums.CoordinateSystem
-import com.nujiak.recce.mapping.Mapping
 import java.text.NumberFormat
 import java.util.Locale
 import kotlin.math.pow
 import kotlin.math.round
-
-fun getGridString(latDeg: Double, lngDeg: Double, coordSysId: CoordinateSystem, resources: Resources): String {
-    val latLng = LatLng(latDeg, lngDeg)
-    return when (coordSysId) {
-        CoordinateSystem.UTM -> {
-            Mapping.toUtm(latLng).toString()
-        }
-        CoordinateSystem.MGRS -> {
-            Mapping.toMgrs(latLng)?.toString()
-        }
-        CoordinateSystem.KERTAU -> {
-            Mapping.toKertau1948(latLng).toString()
-        }
-        CoordinateSystem.WGS84 -> {
-            return Mapping.parseLatLng(latLng).toString()
-        }
-    } ?: resources.getString(R.string.not_available)
-}
 
 private val numberFormat = NumberFormat.getNumberInstance(Locale.US).apply {
     minimumFractionDigits = 1

@@ -15,7 +15,6 @@ import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.formatAsDistanceString
-import com.nujiak.recce.utils.getGridString
 import com.nujiak.recce.utils.radToDeg
 import com.nujiak.recce.utils.spToPx
 import dagger.hilt.android.AndroidEntryPoint
@@ -111,8 +110,8 @@ class GpsFragment : Fragment() {
             binding.gpsAccuracy.text = "±" + accuracy.formatAsDistanceString()
             binding.gpsAltitude.text = altitude.formatAsDistanceString()
             binding.gpsLatLng.text =
-                getGridString(latitude, longitude, CoordinateSystem.WGS84, resources)
-            binding.gpsGrids.text = getGridString(latitude, longitude, viewModel.coordinateSystem.value!!, resources)
+                viewModel.formatAsGrids(latitude, longitude, CoordinateSystem.WGS84)
+            binding.gpsGrids.text = viewModel.formatAsGrids(latitude, longitude)
         }
     }
 }

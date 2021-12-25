@@ -11,7 +11,10 @@ private enum class RulerItemViewType(val index: Int) {
     EMPTY(2),
 }
 
-class RulerAdapter(private var coordSys: CoordinateSystem, private val formatAsAngle: (Float, Boolean) -> String) :
+class RulerAdapter(
+    private var coordSys: CoordinateSystem,
+    private val formatAsAngle: (Float, Boolean) -> String,
+    private val formatAsGrids: (Double, Double) -> String) :
     androidx.recyclerview.widget.ListAdapter<RulerItem, RecyclerView.ViewHolder>(RulerDiffCallback()) {
 
     override fun getItemViewType(position: Int): Int {
@@ -34,7 +37,7 @@ class RulerAdapter(private var coordSys: CoordinateSystem, private val formatAsA
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is RulerPinViewHolder -> {
-                holder.bind(getItem(position) as RulerItem.RulerPointItem, coordSys)
+                holder.bind(getItem(position) as RulerItem.RulerPointItem, coordSys, formatAsGrids)
             }
             is RulerMeasurementViewHolder -> holder.bind(
                 getItem(position) as RulerItem.RulerMeasurementItem,

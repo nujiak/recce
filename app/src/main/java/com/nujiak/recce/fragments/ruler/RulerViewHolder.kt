@@ -14,7 +14,6 @@ import com.nujiak.recce.databinding.RulerPinItemBinding
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.degToRad
-import com.nujiak.recce.utils.getGridString
 
 /**
  * ViewHolder for Pins in the Ruler fragment
@@ -30,7 +29,7 @@ class RulerPinViewHolder private constructor(private val binding: RulerPinItemBi
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(rulerPointItem: RulerItem.RulerPointItem, coordSys: CoordinateSystem) {
+    fun bind(rulerPointItem: RulerItem.RulerPointItem, coordSys: CoordinateSystem, formatAsGrids: (Double, Double) -> String) {
         val location = rulerPointItem.position
 
         // Pin name
@@ -38,10 +37,8 @@ class RulerPinViewHolder private constructor(private val binding: RulerPinItemBi
         binding.rulerPinName.isSelected = true
 
         // Grid System
-        binding.rulerPinGridSystem.text =
-            binding.root.resources.getStringArray(R.array.coordinate_systems)[coordSys.index]
-        binding.rulerPinGrid.text =
-            getGridString(location.latitude, location.longitude, coordSys, binding.root.resources)
+        binding.rulerPinGridSystem.text = binding.root.resources.getStringArray(R.array.coordinate_systems)[coordSys.index]
+        binding.rulerPinGrid.text = formatAsGrids(location.latitude, location.longitude)
 
         val context = binding.root.context
         val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[rulerPointItem.colorId])

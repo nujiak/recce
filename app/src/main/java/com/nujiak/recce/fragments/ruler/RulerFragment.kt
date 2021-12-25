@@ -30,7 +30,8 @@ class RulerFragment : Fragment() {
         // Set up RecyclerView
         val rulerAdapter = RulerAdapter(
             viewModel.coordinateSystem.value ?: CoordinateSystem.atIndex(0),
-            viewModel::formatAsAngle
+            viewModel::formatAsAngle,
+            viewModel::formatAsGrids,
         )
         binding.rulerList.adapter = rulerAdapter
         viewModel.rulerList.observe(viewLifecycleOwner, {

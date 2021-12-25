@@ -31,6 +31,7 @@ import com.nujiak.recce.fragments.ruler.RulerItem
 import com.nujiak.recce.fragments.ruler.generateRulerList
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.livedatas.RotationLiveData
+import com.nujiak.recce.mapping.Mapping
 import com.nujiak.recce.utils.radToDeg
 import com.nujiak.recce.utils.radToNatoMils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -233,6 +234,33 @@ class MainViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Transforms and formats WGS 84 coordinates into grids
+     *
+     * @param latDeg
+     * @param lngDeg
+     * @param coordSys
+     * @return transformed grids formatted for display
+     */
+    fun formatAsGrids(latDeg: Double, lngDeg: Double, coordSys: CoordinateSystem? = null): String {
+        val resources = getApplication<RecceApp>().resources
+        val latLng = LatLng(latDeg, lngDeg)
+        return when (coordSys ?: coordinateSystem.value!!) {
+            CoordinateSystem.UTM -> {
+                Mapping.toUtm(latLng).toString()
+            }
+            CoordinateSystem.MGRS -> {
+                Mapping.toMgrs(latLng)?.toString()
+            }
+            CoordinateSystem.KERTAU -> {
+                Mapping.toKertau1948(latLng).toString()
+            }
+            CoordinateSystem.WGS84 -> {
+                return Mapping.parseLatLng(latLng).toString()
+            }
+        } ?: resources.getString(R.string.not_available)
     }
 
     /**

@@ -56,7 +56,8 @@ class SavedFragment : Fragment() {
             { chain -> onChainClick(chain) },
             { chain -> onChainLongClick(chain) },
             viewModel.coordinateSystem.value ?: CoordinateSystem.atIndex(0),
-            resources
+            viewModel::formatAsGrids,
+            resources,
         )
         binding.pinRecyclerview.adapter = pinAdapter
         val gridLayoutManager = StaggeredGridLayoutManager(getSpanCount(), Configuration.ORIENTATION_PORTRAIT)
