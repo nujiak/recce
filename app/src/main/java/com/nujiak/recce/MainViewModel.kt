@@ -37,7 +37,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -166,73 +165,6 @@ class MainViewModel @Inject constructor(
      */
     var lastAddedId = 0L // Tracks pinId of the last added pin for Map Fragment
         private set
-
-    /**
-     * Adds a [Pin] to the database
-     *
-     * @param pin
-     */
-    fun addPin(pin: Pin) {
-        runBlocking {
-            lastAddedId = insert(pin)
-        } // Blocking to allow pinId to return
-    }
-
-    /**
-     * Updates a [Pin] in the database
-     *
-     * @param pin
-     */
-    fun updatePin(pin: Pin) {
-        viewModelScope.launch { update(pin) }
-    }
-
-    /**
-     * Deletes a [Pin] in the database
-     *
-     * @param pin
-     */
-    fun deletePin(pin: Pin) {
-        viewModelScope.launch { deletePin(pin.pinId) }
-    }
-
-    /**
-     * Adds a [Chain] to the database
-     *
-     * @param chain
-     */
-    fun addChain(chain: Chain)= runBlocking {
-        lastAddedId = insert(chain)
-    }
-
-    /**
-     * Updates a [Chain in the database]
-     *
-     * @param chain
-     * @return
-     */
-    fun updateChain(chain: Chain) = viewModelScope.launch { update(chain) }
-
-    /**
-     * Deletes a [Chain] from the database
-     *
-     * @param chain
-     * @return
-     */
-    fun deleteChain(chain: Chain) = viewModelScope.launch { deleteChain(chain.chainId) }
-
-    /**
-     * Adds all the [pins] and [chains] into the database
-     *
-     * @param pins
-     * @param chains
-     */
-    private fun addPinsAndChains(pins: List<Pin>, chains: List<Chain>) {
-        viewModelScope.launch {
-            pins.forEach { addPin(it) }
-            chains.forEach { addChain(it) }
-        }
-    }
 
     val isLocationGranted: Boolean
         get() {
@@ -962,30 +894,92 @@ class MainViewModel @Inject constructor(
     }
 
     /*
-     * Coroutine database functions
+     * Database operations
      */
 
-    private suspend fun insert(pin: Pin) = withContext(Dispatchers.IO) {
-        database.insert(pin)
+    /**
+     * Adds a [Pin] to the database
+     *
+     * @param pin
+     */
+    fun addPin(pin: Pin) {
+        // Blocking to allow pinId to return
+        lastAddedId = runBlocking(Dispatchers.IO) {
+            database.insert(pin)
+        }
     }
 
-    private suspend fun update(pin: Pin) = withContext(Dispatchers.IO) {
+    /**
+     * Updates a [Pin] in the database
+     *
+     * @param pin
+     */
+    fun updatePin(pin: Pin) = viewModelScope.launch(Dispatchers.IO) {
         database.update(pin)
     }
 
-    private suspend fun deletePin(pinId: Long) = withContext(Dispatchers.IO) {
+    /**
+     * Deletes a [Pin] from the database using its [pinId]
+     *
+     * @param pinId id of [Pin] to be deleted from database
+     * @return true if pin was deleted successfully
+     */
+    private fun deletePin(pinId: Long) = viewModelScope.launch(Dispatchers.IO) {
         database.deletePin(pinId)
     }
 
-    private suspend fun insert(chain: Chain) = withContext(Dispatchers.IO) {
-        database.insert(chain)
+    /**
+     * Deletes a [Pin] in the database
+     *
+     * @param pin
+     */
+    fun deletePin(pin: Pin) = deletePin(pin.pinId)
+
+    /**
+     * Adds a [Chain] to the database
+     *
+     * @param chain
+     */
+    fun addChain(chain: Chain) = runBlocking(Dispatchers.IO) {
+        lastAddedId = database.insert(chain)
     }
 
-    private suspend fun update(chain: Chain) = withContext(Dispatchers.IO) {
+    /**
+     * Updates a [Chain] in the database
+     *
+     * @param chain
+     * @return
+     */
+    fun updateChain(chain: Chain) = viewModelScope.launch(Dispatchers.IO) {
         database.update(chain)
     }
 
-    private suspend fun deleteChain(chainId: Long) = withContext(Dispatchers.IO) {
+    /**
+     * Deletes a [Chain] from the database using its [chainId]
+     *
+     * @param chainId if of [Chain] to be deleted from database
+     * @return
+     */
+    private fun deleteChain(chainId: Long) = viewModelScope.launch(Dispatchers.IO) {
         database.deleteChain(chainId)
+    }
+
+    /**
+     * Deletes a [Chain] from the database
+     *
+     * @param chain
+     * @return
+     */
+    fun deleteChain(chain: Chain) = deleteChain(chain.chainId)
+
+    /**
+     * Adds all the [pins] and [chains] into the database
+     *
+     * @param pins
+     * @param chains
+     */
+    private fun addPinsAndChains(pins: List<Pin>, chains: List<Chain>) = viewModelScope.launch(Dispatchers.IO) {
+        pins.forEach { database.insert(it) }
+        chains.forEach { database.insert(it) }
     }
 }
