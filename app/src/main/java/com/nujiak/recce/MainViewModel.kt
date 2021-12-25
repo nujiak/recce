@@ -31,12 +31,16 @@ import com.nujiak.recce.fragments.ruler.RulerItem
 import com.nujiak.recce.fragments.ruler.generateRulerList
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.livedatas.RotationLiveData
+import com.nujiak.recce.utils.radToDeg
+import com.nujiak.recce.utils.radToNatoMils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 /**
  * View model used for [MainActivity] and all its fragments
@@ -263,9 +267,41 @@ class MainViewModel @Inject constructor(
     val fusedLocationData = FusedLocationLiveData(application)
 
     /**
-     * [RotationLiveData] for fetching and observing device rotation
+     * Internal [RotationLiveData] to observe the rotation of the device
      */
-    val rotationLiveData = RotationLiveData(application, screenRotation)
+    private val rotationLiveData = RotationLiveData(application, screenRotation)
+
+    /**
+     * Transformed [LiveData] for providing the azimuth, pitch, and roll in radian
+     */
+    val rotation = Transformations.map(rotationLiveData) { rotationData ->
+
+        var (azimuth, pitch, roll) = rotationData
+
+        if (azimuth < 0) {
+            azimuth += 2 * kotlin.math.PI.toFloat()
+        }
+
+        Triple(azimuth, pitch, roll)
+    }
+
+    fun formatAsAngle(angleRad: Float, withSign: Boolean = true): String {
+        return when (this.angleUnit.value ?: AngleUnit.DEGREE) {
+            AngleUnit.DEGREE -> {
+                "%.1f°".format(radToDeg(angleRad))
+            }
+            AngleUnit.NATO_MIL -> {
+                if (withSign) {
+                    "${if (angleRad > 0) '+' else '-'}${
+                        radToNatoMils(abs(angleRad)).roundToInt().toString()
+                            .padStart(4, '0')
+                    } mils"
+                } else {
+                    "${radToNatoMils(abs(angleRad)).roundToInt().toString().padStart(4, '0')} mils"
+                }
+            }
+        }
+    }
 
     /**
      * Backing property for [pinToShowInfo]

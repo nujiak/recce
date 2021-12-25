@@ -11,11 +11,9 @@ import com.nujiak.recce.R
 import com.nujiak.recce.databinding.RulerEmptyItemBinding
 import com.nujiak.recce.databinding.RulerMeasurementItemBinding
 import com.nujiak.recce.databinding.RulerPinItemBinding
-import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.degToRad
-import com.nujiak.recce.utils.getAngleString
 import com.nujiak.recce.utils.getGridString
 
 /**
@@ -66,7 +64,7 @@ class RulerMeasurementViewHolder private constructor(private val binding: RulerM
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(rulerMeasurementItem: RulerItem.RulerMeasurementItem, angleUnit: AngleUnit) {
+    fun bind(rulerMeasurementItem: RulerItem.RulerMeasurementItem, formatAsAngle: (Float, Boolean) -> String) {
         val points = rulerMeasurementItem.points
         binding.rulerFrom.text = rulerMeasurementItem.startName
         binding.rulerTo.text = rulerMeasurementItem.endName
@@ -82,7 +80,7 @@ class RulerMeasurementViewHolder private constructor(private val binding: RulerM
         }
 
         binding.rulerDist.text = "%.2fm".format(distance)
-        binding.rulerDir.text = getAngleString(degToRad(heading).toFloat(), angleUnit, false)
+        binding.rulerDir.text = formatAsAngle(degToRad(heading).toFloat(), false)
         if (points.size > 2) {
             binding.rulerIntermediate.text = binding.root.resources.getQuantityString(
                 R.plurals.intermediate_nodes,

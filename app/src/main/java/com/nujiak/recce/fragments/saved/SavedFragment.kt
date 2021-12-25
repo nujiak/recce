@@ -37,9 +37,6 @@ class SavedFragment : Fragment() {
     private lateinit var binding: FragmentSavedBinding
     private lateinit var pinAdapter: PinAdapter
 
-    private var sortBy = SortBy.GROUP
-    private var sortAscending = false
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -112,10 +109,6 @@ class SavedFragment : Fragment() {
             }
         })
 
-        // Fetch sorting parameters
-        sortBy = viewModel.sortBy
-        sortAscending = viewModel.sortAscending
-
         // Set up FAB
         binding.pinFab.setMenuListener(object : SimpleMenuListenerAdapter() {
             override fun onMenuItemSelected(menuItem: MenuItem?): Boolean {
@@ -141,32 +134,23 @@ class SavedFragment : Fragment() {
                     true
                 }
                 R.id.sort_by_alphabetical_asc -> {
-                    sortBy = SortBy.NAME
-                    sortAscending = true
-                    onSortList()
+                    onSortList(SortBy.NAME, true)
                     true
                 }
                 R.id.sort_by_alphabetical_dsc -> {
-                    sortBy = SortBy.NAME
-                    sortAscending = false
-                    onSortList()
+                    onSortList(SortBy.NAME, false)
                     true
                 }
                 R.id.sort_by_time_asc -> {
-                    sortBy = SortBy.TIME
-                    sortAscending = true
-                    onSortList()
+                    onSortList(SortBy.TIME, true)
                     true
                 }
                 R.id.sort_by_time_dsc -> {
-                    sortBy = SortBy.TIME
-                    sortAscending = false
-                    onSortList()
+                    onSortList(SortBy.TIME, false)
                     true
                 }
                 R.id.sort_by_group -> {
-                    sortBy = SortBy.GROUP
-                    onSortList()
+                    onSortList(SortBy.GROUP, false)
                     true
                 }
                 else -> false
@@ -231,7 +215,7 @@ class SavedFragment : Fragment() {
         return true
     }
 
-    private fun onSortList() {
+    private fun onSortList(sortBy: SortBy, sortAscending: Boolean) {
         viewModel.sortBy = sortBy
         viewModel.sortAscending = sortAscending
 
@@ -247,8 +231,8 @@ class SavedFragment : Fragment() {
             newPins,
             newChains,
             viewModel.selectedIds,
-            sortBy,
-            sortAscending
+            viewModel.sortBy,
+            viewModel.sortAscending
         )
     }
 

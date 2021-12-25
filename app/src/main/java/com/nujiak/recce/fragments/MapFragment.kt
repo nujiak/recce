@@ -63,7 +63,6 @@ import com.nujiak.recce.databinding.FragmentMapBinding
 import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.livedatas.FusedLocationLiveData
-import com.nujiak.recce.livedatas.RotationLiveData
 import com.nujiak.recce.mapping.component1
 import com.nujiak.recce.mapping.component2
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
@@ -72,7 +71,6 @@ import com.nujiak.recce.utils.animateColor
 import com.nujiak.recce.utils.degToRad
 import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.formatAsDistanceString
-import com.nujiak.recce.utils.getAngleString
 import com.nujiak.recce.utils.getGridString
 import com.nujiak.recce.utils.withAlpha
 import dagger.hilt.android.AndroidEntryPoint
@@ -396,8 +394,9 @@ class MapFragment :
                 updateLiveMeasurements()
                 mapMgr?.updateMyLocation(it)
             }
-            viewModel.rotationLiveData.observe(viewLifecycleOwner) {
-                mapMgr?.updateRotation(it)
+            viewModel.rotation.observe(viewLifecycleOwner) {
+                val (azimuth, pitch, roll) = it
+                mapMgr?.updateRotation(azimuth)
             }
 
             // Add markers
@@ -813,7 +812,7 @@ class MapFragment :
         }
 
         binding.mapCurrentDistance.text = distance.formatAsDistanceString()
-        binding.mapCurrentDirection.text = getAngleString(degToRad(direction).toFloat(), angleUnit, false)
+        binding.mapCurrentDirection.text = viewModel.formatAsAngle(degToRad(direction).toFloat(), false)
     }
 
     /**
@@ -1812,15 +1811,15 @@ class MapFragment :
         /**
          * Updates the rotation of [myLocationDirection]
          *
-         * @param rotationData latest rotation data from the sensor
+         * @param azimuth latest azimuth of the device
          */
-        fun updateRotation(rotationData: RotationLiveData.RotationData) {
+        fun updateRotation(azimuth: Float) {
 
             val marker = this.myLocationDirection ?: return
             val currentTime = System.currentTimeMillis()
 
             // Add current update to the cumulative sum
-            directionUpdateSum += rotationData.azimuth
+            directionUpdateSum += azimuth
             directionUpdateCount++
 
             var newRotation = directionUpdateSum / directionUpdateCount * 180 / Math.PI.toFloat() - 90

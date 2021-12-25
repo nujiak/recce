@@ -5,15 +5,12 @@ import android.graphics.Color
 import android.util.TypedValue
 import com.google.android.gms.maps.model.LatLng
 import com.nujiak.recce.R
-import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.mapping.Mapping
 import java.text.NumberFormat
 import java.util.Locale
-import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.round
-import kotlin.math.roundToInt
 
 fun getGridString(latDeg: Double, lngDeg: Double, coordSysId: CoordinateSystem, resources: Resources): String {
     val latLng = LatLng(latDeg, lngDeg)
@@ -31,24 +28,6 @@ fun getGridString(latDeg: Double, lngDeg: Double, coordSysId: CoordinateSystem, 
             return Mapping.parseLatLng(latLng).toString()
         }
     } ?: resources.getString(R.string.not_available)
-}
-
-fun getAngleString(angleRad: Float, angleUnit: AngleUnit, withSign: Boolean = true): String {
-    return when (angleUnit) {
-        AngleUnit.DEGREE -> {
-            "%.1f°".format(radToDeg(angleRad))
-        }
-        AngleUnit.NATO_MIL -> {
-            if (withSign) {
-                "${if (angleRad > 0) '+' else '-'}${
-                radToNatoMils(abs(angleRad)).roundToInt().toString()
-                    .padStart(4, '0')
-                } mils"
-            } else {
-                "${radToNatoMils(abs(angleRad)).roundToInt().toString().padStart(4, '0')} mils"
-            }
-        }
-    }
 }
 
 private val numberFormat = NumberFormat.getNumberInstance(Locale.US).apply {
