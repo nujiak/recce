@@ -864,7 +864,7 @@ class MainViewModel @Inject constructor(
             val chainsToShare = allChains.value?.filter { it.chainId in chainIdsToShare }
 
             shareQuantity = Pair(pinsToShare?.size, chainsToShare?.size)
-            _shareCode.value = toShareCode(pinsToShare, chainsToShare)
+            _shareCode.postValue(toShareCode(pinsToShare, chainsToShare))
         }
     }
 

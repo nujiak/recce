@@ -15,6 +15,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -29,6 +30,9 @@ import com.nujiak.recce.enums.SortBy
 import com.nujiak.recce.utils.spToPx
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class SavedFragment : Fragment() {
@@ -247,15 +251,17 @@ class SavedFragment : Fragment() {
         val shareCodeInput = alertDialog.findViewById<TextInputEditText>(R.id.share_code_edit)
 
         alertDialog.findViewById<Button>(R.id.paste)?.setOnClickListener {
-            activity?.let { activity ->
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 val clipboard =
-                    activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val item = clipboard.primaryClip?.getItemAt(0)
                 val pasteData = item?.text
-                if (pasteData != null) {
-                    shareCodeInput.setText(pasteData)
-                } else {
-                    Toast.makeText(context, R.string.paste_error, Toast.LENGTH_SHORT).show()
+                withContext(Dispatchers.Main) {
+                    if (pasteData != null) {
+                        shareCodeInput.setText(pasteData)
+                    } else {
+                        Toast.makeText(context, R.string.paste_error, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
