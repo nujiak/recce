@@ -9,7 +9,7 @@ import kotlin.math.floor
 const val NORTH_BAND = 'N'
 const val SOUTH_BAND = 'S'
 
-enum class UtmBand(private val letter: Char) {
+enum class UtmBand(val letter: Char) {
     NORTH(NORTH_BAND),
     SOUTH(SOUTH_BAND);
 
