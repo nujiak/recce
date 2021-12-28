@@ -54,33 +54,6 @@ fun intsFromGridString(gridStr: String, magnitude: Int = 5): Pair<Double, Double
 }
 
 object MgrsUtils {
-    /**
-     * Regex matching the MGRS format with all whitespaces trimmed
-     *
-     * Example of match: "48NUG123456123456"
-     */
-    private val mgrsRegex = Regex("(^\\d{1,2})(\\w{3})(\\d{1,12})$")
-
-    /**
-     * Parses and segments a MGRS string
-     *
-     * @param mgrsString MGRS String
-     * @return MgrsData containing the data of the point in MGRS
-     */
-    fun parse(mgrsString: String): Coordinate? {
-        val matchResult =
-            mgrsRegex.find(mgrsString.filterWhitespaces().uppercase())
-
-        matchResult ?: return null
-
-        val matchGroupValues = matchResult.groupValues
-
-        val gridString = matchGroupValues[3]
-        val (easting, northing) = intsFromGridString(gridString) ?: return null
-        val (band, eastingLtr, northingLtr) = matchGroupValues[2].toList()
-
-        return parse(matchGroupValues[1].toInt(), band, eastingLtr, northingLtr, easting, northing)
-    }
 
     /**
      * MGRS Easting letters according to both AA and AL lettering schemes.
@@ -144,7 +117,7 @@ object MgrsUtils {
      * @param latitude Latitude in degrees
      * @return [Char] of the corresponding MGRS latitude band
      */
-    fun getMgrsBand(latitude: Double): Char {
+    private fun getMgrsBand(latitude: Double): Char {
         return when {
             latitude < -80 -> throw IllegalArgumentException("Latitude must be between -80 and 84: $latitude")
             latitude < -72 -> 'C'
@@ -250,7 +223,10 @@ object MgrsUtils {
      * @param longitude
      * @return [Coordinate] representing the location in MGRS
      */
-    fun transformFromWgs84(latitude: Double, longitude: Double): Coordinate? {
+    fun transform(latLng: LatLng): Coordinate? {
+
+        val latitude = latLng.latitude
+        val longitude = latLng.longitude
 
         if (latitude < -84 || latitude > 84) {
             return null
@@ -296,6 +272,7 @@ object KertauUtils {
     private val wgs84Crs: CoordinateReferenceSystem by lazy {
         crsFactory.createFromName("EPSG:$EPSG_CODE_WGS_84")
     }
+
     private val kertau1948Crs: CoordinateReferenceSystem by lazy {
         crsFactory.createFromParameters(
             KERTAU_1948_NAME,
@@ -307,7 +284,11 @@ object KertauUtils {
         ctFactory.createTransform(wgs84Crs, kertau1948Crs)
     }
 
-    fun toKertau1948(latLng: LatLng): Coordinate? {
+    private val kertau1948ToWgs84Transform: CoordinateTransform by lazy {
+        ctFactory.createTransform(kertau1948Crs, wgs84Crs)
+    }
+
+    fun transform(latLng: LatLng): Coordinate? {
         with(latLng) {
             if (latitude < 1.12 || latitude > 6.72 || longitude < 99.59 || longitude > 104.6) {
                 return null
@@ -324,6 +305,17 @@ object KertauUtils {
 
     private fun LatLng.toProjCoordinate(): ProjCoordinate {
         return ProjCoordinate(this.longitude, this.latitude)
+    }
+
+    fun parse(easting: Double, northing: Double): Coordinate? {
+        val sourceCoord = ProjCoordinate(easting, northing)
+        val resultCoord = ProjCoordinate()
+
+        kertau1948ToWgs84Transform.transform(sourceCoord, resultCoord)
+
+        val latLng = LatLng(resultCoord.y, resultCoord.x)
+
+        return Coordinate.of(latLng, easting, northing)
     }
 }
 
@@ -450,7 +442,11 @@ object UtmUtils {
         return Coordinate.of(latLng, zone, band, x, y)
     }
 
-    fun transform(latitude: Double, longitude: Double): Coordinate? {
+    fun transform(latLng: LatLng): Coordinate? {
+
+        val latitude = latLng.latitude
+        val longitude = latLng.longitude
+
         if (latitude < -80 || latitude > 84) {
             return null
         }

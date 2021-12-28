@@ -19,9 +19,9 @@ object Mapping {
     fun transformTo(coordinateSystem: CoordinateSystem, latLng: LatLng): Coordinate? {
         return when (coordinateSystem) {
             CoordinateSystem.WGS84 -> Coordinate.of(latLng)
-            CoordinateSystem.UTM -> toUtm(latLng)
-            CoordinateSystem.MGRS -> toMgrs(latLng)
-            CoordinateSystem.KERTAU -> toKertau1948(latLng)
+            CoordinateSystem.UTM -> UtmUtils.transform(latLng)
+            CoordinateSystem.MGRS -> MgrsUtils.transform(latLng)
+            CoordinateSystem.KERTAU -> KertauUtils.transform(latLng)
         }
     }
 
@@ -35,25 +35,5 @@ object Mapping {
     fun parse(s: String, coordinateSystem: CoordinateSystem): Coordinate? {
         val parser = Parser.getParser(coordinateSystem)
         return parser.parse(s)
-    }
-
-    private fun toKertau1948(latLng: LatLng): Coordinate? {
-        return KertauUtils.toKertau1948(latLng)
-    }
-
-    private fun toUtm(latLng: LatLng): Coordinate? {
-        return this.toUtm(latLng.latitude, latLng.longitude)
-    }
-
-    private fun toUtm(latitude: Double, longitude: Double): Coordinate? {
-        return UtmUtils.transform(latitude, longitude)
-    }
-
-    private fun toMgrs(latLng: LatLng): Coordinate? {
-        return this.toMgrs(latLng.latitude, latLng.longitude)
-    }
-
-    private fun toMgrs(latitude: Double, longitude: Double): Coordinate? {
-        return MgrsUtils.transformFromWgs84(latitude, longitude)
     }
 }
