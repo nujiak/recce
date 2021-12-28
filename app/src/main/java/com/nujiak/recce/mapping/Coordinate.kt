@@ -109,6 +109,16 @@ open class Coordinate private constructor(
         ): Coordinate {
             return MgrsCoordinate(latLng, zone, band, eastingLetter, northingLetter, x, y)
         }
+
+        fun of(
+            latLng: LatLng,
+            majorLetter: Char,
+            minorLetter: Char,
+            x: Double,
+            y: Double,
+        ): Coordinate {
+            return BngCoordinate(latLng, majorLetter, minorLetter, x, y)
+        }
     }
 
     /**
@@ -179,6 +189,30 @@ open class Coordinate private constructor(
     ) : Coordinate(latLng, x, y) {
         override fun toString(): String {
             return "$zone$band$eastingLetter$northingLetter ${this.x.format(5, 0)} ${this.y.format(5, 0)}"
+        }
+    }
+
+    /**
+     * Represents a location in the British National Grid (BNG)
+     *
+     * @property majorLetter
+     * @property minorLetter
+     * @constructor
+     * Creates a [BngCoordinate] for the given point
+     *
+     * @param latLng corresponding [LatLng] of the location
+     * @param x easting
+     * @param y northing
+     */
+    private class BngCoordinate(
+        latLng: LatLng,
+        private val majorLetter: Char,
+        private val minorLetter: Char,
+        x: Double,
+        y: Double,
+    ) : Coordinate(latLng, x, y) {
+        override fun toString(): String {
+            return "$majorLetter$minorLetter ${this.x.format(5, 0)} ${this.y.format(5, 0)}"
         }
     }
 }

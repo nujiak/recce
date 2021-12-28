@@ -14,6 +14,7 @@
     <string name="utm" translatable="false">UTM</string>
     <string name="kertau" translatable="false">Kertau 1948</string>
     <string name="mgrs" translatable="false">MGRS</string>
+    <string name="bng" translatable="false">British National Grid</string>
     <string name="nato_mils" translatable="false">NATO mils</string>
     <string name="degrees" translatable="false">Degrees</string>
     <string name="name">Name</string>

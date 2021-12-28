@@ -12,6 +12,8 @@ import org.locationtech.proj4j.ProjCoordinate
 import kotlin.math.floor
 import kotlin.math.pow
 
+infix fun Double.div(i: Int): Int = floor(this / i).toInt()
+
 /**
  * Extension function to create a string with all whitespaces removed
  */
@@ -51,6 +53,18 @@ fun intsFromGridString(gridStr: String, magnitude: Int = 5): Pair<Double, Double
     val eastingInt = easting.toInt() * 10.0.pow(magnitude - precision)
     val northingInt = northing.toInt() * 10.0.pow(magnitude - precision)
     return Pair(eastingInt, northingInt)
+}
+
+private operator fun LatLng.component1() = this.latitude
+private operator fun LatLng.component2() = this.longitude
+
+private const val EPSG_CODE_WGS_84: Short = 4326
+
+private val crsFactory = CRSFactory()
+private val ctFactory = CoordinateTransformFactory()
+
+private val wgs84Crs: CoordinateReferenceSystem by lazy {
+    crsFactory.createFromName("EPSG:$EPSG_CODE_WGS_84")
 }
 
 object MgrsUtils {
@@ -261,17 +275,8 @@ object MgrsUtils {
 
 object KertauUtils {
 
-    private const val EPSG_CODE_WGS_84: Short = 4326
-
-    private val crsFactory = CRSFactory()
-    private val ctFactory = CoordinateTransformFactory()
-
     private const val KERTAU_1948_NAME = "Kertau 1948"
     private const val KERTAU_1948_PROJ_STRING = "+proj=omerc +lat_0=4 +lonc=102.25 +alpha=323.0257905 +k=0.99984 +x_0=804670.24 +y_0=0 +no_uoff +gamma=323.1301023611111 +a=6377295.664 +b=6356094.667915204 +units=m +no_defs +towgs84=-11,851,5"
-
-    private val wgs84Crs: CoordinateReferenceSystem by lazy {
-        crsFactory.createFromName("EPSG:$EPSG_CODE_WGS_84")
-    }
 
     private val kertau1948Crs: CoordinateReferenceSystem by lazy {
         crsFactory.createFromParameters(
@@ -341,15 +346,6 @@ object UtmUtils {
 
     private val utmToWgs84Transforms = HashMap<Short, CoordinateTransform>()
     private val wgs84ToUtmTransforms = HashMap<Short, CoordinateTransform>()
-
-    private val crsFactory = CRSFactory()
-    private val ctFactory = CoordinateTransformFactory()
-
-    private const val EPSG_CODE_WGS_84: Short = 4326
-
-    private val wgs84Crs: CoordinateReferenceSystem by lazy {
-        crsFactory.createFromName("EPSG:$EPSG_CODE_WGS_84")
-    }
 
     private fun getUtmEpsgCode(zone: Int, band: UtmBand): Short {
         if (zone < 1 || zone > 60) {
@@ -444,8 +440,7 @@ object UtmUtils {
 
     fun transform(latLng: LatLng): Coordinate? {
 
-        val latitude = latLng.latitude
-        val longitude = latLng.longitude
+        val (latitude, longitude) = latLng
 
         if (latitude < -80 || latitude > 84) {
             return null
@@ -460,5 +455,95 @@ object UtmUtils {
         getWgs84ToUtmTransform(epsgCode).transform(sourceCoord, resultCoord)
 
         return Coordinate.of(LatLng(latitude, longitude), zone, band, resultCoord.x, resultCoord.y)
+    }
+}
+
+object BngUtils {
+
+    private const val EPSG_CODE_BNG: Short = 27700
+
+    private val bngCrs = crsFactory.createFromName("EPSG:$EPSG_CODE_BNG")
+
+    private val wgs84ToBngTransform: CoordinateTransform by lazy {
+        ctFactory.createTransform(wgs84Crs, bngCrs)
+    }
+
+    private val bngToWgs84Transform: CoordinateTransform by lazy {
+        ctFactory.createTransform(bngCrs, wgs84Crs)
+    }
+
+    private val majorLetters = arrayListOf(
+        arrayListOf('S', 'T'),
+        arrayListOf('N', 'O'),
+        arrayListOf('H', 'J'),
+    )
+
+    private val minorLetters = arrayListOf(
+        arrayListOf('V', 'W', 'X', 'Y', 'Z'),
+        arrayListOf('Q', 'R', 'S', 'T', 'U'),
+        arrayListOf('L', 'M', 'N', 'O', 'P'),
+        arrayListOf('F', 'G', 'H', 'J', 'K'),
+        arrayListOf('A', 'B', 'C', 'D', 'E'),
+    )
+
+    fun transform(latLng: LatLng): Coordinate? {
+        val (latitude, longitude) = latLng
+
+        val sourceCoord = ProjCoordinate(longitude, latitude)
+        val resultCoord = ProjCoordinate()
+
+        wgs84ToBngTransform.transform(sourceCoord, resultCoord)
+
+        val x = resultCoord.x
+        val y = resultCoord.y
+
+        val majorLetter = majorLetters.getOrNull(y div 500_000)?.getOrNull(x div 500_000) ?: return null
+        val minorLetter = minorLetters.getOrNull((y % 500_000) div 100_000)?.getOrNull((x % 500_000) div 100_000) ?: return null
+
+        val easting = x % 100_000
+        val northing = y % 100_000
+
+        return Coordinate.of(latLng, majorLetter, minorLetter, easting, northing)
+    }
+
+    fun parse(majorLetter: Char, minorLetter: Char, x: Double, y: Double): Coordinate? {
+        var easting = x
+        var northing = y
+        easting += when (majorLetter) {
+            'T', 'O', 'J' -> 500_000
+            'S', 'N', 'H' -> 0
+            else -> return null
+        }
+        easting += when (minorLetter) {
+            'E', 'K', 'P', 'U', 'Z' -> 400_000
+            'D', 'J', 'O', 'T', 'Y' -> 300_000
+            'C', 'H', 'N', 'S', 'X' -> 200_000
+            'B', 'G', 'M', 'R', 'W' -> 100_000
+            'A', 'F', 'L', 'Q', 'V' -> 0
+            else -> return null
+        }
+        northing += when (majorLetter) {
+            'H', 'J' -> 1_000_000
+            'O', 'N' -> 500_000
+            'S', 'T' -> 0
+            else -> return null
+        }
+        northing += when (minorLetter) {
+            'A', 'B', 'C', 'D', 'E' -> 400_000
+            'F', 'G', 'H', 'J', 'K' -> 300_000
+            'L', 'M', 'N', 'O', 'P' -> 200_000
+            'Q', 'R', 'S', 'T', 'U' -> 100_000
+            'V', 'W', 'X', 'Y', 'Z' -> 0
+            else -> return null
+        }
+
+        val sourceCoord = ProjCoordinate(easting, northing)
+        val resultCoord = ProjCoordinate()
+
+        bngToWgs84Transform.transform(sourceCoord, resultCoord)
+
+        val latLng = LatLng(resultCoord.y, resultCoord.x)
+
+        return Coordinate.of(latLng)
     }
 }

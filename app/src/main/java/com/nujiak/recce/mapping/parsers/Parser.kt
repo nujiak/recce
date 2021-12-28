@@ -22,6 +22,7 @@ sealed interface Parser {
                 CoordinateSystem.UTM -> UtmParser
                 CoordinateSystem.KERTAU -> KertauParser
                 CoordinateSystem.WGS84 -> Wgs84Parser
+                CoordinateSystem.BNG -> BngParser
             }
         }
     }

@@ -204,6 +204,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                 CoordinateSystem.MGRS -> R.string.mgrs
                 CoordinateSystem.KERTAU -> R.string.kertau
                 CoordinateSystem.WGS84 -> R.string.lat_lng
+                CoordinateSystem.BNG -> R.string.bng
             }
         )
 
