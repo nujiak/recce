@@ -82,7 +82,7 @@ open class Coordinate private constructor(
          * @param y northing
          * @return
          */
-        fun of(latLng: LatLng, zone: Int, band: UtmBand, x: Double, y: Double): Coordinate {
+        fun of(latLng: LatLng, zone: Int, band: UtmUtils.UtmBand, x: Double, y: Double): Coordinate {
             return UtmCoordinate(latLng, zone, band, x, y)
         }
 
@@ -145,12 +145,12 @@ open class Coordinate private constructor(
     private class UtmCoordinate(
         latLng: LatLng,
         val zone: Int,
-        val band: UtmBand,
+        val band: UtmUtils.UtmBand,
         x: Double,
         y: Double,
     ) : Coordinate(latLng, x, y) {
         override fun toString(): String {
-            return "$zone${band.letter} ${this.x.format(5, 0)} ${this.y.format(5, 0)}"
+            return "$zone${band.letter} ${this.x.format(6, 0)} ${this.y.format(6, 0)}"
         }
     }
 

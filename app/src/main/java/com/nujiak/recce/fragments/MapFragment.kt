@@ -63,8 +63,6 @@ import com.nujiak.recce.databinding.FragmentMapBinding
 import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.livedatas.FusedLocationLiveData
-import com.nujiak.recce.mapping.component1
-import com.nujiak.recce.mapping.component2
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.PIN_VECTOR_DRAWABLE
 import com.nujiak.recce.utils.animateColor
@@ -196,6 +194,9 @@ class MapFragment :
     }
 
     companion object {
+
+        private operator fun LatLng.component1() = this.latitude
+        private operator fun LatLng.component2() = this.longitude
 
         // Lat Lng evaluator for animating myLocationMarker and myLocationCircle positions
         private val latLngEvaluator by lazy {
