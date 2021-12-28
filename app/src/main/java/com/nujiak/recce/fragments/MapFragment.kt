@@ -62,19 +62,13 @@ import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.FragmentMapBinding
 import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
-import com.nujiak.recce.enums.SharedPrefsKey
 import com.nujiak.recce.livedatas.FusedLocationLiveData
-import com.nujiak.recce.livedatas.RotationLiveData
-import com.nujiak.recce.mapping.component1
-import com.nujiak.recce.mapping.component2
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.PIN_VECTOR_DRAWABLE
 import com.nujiak.recce.utils.animateColor
 import com.nujiak.recce.utils.degToRad
 import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.formatAsDistanceString
-import com.nujiak.recce.utils.getAngleString
-import com.nujiak.recce.utils.getGridString
 import com.nujiak.recce.utils.withAlpha
 import dagger.hilt.android.AndroidEntryPoint
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence
@@ -186,7 +180,6 @@ class MapFragment :
                 if (itemView.equals(lastShowcase)) {
                     isChainGuideShowing = false
                     viewModel.chainsGuideShown = true
-                    viewModel.sharedPreference.edit().putBoolean(SharedPrefsKey.CHAINS_GUIDE_SHOWN.key, true).apply()
                 }
             }
 
@@ -201,6 +194,9 @@ class MapFragment :
     }
 
     companion object {
+
+        private operator fun LatLng.component1() = this.latitude
+        private operator fun LatLng.component2() = this.longitude
 
         // Lat Lng evaluator for animating myLocationMarker and myLocationCircle positions
         private val latLngEvaluator by lazy {
@@ -361,9 +357,6 @@ class MapFragment :
         // Set up Map rotation reset
         binding.mapCompass.setOnClickListener { mapMgr?.resetMapRotation() }
 
-        viewModel.chainsGuideShown =
-            viewModel.sharedPreference.getBoolean(SharedPrefsKey.CHAINS_GUIDE_SHOWN.key, false)
-
         return binding.root
     }
 
@@ -371,8 +364,7 @@ class MapFragment :
         if (mMap != null) {
             mapMgr = MapManager(mMap)
 
-            val newMapType =
-                viewModel.sharedPreference.getInt(SharedPrefsKey.MAP_TYPE.key, GoogleMap.MAP_TYPE_HYBRID)
+            val newMapType = viewModel.mapType
             mapMgr?.changeMapType(newMapType)
             binding.mapTypeGroup.check(
                 when (newMapType) {
@@ -402,8 +394,9 @@ class MapFragment :
                 updateLiveMeasurements()
                 mapMgr?.updateMyLocation(it)
             }
-            viewModel.rotationLiveData.observe(viewLifecycleOwner) {
-                mapMgr?.updateRotation(it)
+            viewModel.rotation.observe(viewLifecycleOwner) {
+                val (azimuth, pitch, roll) = it
+                mapMgr?.updateRotation(azimuth)
             }
 
             // Add markers
@@ -471,12 +464,12 @@ class MapFragment :
     @SuppressLint("SetTextI18n")
     private fun updateGrids(latitude: Double? = null, longitude: Double? = null) {
         if (latitude != null && longitude != null) {
-            binding.mapCurrentGrids.text = getGridString(latitude, longitude, coordSys, resources)
+            binding.mapCurrentGrids.text = viewModel.formatAsGrids(latitude, longitude)
             updateLiveMeasurements(latitude, longitude)
         } else if (mapMgr != null) {
             // Update grids and live measurement only if not showing Pin
             val (lat, lng) = mapMgr?.getCameraTarget() ?: return
-            binding.mapCurrentGrids.text = getGridString(lat, lng, coordSys, resources)
+            binding.mapCurrentGrids.text = viewModel.formatAsGrids(lat, lng)
             updateLiveMeasurements(lat, lng)
         }
     }
@@ -819,7 +812,7 @@ class MapFragment :
         }
 
         binding.mapCurrentDistance.text = distance.formatAsDistanceString()
-        binding.mapCurrentDirection.text = getAngleString(degToRad(direction).toFloat(), angleUnit, false)
+        binding.mapCurrentDirection.text = viewModel.formatAsAngle(degToRad(direction).toFloat(), false)
     }
 
     /**
@@ -1290,7 +1283,7 @@ class MapFragment :
             if (this.mapType != mapType) {
                 map.mapType = mapType
                 this.mapType = mapType
-                viewModel.sharedPreference.edit().putInt(SharedPrefsKey.MAP_TYPE.key, mapType).apply()
+                viewModel.mapType = mapType
             }
         }
 
@@ -1818,15 +1811,15 @@ class MapFragment :
         /**
          * Updates the rotation of [myLocationDirection]
          *
-         * @param rotationData latest rotation data from the sensor
+         * @param azimuth latest azimuth of the device
          */
-        fun updateRotation(rotationData: RotationLiveData.RotationData) {
+        fun updateRotation(azimuth: Float) {
 
             val marker = this.myLocationDirection ?: return
             val currentTime = System.currentTimeMillis()
 
             // Add current update to the cumulative sum
-            directionUpdateSum += rotationData.azimuth
+            directionUpdateSum += azimuth
             directionUpdateCount++
 
             var newRotation = directionUpdateSum / directionUpdateCount * 180 / Math.PI.toFloat() - 90

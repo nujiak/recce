@@ -20,7 +20,6 @@ import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.formatAsAreaString
 import com.nujiak.recce.utils.formatAsDistanceString
-import com.nujiak.recce.utils.getGridString
 
 private const val STROKE_SIZE_DP: Float = 2f
 private const val STROKE_SIZE_SELECTED_DP: Float = 4f
@@ -40,7 +39,8 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
         item: PinWrapper,
         onItemClick: (Pin) -> Unit,
         onItemLongClick: (Pin) -> Boolean,
-        coordSys: CoordinateSystem
+        coordSys: CoordinateSystem,
+        formatAsGrids: (Double, Double) -> String
     ) {
         val pin = item.pin
         if (pin.group != "") {
@@ -55,7 +55,7 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
             binding.root.resources.getStringArray(R.array.coordinate_systems)[coordSys.index]
 
         binding.pinGrid.text =
-            getGridString(pin.latitude, pin.longitude, coordSys, binding.root.resources)
+            formatAsGrids(pin.latitude, pin.longitude)
 
         val context = binding.root.context
         val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[pin.color])

@@ -11,12 +11,9 @@ import com.nujiak.recce.R
 import com.nujiak.recce.databinding.RulerEmptyItemBinding
 import com.nujiak.recce.databinding.RulerMeasurementItemBinding
 import com.nujiak.recce.databinding.RulerPinItemBinding
-import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.degToRad
-import com.nujiak.recce.utils.getAngleString
-import com.nujiak.recce.utils.getGridString
 
 /**
  * ViewHolder for Pins in the Ruler fragment
@@ -32,7 +29,7 @@ class RulerPinViewHolder private constructor(private val binding: RulerPinItemBi
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(rulerPointItem: RulerItem.RulerPointItem, coordSys: CoordinateSystem) {
+    fun bind(rulerPointItem: RulerItem.RulerPointItem, coordSys: CoordinateSystem, formatAsGrids: (Double, Double) -> String) {
         val location = rulerPointItem.position
 
         // Pin name
@@ -40,10 +37,8 @@ class RulerPinViewHolder private constructor(private val binding: RulerPinItemBi
         binding.rulerPinName.isSelected = true
 
         // Grid System
-        binding.rulerPinGridSystem.text =
-            binding.root.resources.getStringArray(R.array.coordinate_systems)[coordSys.index]
-        binding.rulerPinGrid.text =
-            getGridString(location.latitude, location.longitude, coordSys, binding.root.resources)
+        binding.rulerPinGridSystem.text = binding.root.resources.getStringArray(R.array.coordinate_systems)[coordSys.index]
+        binding.rulerPinGrid.text = formatAsGrids(location.latitude, location.longitude)
 
         val context = binding.root.context
         val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[rulerPointItem.colorId])
@@ -66,7 +61,7 @@ class RulerMeasurementViewHolder private constructor(private val binding: RulerM
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(rulerMeasurementItem: RulerItem.RulerMeasurementItem, angleUnit: AngleUnit) {
+    fun bind(rulerMeasurementItem: RulerItem.RulerMeasurementItem, formatAsAngle: (Float, Boolean) -> String) {
         val points = rulerMeasurementItem.points
         binding.rulerFrom.text = rulerMeasurementItem.startName
         binding.rulerTo.text = rulerMeasurementItem.endName
@@ -82,7 +77,7 @@ class RulerMeasurementViewHolder private constructor(private val binding: RulerM
         }
 
         binding.rulerDist.text = "%.2fm".format(distance)
-        binding.rulerDir.text = getAngleString(degToRad(heading).toFloat(), angleUnit, false)
+        binding.rulerDir.text = formatAsAngle(degToRad(heading).toFloat(), false)
         if (points.size > 2) {
             binding.rulerIntermediate.text = binding.root.resources.getQuantityString(
                 R.plurals.intermediate_nodes,

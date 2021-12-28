@@ -25,16 +25,11 @@ import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.SheetPinCreatorBinding
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.mapping.Mapping
-import com.nujiak.recce.mapping.ZONE_BANDS
-import com.nujiak.recce.mapping.getUtmZoneAndBand
 import com.nujiak.recce.utils.COLORS
 import com.nujiak.recce.utils.PIN_CARD_DARK_BACKGROUNDS
 import com.nujiak.recce.utils.animateColor
 import com.nujiak.recce.utils.dpToPx
-import com.nujiak.recce.utils.wrapLngDeg
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Locale
-import kotlin.math.floor
 
 @AndroidEntryPoint
 class PinCreatorSheet : BottomSheetDialogFragment() {
@@ -45,7 +40,6 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
     private var updatedPin: Pin? = null
 
     private var isUpdate: Boolean = false
-    private var isInputValid: Boolean = false
 
     private var coordSys = CoordinateSystem.atIndex(0)
 
@@ -63,48 +57,28 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         coordSys = viewModel.coordinateSystem.value ?: CoordinateSystem.atIndex(0)
         setUpTextFields()
 
-        binding.newPinCustomGridsGroup.visibility = when (coordSys) {
-            CoordinateSystem.WGS84 -> View.GONE
-            else -> View.VISIBLE
-        }
-
         // Set up exposed dropdown menus
-        requireContext().let {
-            binding.newPinColorDropdown.setAdapter(
-                NoFilterArrayAdapter(
-                    it, R.layout.dropdown_menu_popup_item, COLORS
-                )
-            )
-            binding.newPinZoneDropdown.setAdapter(
-                NoFilterArrayAdapter(
-                    it, R.layout.dropdown_menu_popup_item,
-                    ZONE_BANDS
-                )
-            )
-            groupArrayAdapter = NoFilterArrayAdapter(
-                it,
-                R.layout.dropdown_menu_popup_item,
-                viewModel.getGroupNames().apply {
-                    add(0, getString(R.string.new_group_plus))
-                    add(1, getString(R.string.none))
-                }
-            )
-            // Restore newly added group after configuration change (ie rotations)
-            savedInstanceState?.getString("transient_group")?.let { currentGroup ->
-                if (currentGroup !in groupArrayAdapter.items && currentGroup.isNotEmpty()) {
-                    groupArrayAdapter.add(currentGroup)
-                }
+        binding.newPinColorDropdown.setAdapter(
+            NoFilterArrayAdapter(requireContext(), R.layout.dropdown_menu_popup_item, COLORS)
+        )
+        groupArrayAdapter = NoFilterArrayAdapter(
+            requireContext(),
+            R.layout.dropdown_menu_popup_item,
+            viewModel.getGroupNames().apply {
+                add(0, getString(R.string.new_group_plus))
+                add(1, getString(R.string.none))
             }
-            binding.newPinGroupDropdown.setAdapter(groupArrayAdapter)
+        )
+        // Restore newly added group after configuration change (ie rotations)
+        savedInstanceState?.getString("transient_group")?.let { currentGroup ->
+            if (currentGroup !in groupArrayAdapter.items && currentGroup.isNotEmpty()) {
+                groupArrayAdapter.add(currentGroup)
+            }
         }
+        binding.newPinGroupDropdown.setAdapter(groupArrayAdapter)
 
         // Get pin passed in as argument
-        val argPin = arguments?.getParcelable<Pin>("pin")
-        pin = if (argPin != null) {
-            argPin
-        } else {
-            Pin("", 0.0, 0.0)
-        }
+        pin = arguments?.getParcelable("pin") ?: Pin("", 0.0, 0.0)
 
         // Check if this is an update and pre set data fields
         isUpdate = pin.pinId != 0L
@@ -112,11 +86,6 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
         binding.newPinNameEditText.setText(pin.name)
         if (isUpdate) {
             binding.creatorSheetHeader.text = getString(R.string.edit_pin)
-        }
-        if (pin.latitude != 0.0 || pin.longitude != 0.0) {
-            // Populate lat long fields if available
-            binding.newPinLatEditText.setText("%.6f".format(Locale.US, pin.latitude))
-            binding.newPinLongEditText.setText("%.6f".format(Locale.US, pin.longitude))
         }
         binding.newPinColorDropdown.setText(COLORS[pin.color], false)
         binding.newPinGroupDropdown.setText(
@@ -134,8 +103,10 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                 dismiss()
             }
         }
-        updateGrids()
         updateSheetColor(pin.color)
+
+        val coordinate = Mapping.transformTo(coordSys, LatLng(pin.latitude, pin.longitude))
+        binding.newPinGridsEditText.setText(coordinate?.toString() ?: "")
 
         // Expand bottom sheet fully
         (dialog as BottomSheetDialog).behavior.apply {
@@ -147,48 +118,9 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
     }
 
     private fun onCompleted() {
-        onValidateInput()
-        if (isInputValid) {
-
-            var group = binding.newPinGroupDropdown.text.toString().trim()
-            if (group == getString(R.string.none)) {
-                group = ""
-            }
-
-            // Create new pin instead of modifying old pin
-            updatedPin = pin.copy(
-                name = binding.newPinNameEditText.text.toString(),
-                latitude = binding.newPinLatEditText.text.toString().toDouble(),
-                longitude = wrapLngDeg(binding.newPinLongEditText.text.toString().toDouble()),
-                color = COLORS.indexOf(binding.newPinColorDropdown.text.toString()),
-                group = group,
-                description = binding.newPinDescriptionEditText.text
-                    .toString()
-                    .replace(Regex("\\n{3,}"), "\n\n")
-                    .trim()
-            )
-
-            when (isUpdate) {
-                true -> viewModel.updatePin(updatedPin!!)
-                false -> viewModel.addPin(updatedPin!!)
-            }
-
-            // Open Pin Info
-            when {
-                isUpdate -> viewModel.showPinInfo(pin.pinId)
-                updatedPin != null -> viewModel.showPinOnMap(updatedPin!!.copy(pinId = viewModel.lastAddedId))
-            }
-
-            dismiss()
-        }
-    }
-
-    private fun onValidateInput() {
-
-        isInputValid = true
-
         // Validate pin name
         val name = binding.newPinNameEditText.text
+        var isInputValid = true
         when {
             name.isNullOrBlank() -> {
                 binding.newPinNameInput.error = getString(R.string.name_blank_error)
@@ -200,22 +132,47 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             }
         }
 
-        // Validate latitude
-        val lat = binding.newPinLatEditText.text.toString().toDoubleOrNull()
-        if (lat == null) {
-            binding.newPinLatInput.error = getString(R.string.lat_empty_error)
-            isInputValid = false
-        } else if (lat < -90 || lat > 90) {
-            binding.newPinLatInput.error = getString(R.string.lat_out_of_range_error)
-            isInputValid = false
+        // Validate coordinate
+        val coordinate = Mapping.parse(binding.newPinGridsEditText.text.toString(), coordSys)
+
+        if (coordinate == null) {
+            binding.newPinGridsInput.error = getString(R.string.invalid_coordinate)
         }
 
-        // Validate longitude
-        val lng = binding.newPinLongEditText.text.toString().toDoubleOrNull()
-        if (lng == null) {
-            binding.newPinLongInput.error = getString(R.string.long_empty_error)
-            isInputValid = false
+        if (!isInputValid || coordinate == null) {
+            return
         }
+
+        var group = binding.newPinGroupDropdown.text.toString().trim()
+        if (group == getString(R.string.none)) {
+            group = ""
+        }
+
+        // Create new pin instead of modifying old pin
+        updatedPin = pin.copy(
+            name = binding.newPinNameEditText.text.toString(),
+            latitude = coordinate.latLng.latitude,
+            longitude = coordinate.latLng.longitude,
+            color = COLORS.indexOf(binding.newPinColorDropdown.text.toString()),
+            group = group,
+            description = binding.newPinDescriptionEditText.text
+                .toString()
+                .replace(Regex("\\n{3,}"), "\n\n")
+                .trim()
+        )
+
+        when (isUpdate) {
+            true -> viewModel.updatePin(updatedPin!!)
+            false -> viewModel.addPin(updatedPin!!)
+        }
+
+        // Open Pin Info
+        when {
+            isUpdate -> viewModel.showPinInfo(pin.pinId)
+            updatedPin != null -> viewModel.showPinOnMap(updatedPin!!.copy(pinId = viewModel.lastAddedId))
+        }
+
+        dismiss()
     }
 
     private fun setUpTextFields() {
@@ -226,46 +183,10 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
             }
             false
         }
-        binding.newPinLatEditText.setOnKeyListener { _, _, _ ->
-            updateGrids()
-            binding.newPinLatInput.error = null
+
+        binding.newPinGridsEditText.setOnKeyListener { _, _, _ ->
+            binding.newPinGridsInput.error = null
             false
-        }
-        binding.newPinLongEditText.setOnKeyListener { _, _, _ ->
-            updateGrids()
-            binding.newPinLongInput.error = null
-            false
-        }
-
-        // Set up zone dropdown for UTM, or else hide the dropdown
-        if (coordSys == CoordinateSystem.UTM) {
-            binding.newPinZoneDropdown.setOnItemClickListener { _, _, _, _ ->
-                updateLatLng()
-            }
-        } else {
-            binding.newPinZoneInput.visibility = View.GONE
-        }
-
-        // Set up easting/northing EditTexts for relevant coordinate systems
-        if (coordSys == CoordinateSystem.UTM || coordSys == CoordinateSystem.KERTAU) {
-            binding.newPinEastingEditText.setOnKeyListener { _, _, _ ->
-                updateLatLng()
-                false
-            }
-            binding.newPinNorthingEditText.setOnKeyListener { _, _, _ ->
-                updateLatLng()
-                false
-            }
-        }
-
-        // Set up MGRS String EditText for MGRS
-        if (coordSys == CoordinateSystem.MGRS) {
-            binding.newPinMgrsEditText.setOnKeyListener { _, _, _ ->
-                updateLatLng()
-                false
-            }
-            binding.newPinGridGroup.visibility = View.GONE
-            binding.newPinMgrsGroup.visibility = View.VISIBLE
         }
 
         binding.newPinColorDropdown.setOnItemClickListener { _, _, position, _ ->
@@ -286,6 +207,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                 CoordinateSystem.MGRS -> R.string.mgrs
                 CoordinateSystem.KERTAU -> R.string.kertau
                 CoordinateSystem.WGS84 -> R.string.lat_lng
+                CoordinateSystem.BNG -> R.string.bng
             }
         )
 
@@ -299,114 +221,6 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
                 )
             }
         }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun updateLatLng() {
-        when (coordSys) {
-            CoordinateSystem.UTM -> {
-                val zoneBand = binding.newPinZoneDropdown.text.toString()
-                val easting = binding.newPinEastingEditText.text.toString()
-                val northing = binding.newPinNorthingEditText.text.toString()
-
-                if (zoneBand.isBlank() || easting.isBlank() || northing.isBlank()) {
-                    return
-                }
-
-                val zone = zoneBand.slice(if (zoneBand.length == 3) 0..1 else 0..0).toInt()
-                val band = zoneBand[if (zoneBand.length == 3) 2 else 1]
-
-                val utmCoord = Mapping.parseUtm(zone, band, easting.toDouble(), northing.toDouble())
-                val lat = utmCoord?.latLng?.latitude ?: Double.NaN
-                val lng = utmCoord?.latLng?.longitude ?: Double.NaN
-
-                if (!lat.isNaN() && lat < 90 && lat > -90 && !lng.isNaN()) {
-                    // Lat and Lng are valid numbers
-                    binding.newPinLatEditText.setText("%.6f".format(Locale.US, lat))
-                    binding.newPinLongEditText.setText("%.6f".format(Locale.US, lng))
-                } else {
-                    // Lat and Lng are invalid (NaN / outside bounds)
-                    binding.newPinLatEditText.setText("")
-                    binding.newPinLongEditText.setText("")
-                }
-            }
-            CoordinateSystem.MGRS -> {
-                val mgrsCoord = Mapping.parseMgrs(binding.newPinMgrsEditText.text.toString())
-                val latLng = mgrsCoord?.latLng
-
-                if (latLng != null) {
-                    binding.newPinLatEditText.setText("%.6f".format(Locale.US, latLng.latitude))
-                    binding.newPinLongEditText.setText("%.6f".format(Locale.US, latLng.longitude))
-                } else {
-                    binding.newPinLatEditText.setText("")
-                    binding.newPinLongEditText.setText("")
-                }
-            }
-            CoordinateSystem.KERTAU -> {
-                val easting = binding.newPinEastingEditText.text.toString()
-                val northing = binding.newPinNorthingEditText.text.toString()
-
-                if (!easting.isBlank() && !northing.isBlank()) {
-                    val coord = Mapping.parseKertau1948(easting.toDouble(), northing.toDouble())
-                    val latLng = coord.latLng
-                    binding.newPinLatEditText.setText("%.6f".format(Locale.US, latLng.latitude))
-                    binding.newPinLongEditText.setText("%.6f".format(Locale.US, latLng.longitude))
-                }
-            }
-            CoordinateSystem.WGS84 -> {
-            }
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun updateGrids() {
-        val lat: Double
-        val lng: Double
-        try {
-            lat = binding.newPinLatEditText.text.toString().toDouble()
-            lng = binding.newPinLongEditText.text.toString().toDouble()
-        } catch (e: Exception) {
-            clearGrids()
-            return
-        }
-
-        when (coordSys) {
-            CoordinateSystem.UTM -> {
-                val utmData = Mapping.toUtm(lat, lng)
-                utmData?.let {
-                    // UTM data is valid, set texts then return
-                    binding.newPinEastingEditText.setText(floor(it.x).toInt().toString())
-                    binding.newPinNorthingEditText.setText(floor(it.y).toInt().toString())
-
-                    // TODO: Replace this workaround
-                    val (zone, band) = getUtmZoneAndBand(lat, lng)
-                    binding.newPinZoneDropdown.setText("$zone$band", false)
-                    return
-                }
-            }
-            CoordinateSystem.MGRS -> {
-                binding.newPinMgrsEditText.setText(Mapping.toMgrs(lat, lng).toString())
-                return
-            }
-            CoordinateSystem.KERTAU -> {
-                val latLng = LatLng(lat, lng)
-                val kertauCoordinate = Mapping.toKertau1948(latLng)
-                binding.newPinEastingEditText.setText(floor(kertauCoordinate.x).toInt().toString())
-                binding.newPinNorthingEditText.setText(floor(kertauCoordinate.y).toInt().toString())
-                return
-            }
-            CoordinateSystem.WGS84 -> {
-            }
-        }
-        // Grids are not valid for current coordinate system (out of bounds),
-        // wipe zone, easting and northing fields
-        clearGrids()
-    }
-
-    private fun clearGrids() {
-        binding.newPinEastingEditText.setText("")
-        binding.newPinNorthingEditText.setText("")
-        binding.newPinZoneDropdown.setText("", false)
     }
 
     private fun onAddNewGroup() {

@@ -2,12 +2,8 @@
     <string name="app_name">Recce</string>
 
     <!-- General-use -->
-    <string name="latitude">Latitude</string>
-    <string name="longitude">Longitude</string>
     <string name="pin_name">Pin Name</string>
     <string name="not_available">N/A</string>
-    <string name="easting">Easting</string>
-    <string name="northing">Northing</string>
     <string name="lat_lng">LatLng (WGS 84)</string>
     <string name="lat_lng_full">Latitude / Longitude (WGS 84)</string>
     <string name="color">Color</string>
@@ -16,9 +12,9 @@
     <string name="coordinate_system">Coordinate System</string>
     <string name="angle_unit">Angle Unit</string>
     <string name="utm" translatable="false">UTM</string>
-    <string name="kertau" translatable="false">Kertau (RSO)</string>
-    <string name="kertau_full" translatable="false">Kertau (RSO) / RSO Malaya (m)</string>
+    <string name="kertau" translatable="false">Kertau 1948</string>
     <string name="mgrs" translatable="false">MGRS</string>
+    <string name="bng" translatable="false">British National Grid</string>
     <string name="nato_mils" translatable="false">NATO mils</string>
     <string name="degrees" translatable="false">Degrees</string>
     <string name="name">Name</string>
@@ -28,6 +24,7 @@
     <string name="dark">Dark</string>
     <string name="auto">Auto</string>
     <string name="saved">Saved</string>
+    <string name="coordinate">Coordinate</string>
 
     <!-- Pin Selector -->
     <string name="pins">Pins</string>
@@ -84,12 +81,10 @@
     <!-- Errors -->
     <string name="name_blank_error">Name cannot be blank</string>
     <string name="name_too_long_error">Name cannot exceed 20 characters</string>
-    <string name="lat_empty_error">Latitude cannot be blank</string>
-    <string name="long_empty_error">Longitude cannot be blank</string>
-    <string name="lat_out_of_range_error">Latitude is out of range</string>
     <string name="group_empty_error">Group cannot be blank</string>
     <string name="group_too_long_error">Group name cannot exceed 12 characters</string>
     <string name="group_invalid_error">Group name invalid</string>
+    <string name="invalid_coordinate">Invalid coordinate</string>
 
     <!-- Chain Creator -->
     <string name="route_area_name_name">Route/Area Name</string>
@@ -100,7 +95,6 @@
 
     <!-- Map -->
     <string name="map">Map</string>
-    <string name="zone">Zone</string>
     <string name="new_checkpoint">New Checkpoint</string>
     <string name="unnamed">Unnamed</string>
     <string name="route_checkpoint">%s: %s</string>

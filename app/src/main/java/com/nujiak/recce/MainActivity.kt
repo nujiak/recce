@@ -42,7 +42,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
-import com.nujiak.recce.enums.SharedPrefsKey
 import com.nujiak.recce.enums.ThemePreference
 import com.nujiak.recce.fragments.ChainInfoFragment
 import com.nujiak.recce.fragments.GoToFragment
@@ -89,21 +88,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Run Onboarding
-        if (!viewModel.sharedPreference.getBoolean(SharedPrefsKey.ONBOARDING_COMPLETED.key, false)) {
+        if (!viewModel.isOnboardingCompleted) {
             startActivity(Intent(this, OnboardingActivity::class.java))
             finish()
         }
 
         // Set app theme (auto/light/dark)
-        viewModel.sharedPreference.getInt(SharedPrefsKey.THEME_PREF.key, 0).let {
-            setDefaultNightMode(
-                when (ThemePreference.atIndex(it)) {
-                    ThemePreference.AUTO -> MODE_NIGHT_FOLLOW_SYSTEM
-                    ThemePreference.LIGHT -> MODE_NIGHT_NO
-                    ThemePreference.DARK -> MODE_NIGHT_YES
-                }
-            )
-        }
+        setDefaultNightMode(
+            when (viewModel.theme) {
+                ThemePreference.AUTO -> MODE_NIGHT_FOLLOW_SYSTEM
+                ThemePreference.LIGHT -> MODE_NIGHT_NO
+                ThemePreference.DARK -> MODE_NIGHT_YES
+            }
+        )
 
         // Set up ViewPager2
         viewPager = findViewById(R.id.view_pager)

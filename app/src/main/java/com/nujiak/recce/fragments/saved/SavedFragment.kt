@@ -15,6 +15,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -25,11 +26,13 @@ import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.FragmentSavedBinding
 import com.nujiak.recce.enums.CoordinateSystem
-import com.nujiak.recce.enums.SharedPrefsKey
 import com.nujiak.recce.enums.SortBy
 import com.nujiak.recce.utils.spToPx
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class SavedFragment : Fragment() {
@@ -37,9 +40,6 @@ class SavedFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var binding: FragmentSavedBinding
     private lateinit var pinAdapter: PinAdapter
-
-    private var sortBy = SortBy.GROUP
-    private var sortAscending = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,7 +56,8 @@ class SavedFragment : Fragment() {
             { chain -> onChainClick(chain) },
             { chain -> onChainLongClick(chain) },
             viewModel.coordinateSystem.value ?: CoordinateSystem.atIndex(0),
-            resources
+            viewModel::formatAsGrids,
+            resources,
         )
         binding.pinRecyclerview.adapter = pinAdapter
         val gridLayoutManager = StaggeredGridLayoutManager(getSpanCount(), Configuration.ORIENTATION_PORTRAIT)
@@ -113,10 +114,6 @@ class SavedFragment : Fragment() {
             }
         })
 
-        // Fetch sorting parameters
-        sortBy = SortBy.atIndex(viewModel.sharedPreference.getInt(SharedPrefsKey.SORT_BY.key, sortBy.index))
-        sortAscending = viewModel.sharedPreference.getBoolean(SharedPrefsKey.SORT_ASCENDING.key, sortAscending)
-
         // Set up FAB
         binding.pinFab.setMenuListener(object : SimpleMenuListenerAdapter() {
             override fun onMenuItemSelected(menuItem: MenuItem?): Boolean {
@@ -142,32 +139,23 @@ class SavedFragment : Fragment() {
                     true
                 }
                 R.id.sort_by_alphabetical_asc -> {
-                    sortBy = SortBy.NAME
-                    sortAscending = true
-                    onSortList()
+                    onSortList(SortBy.NAME, true)
                     true
                 }
                 R.id.sort_by_alphabetical_dsc -> {
-                    sortBy = SortBy.NAME
-                    sortAscending = false
-                    onSortList()
+                    onSortList(SortBy.NAME, false)
                     true
                 }
                 R.id.sort_by_time_asc -> {
-                    sortBy = SortBy.TIME
-                    sortAscending = true
-                    onSortList()
+                    onSortList(SortBy.TIME, true)
                     true
                 }
                 R.id.sort_by_time_dsc -> {
-                    sortBy = SortBy.TIME
-                    sortAscending = false
-                    onSortList()
+                    onSortList(SortBy.TIME, false)
                     true
                 }
                 R.id.sort_by_group -> {
-                    sortBy = SortBy.GROUP
-                    onSortList()
+                    onSortList(SortBy.GROUP, false)
                     true
                 }
                 else -> false
@@ -232,11 +220,10 @@ class SavedFragment : Fragment() {
         return true
     }
 
-    private fun onSortList() {
-        viewModel.sharedPreference.edit()
-            .putInt(SharedPrefsKey.SORT_BY.key, sortBy.index)
-            .putBoolean(SharedPrefsKey.SORT_ASCENDING.key, sortAscending)
-            .apply()
+    private fun onSortList(sortBy: SortBy, sortAscending: Boolean) {
+        viewModel.sortBy = sortBy
+        viewModel.sortAscending = sortAscending
+
         refreshList()
         binding.pinRecyclerview.smoothScrollToPosition(0)
     }
@@ -249,8 +236,8 @@ class SavedFragment : Fragment() {
             newPins,
             newChains,
             viewModel.selectedIds,
-            sortBy,
-            sortAscending
+            viewModel.sortBy,
+            viewModel.sortAscending
         )
     }
 
@@ -265,15 +252,17 @@ class SavedFragment : Fragment() {
         val shareCodeInput = alertDialog.findViewById<TextInputEditText>(R.id.share_code_edit)
 
         alertDialog.findViewById<Button>(R.id.paste)?.setOnClickListener {
-            activity?.let { activity ->
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 val clipboard =
-                    activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val item = clipboard.primaryClip?.getItemAt(0)
                 val pasteData = item?.text
-                if (pasteData != null) {
-                    shareCodeInput.setText(pasteData)
-                } else {
-                    Toast.makeText(context, R.string.paste_error, Toast.LENGTH_SHORT).show()
+                withContext(Dispatchers.Main) {
+                    if (pasteData != null) {
+                        shareCodeInput.setText(pasteData)
+                    } else {
+                        Toast.makeText(context, R.string.paste_error, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }

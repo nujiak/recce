@@ -28,7 +28,12 @@ enum class CoordinateSystem(val index: Int) {
      *
      * Used in Google Maps
      */
-    WGS84(3);
+    WGS84(3),
+
+    /**
+     * Ordnance Survey National Grid / British National Grid (BNG)
+     */
+    BNG(4);
 
     companion object {
         private val map = values().associateBy(CoordinateSystem::index)
