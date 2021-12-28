@@ -51,11 +51,6 @@ class GoToFragment : DialogFragment() {
 
     private fun setUp() {
 
-        binding.newPinCustomGridsGroup.visibility = when (coordSys) {
-            CoordinateSystem.WGS84 -> View.GONE
-            else -> View.VISIBLE
-        }
-
         binding.newPinGridsInput.hint = getString(
             when (coordSys) {
                 CoordinateSystem.UTM -> R.string.utm
