@@ -246,20 +246,8 @@ class MainViewModel @Inject constructor(
     fun formatAsGrids(latDeg: Double, lngDeg: Double, coordSys: CoordinateSystem? = null): String {
         val resources = getApplication<RecceApp>().resources
         val latLng = LatLng(latDeg, lngDeg)
-        return when (coordSys ?: coordinateSystem.value!!) {
-            CoordinateSystem.UTM -> {
-                Mapping.toUtm(latLng).toString()
-            }
-            CoordinateSystem.MGRS -> {
-                Mapping.toMgrs(latLng)?.toString()
-            }
-            CoordinateSystem.KERTAU -> {
-                Mapping.toKertau1948(latLng).toString()
-            }
-            CoordinateSystem.WGS84 -> {
-                return Mapping.parseLatLng(latLng).toString()
-            }
-        } ?: resources.getString(R.string.not_available)
+        return Mapping.transformTo(coordSys ?: coordinateSystem.value!!, latLng)?.toString()
+            ?: resources.getString(R.string.not_available)
     }
 
     /**

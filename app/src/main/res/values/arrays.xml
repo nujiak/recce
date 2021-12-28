@@ -5,6 +5,7 @@
         <item>@string/mgrs</item>
         <item>@string/kertau</item>
         <item>@string/lat_lng</item>
+        <item>@string/bng</item>
     </string-array>
 
     <string-array name="angle_units">
