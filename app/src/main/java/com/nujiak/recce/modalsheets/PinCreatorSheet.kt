@@ -40,7 +40,6 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
     private var updatedPin: Pin? = null
 
     private var isUpdate: Boolean = false
-    private var isInputValid: Boolean = false
 
     private var coordSys = CoordinateSystem.atIndex(0)
 
@@ -121,6 +120,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
     private fun onCompleted() {
         // Validate pin name
         val name = binding.newPinNameEditText.text
+        var isInputValid = true
         when {
             name.isNullOrBlank() -> {
                 binding.newPinNameInput.error = getString(R.string.name_blank_error)
@@ -137,6 +137,9 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
 
         if (coordinate == null) {
             binding.newPinGridsInput.error = getString(R.string.invalid_coordinate)
+        }
+
+        if (!isInputValid || coordinate == null) {
             return
         }
 
