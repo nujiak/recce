@@ -25,6 +25,8 @@
     <string name="auto">Auto</string>
     <string name="saved">Saved</string>
     <string name="coordinate">Coordinate</string>
+    <string name="measurement">Measurement</string>
+    <string name="app">App</string>
 
     <!-- Pin Selector -->
     <string name="pins">Pins</string>

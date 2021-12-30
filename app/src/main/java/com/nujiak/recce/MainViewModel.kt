@@ -315,7 +315,7 @@ class MainViewModel @Inject constructor(
     /**
      * LiveData to determine whether to open Settings sheet
      *
-     * Observed by [MainActivity] to start [SettingsSheet][com.nujiak.recce.modalsheets.SettingsSheet]
+     * Observed by [MainActivity] to start [PreferenceActivity]
      */
     val toOpenSettings: LiveData<Boolean>
         get() = _toOpenSettings

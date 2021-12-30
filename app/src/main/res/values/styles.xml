@@ -141,7 +141,11 @@
         <item name="android:windowAnimationStyle">@style/Animation.Recce.InfoDialogs</item>
         <item name="android:layout_width">match_parent</item>
     </style>
-    
+
+    <style name="Theme.Recce.Preference" parent="Theme.Recce">
+        <item name="tint">?android:attr/textColorPrimary</item>
+    </style>
+
     <style name="Animation.Recce.InfoDialogs" parent="@android:style/Animation.Activity">
         <item name="android:windowEnterAnimation">@anim/info_dialog_enter_animation</item>
         <item name="android:windowExitAnimation">@anim/info_dialog_exit_animation</item>

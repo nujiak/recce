@@ -48,7 +48,6 @@ import com.nujiak.recce.fragments.GoToFragment
 import com.nujiak.recce.fragments.PinInfoFragment
 import com.nujiak.recce.modalsheets.ChainCreatorSheet
 import com.nujiak.recce.modalsheets.PinCreatorSheet
-import com.nujiak.recce.modalsheets.SettingsSheet
 import com.nujiak.recce.onboarding.OnboardingActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -418,8 +417,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openSettings() {
-        val settingsSheet = SettingsSheet()
-        settingsSheet.show(supportFragmentManager, settingsSheet.tag)
+        val intent = Intent(this, PreferenceActivity::class.java)
+        startActivity(intent)
         viewModel.finishedOpenSettings()
     }
 

@@ -126,4 +126,7 @@ dependencies {
 
     // Proj4j
     implementation 'org.locationtech.proj4j:proj4j:1.1.3'
+
+    // AndroidX Preference
+    implementation 'androidx.preference:preference-ktx:1.1.1'
 }
