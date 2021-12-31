@@ -328,15 +328,15 @@ class MapFragment :
         }
 
         // Set up Coordinate System
-        viewModel.coordinateSystem.observe(viewLifecycleOwner, {
+        viewModel.coordinateSystem.observe(viewLifecycleOwner) {
             coordSys = it
             updateCardGridSystem(coordSys)
             updateGrids()
-        })
-        viewModel.angleUnit.observe(viewLifecycleOwner, {
+        }
+        viewModel.angleUnit.observe(viewLifecycleOwner) {
             angleUnit = it
             updateLiveMeasurements()
-        })
+        }
 
         // Set up Map Type toggle buttons
         binding.mapNormalType.setOnClickListener {

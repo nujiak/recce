@@ -7,7 +7,6 @@ import com.nujiak.recce.databinding.ActivityPreferenceBinding
 import com.nujiak.recce.preference.PreferenceFragment
 
 class PreferenceActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityPreferenceBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,7 +16,7 @@ class PreferenceActivity : AppCompatActivity() {
 
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            add(R.id.preference_fragment_container, PreferenceFragment())
+            replace(R.id.preference_fragment_container, PreferenceFragment())
         }
 
         setContentView(binding.root)

@@ -12,6 +12,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
@@ -31,6 +32,7 @@ import com.nujiak.recce.fragments.ruler.RulerItem
 import com.nujiak.recce.fragments.ruler.generateRulerList
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.livedatas.RotationLiveData
+import com.nujiak.recce.livedatas.SharedPreferenceLiveData
 import com.nujiak.recce.mapping.Mapping
 import com.nujiak.recce.utils.radToDeg
 import com.nujiak.recce.utils.radToNatoMils
@@ -486,55 +488,18 @@ class MainViewModel @Inject constructor(
      */
 
     /**
-     * Backing property for [coordinateSystem]
-     */
-    private val _coordinateSystem = MutableLiveData(CoordinateSystem.atIndex(sharedPreference.getInt(SharedPrefsKey.COORDINATE_SYSTEM.key, 0)))
-
-    /**
      * [LiveData] holding the [CoordinateSystem] to be used according to the
      * user's preference
      */
-    val coordinateSystem: LiveData<CoordinateSystem>
-        get() = _coordinateSystem
-
-    /**
-     * Update the coordinate system used
-     *
-     * @param coordSys
-     */
-    fun updateCoordinateSystem(coordSys: CoordinateSystem) {
-        if (coordSys != _coordinateSystem.value) {
-            _coordinateSystem.value = coordSys
-        }
-        this.sharedPreference.edit().putInt(SharedPrefsKey.COORDINATE_SYSTEM.key, coordSys.index).apply()
+    val coordinateSystem = SharedPreferenceLiveData(sharedPreference, SharedPrefsKey.COORDINATE_SYSTEM).map {
+        CoordinateSystem.atIndex(it)
     }
-
-    /**
-     * Backing property for [angleUnit]
-     */
-    private val _angleUnit =
-        MutableLiveData(
-            AngleUnit.atIndex(sharedPreference.getInt(SharedPrefsKey.ANGLE_UNIT.key, 0))
-        )
 
     /**
      * [LiveData] holding the [AngleUnit] to be used according to the user's preference
      */
-    val angleUnit: LiveData<AngleUnit>
-        get() = _angleUnit
-
-    /**
-     * Updates the angle unit used
-     *
-     * @param angleUnit
-     */
-    fun updateAngleUnit(angleUnit: AngleUnit) {
-        if (angleUnit != _angleUnit.value) {
-            _angleUnit.value = angleUnit
-        }
-        this.sharedPreference.edit {
-            putInt(SharedPrefsKey.ANGLE_UNIT.key, angleUnit.index)
-        }
+    val angleUnit = SharedPreferenceLiveData(sharedPreference, SharedPrefsKey.ANGLE_UNIT).map {
+        AngleUnit.atIndex(it)
     }
 
     /*
@@ -880,15 +845,6 @@ class MainViewModel @Inject constructor(
 
             shareQuantity = Pair(pinsToShare?.size, chainsToShare?.size)
             _shareCode.postValue(toShareCode(pinsToShare, chainsToShare))
-        }
-    }
-
-    /**
-     * Clears all shared preferences entries
-     */
-    fun clearSharedPreferences() {
-        this.sharedPreference.edit {
-            clear()
         }
     }
 
