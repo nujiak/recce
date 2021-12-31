@@ -71,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/colorPrimaryLight"
                     android:textColor="@color/textColorLight"
-                    android:text="@string/lat_lng_full" />
+                    android:text="@string/wgs_84" />
             </RadioGroup>
     </ScrollView>
 

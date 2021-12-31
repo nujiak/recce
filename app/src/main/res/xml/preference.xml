@@ -4,7 +4,7 @@
     <PreferenceCategory android:title="@string/measurement">
         <com.nujiak.recce.preference.IntListPreference
             app:defaultValue="0"
-            app:entries="@array/coordinate_systems"
+            app:entries="@array/coordinate_systems_full"
             app:icon="@drawable/ic_baseline_grid_4x4_24"
             app:key="coordinate_system"
             app:title="@string/coordinate_system" />

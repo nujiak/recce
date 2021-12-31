@@ -4,7 +4,7 @@
     <!-- General-use -->
     <string name="pin_name">Pin Name</string>
     <string name="not_available">N/A</string>
-    <string name="lat_lng">LatLng (WGS 84)</string>
+    <string name="wgs_84">WGS 84</string>
     <string name="lat_lng_full">Latitude / Longitude (WGS 84)</string>
     <string name="color">Color</string>
     <string name="group">Group</string>
@@ -12,9 +12,12 @@
     <string name="coordinate_system">Coordinate System</string>
     <string name="angle_unit">Angle Unit</string>
     <string name="utm" translatable="false">UTM</string>
+    <string name="utm_full" translatable="false">Universal Traverse Mercator (UTM)</string>
     <string name="kertau" translatable="false">Kertau 1948</string>
     <string name="mgrs" translatable="false">MGRS</string>
-    <string name="bng" translatable="false">British National Grid</string>
+    <string name="mgrs_full" translatable="false">Military Grid Reference System (MGRS)</string>
+    <string name="bng" translatable="false">BNG</string>
+    <string name="bng_full" translatable="false">British National Grid (BNG)</string>
     <string name="nato_mils" translatable="false">NATO mils</string>
     <string name="degrees" translatable="false">Degrees</string>
     <string name="name">Name</string>
