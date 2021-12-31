@@ -21,7 +21,6 @@ class IntListPreference : ListPreference {
 
     override fun persistString(value: String): Boolean {
         val intValue = value.toInt()
-        summary = entries[intValue]
         return persistInt(intValue)
     }
 }
