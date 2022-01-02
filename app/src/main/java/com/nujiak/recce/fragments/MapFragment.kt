@@ -255,6 +255,9 @@ class MapFragment :
         }
 
         binding.mapLiveGrids.setOnClickListener {
+            viewModel.openSettings()
+        }
+        binding.mapGotoFab.setOnClickListener {
             mapMgr?.getCameraTarget()?.let {
                 viewModel.openGoTo(it.latitude, it.longitude)
             }

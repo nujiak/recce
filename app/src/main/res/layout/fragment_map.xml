@@ -211,8 +211,19 @@
         android:hapticFeedbackEnabled="true"
         android:src="@drawable/ic_baseline_timeline_24"
         app:backgroundTint="?attr/colorSurface"
+        app:layout_constraintBottom_toTopOf="@id/map_goto_fab"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="?android:attr/textColorPrimary" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/map_goto_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/map_fab"
         app:layout_constraintEnd_toEndOf="parent"
+        app:backgroundTint="?attr/colorSurface"
+        android:src="@drawable/ic_baseline_zoom_in_map_24"
+        android:layout_margin="@dimen/large_padding"
         app:tint="?android:attr/textColorPrimary" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -234,7 +245,7 @@
         android:visibility="invisible"
         app:cardCornerRadius="24dp"
         app:cardElevation="4dp"
-        app:layout_constraintBottom_toTopOf="@id/map_fab"
+        app:layout_constraintBottom_toTopOf="@id/map_goto_fab"
         app:layout_constraintEnd_toEndOf="@+id/map_fab"
         app:layout_constraintStart_toStartOf="@+id/map_fab"
         tools:visibility="visible">
