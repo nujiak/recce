@@ -363,7 +363,7 @@ class MapFragment :
         return binding.root
     }
 
-    override fun onMapReady(mMap: GoogleMap?) {
+    override fun onMapReady(mMap: GoogleMap) {
         if (mMap != null) {
             mapMgr = MapManager(mMap)
 
@@ -1248,13 +1248,13 @@ class MapFragment :
                 field = value
             }
         private var isShowingCheckpoint = false
-        private var zoomStack = 0f
+        @Volatile private var zoomStack = 0f
 
         private var isAnimating = false
 
         private var mapType: Int = map.mapType
 
-        private var targetPosition: CameraPosition = map.cameraPosition
+        @Volatile private var targetPosition: CameraPosition = map.cameraPosition
         private val cameraPosition: CameraPosition
             get() = map.cameraPosition
 
@@ -1267,7 +1267,6 @@ class MapFragment :
                 setOnPolygonClickListener { onPolygonClick(it) }
                 isIndoorEnabled = false
                 setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style))
-                uiSettings.isZoomControlsEnabled = true
             }
 
             map.uiSettings.apply {
@@ -1462,7 +1461,7 @@ class MapFragment :
             // Marker represents a current polyline checkpoint
             if (currentPolylineMarkers.contains(marker)) {
                 val position = marker.position
-                val checkpointNode = ChainNode(marker.title, position, null)
+                val checkpointNode = ChainNode(marker.title ?: "", position, null)
                 focusOn(checkpointNode)
                 return true
             }
@@ -1489,7 +1488,7 @@ class MapFragment :
                         .position(LatLng(pin.latitude, pin.longitude))
                         .title(pin.name)
                         .icon(bitmapDescriptorFromVector(PIN_VECTOR_DRAWABLE[pin.color]))
-                )
+                ) ?: continue
                 markersMap[marker] = pin
             }
         }
@@ -1549,7 +1548,7 @@ class MapFragment :
                                 .anchor(0.5f, 0.5f)
                                 .flat(true)
                                 .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
-                        )
+                        ) ?: continue
                         checkpointsMap[marker] = node
                     }
                 }
@@ -1671,7 +1670,7 @@ class MapFragment :
                                 .title(node.name)
                                 .flat(true)
                                 .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
-                        )
+                        ) ?: continue
                         currentPolylineMarkers.add(marker)
                     }
                 }

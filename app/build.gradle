@@ -100,8 +100,8 @@ dependencies {
     // kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 
     // Google Play services
-    implementation 'com.google.android.gms:play-services-location:18.0.0'
-    implementation 'com.google.android.gms:play-services-maps:17.0.1'
+    implementation 'com.google.android.gms:play-services-location:19.0.0'
+    implementation 'com.google.android.gms:play-services-maps:18.0.1'
 
     // Utilities for Maps SDK for Android
     implementation 'com.google.maps.android:android-maps-utils:2.2.0'
