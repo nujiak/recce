@@ -798,6 +798,7 @@ class MainViewModel @Inject constructor(
                 chains?.forEach { chain -> addChain(chain) }
             }
         }
+        _lastMultiDeletedItems.value = null
     }
 
     /**

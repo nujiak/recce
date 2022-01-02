@@ -27,6 +27,7 @@ import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.FragmentSavedBinding
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.enums.SortBy
+import com.nujiak.recce.utils.animate
 import com.nujiak.recce.utils.spToPx
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter
@@ -110,6 +111,15 @@ class SavedFragment : Fragment() {
                     resources.getQuantityString(R.plurals.number_deleted, size, size),
                     Snackbar.LENGTH_LONG
                 ).setAction(R.string.undo) { viewModel.onRestoreLastDeletedPins() }
+                snackBar.view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+                    override fun onViewAttachedToWindow(p0: View?) {}
+
+                    override fun onViewDetachedFromWindow(p0: View?) {
+                        animate(binding.pinFab.translationY, 0f) { animatedValue ->
+                            binding.pinFab.translationY = animatedValue
+                        }
+                    }
+                })
                 snackBar.show()
             }
         })
