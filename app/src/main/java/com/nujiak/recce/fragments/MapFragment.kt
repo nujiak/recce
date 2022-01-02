@@ -2,7 +2,6 @@ package com.nujiak.recce.fragments
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.animation.FloatEvaluator
 import android.animation.ObjectAnimator
 import android.animation.TypeEvaluator
 import android.animation.ValueAnimator
@@ -65,6 +64,7 @@ import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.PIN_VECTOR_DRAWABLE
+import com.nujiak.recce.utils.animate
 import com.nujiak.recce.utils.animateColor
 import com.nujiak.recce.utils.degToRad
 import com.nujiak.recce.utils.dpToPx
@@ -1845,25 +1845,20 @@ class MapFragment :
                     else -> newRotation
                 }
 
-                ValueAnimator.ofObject(FloatEvaluator(), currentRotation, newRotation).apply {
-                    duration = 100
-                    addUpdateListener { valAnim ->
-                        val rotation = valAnim.animatedValue as Float
-                        marker.rotation = rotation
-                        if (isShowingMyLocationRotation) {
-                            moveTo(
-                                target = myLocationMarker?.position,
-                                bearing = rotation + 90,
-                                duration = 0,
-                                zoom = targetPosition.zoom
-                            )
-                            // Update map compass
-                            updateMapCompass(rotation + 90, tilt)
-                        }
+                animate(currentRotation, newRotation, 150, LinearInterpolator()) { rotation ->
+                    marker.rotation = rotation
+                    if (isShowingMyLocationRotation) {
+                        moveTo(
+                            target = myLocationMarker?.position,
+                            bearing = rotation + 90,
+                            duration = 0,
+                            zoom = targetPosition.zoom
+                        )
+                        // Update map compass
+                        updateMapCompass(rotation + 90, tilt)
                     }
-                    interpolator = LinearInterpolator()
-                    start()
                 }
+
                 lastDirectionUpdate = currentTime
             } else if (currentTime - lastDirectionUpdate > 500) {
                 // Dispose outdated rotation information
