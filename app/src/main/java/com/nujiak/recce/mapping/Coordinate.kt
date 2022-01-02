@@ -1,6 +1,7 @@
 package com.nujiak.recce.mapping
 
 import com.google.android.gms.maps.model.LatLng
+import kotlin.math.abs
 import kotlin.math.pow
 
 open class Coordinate private constructor(
@@ -136,7 +137,9 @@ open class Coordinate private constructor(
         constructor(latLng: LatLng) : this(latLng.latitude, latLng.longitude)
 
         override fun toString(): String {
-            return "${this.y.format(0, 6)} ${this.x.format(0, 6)}"
+            val longLetter = if (x >= 0) 'E' else 'W'
+            val latLetter = if (y >= 0) 'N' else 'S'
+            return "${abs(this.y).format(0, 5)}$latLetter ${abs(this.x).format(0, 5)}$longLetter"
         }
     }
 
