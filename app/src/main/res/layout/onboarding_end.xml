@@ -37,21 +37,5 @@
             android:gravity="center"
             android:textColor="@color/textColorLight"
             android:text="@string/onboarding_ready" />
-
-        <Button
-            android:id="@+id/onboarding_end_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/large_padding"
-            android:text="@string/start"
-            android:textColor="@color/textColorLight"/>
-
-        <Button
-            android:id="@+id/onboarding_end_back"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/back"
-            android:textColor="@color/colorPrimaryLight"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

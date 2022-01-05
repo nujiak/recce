@@ -36,25 +36,5 @@
             android:gravity="center"
             android:textColor="@color/textColorLight"
             android:text="@string/onboarding_title" />
-
-        <Button
-            android:id="@+id/onboarding_title_next"
-            style="?attr/materialButtonOutlinedStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/large_padding"
-            android:text="@string/get_started"
-            android:textColor="@color/textColorLight"/>
     </LinearLayout>
-    <Button
-        android:id="@+id/onboarding_title_ns"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/large_padding"
-        android:text="@string/nsf_nsmen"
-        android:textColor="@color/textColorLight"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

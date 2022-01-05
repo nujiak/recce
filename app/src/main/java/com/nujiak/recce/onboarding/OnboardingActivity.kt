@@ -2,6 +2,7 @@ package com.nujiak.recce.onboarding
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -9,50 +10,86 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.nujiak.recce.MainActivity
 import com.nujiak.recce.R
-import com.nujiak.recce.fragments.ruler.RulerFragment
+import com.nujiak.recce.databinding.ActivityOnboardingBinding
+import com.nujiak.recce.preference.PreferenceFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class OnboardingActivity : AppCompatActivity() {
 
     private lateinit var viewpager: ViewPager2
+    private lateinit var binding: ActivityOnboardingBinding
 
     val viewModel: OnboardingViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_onboarding)
+        binding = ActivityOnboardingBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        viewpager = findViewById(R.id.onboarding_viewpager)
-        viewpager.apply {
-            adapter = OnboardingViewPagerAdapter(this@OnboardingActivity)
-            isUserInputEnabled = false
-        }
+        viewpager = binding.onboardingViewpager
+        viewpager.adapter = OnboardingViewPagerAdapter(this@OnboardingActivity)
+        viewpager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                viewModel.gotoPage(position)
+            }
 
-        viewModel.changePage.observe(this, {
-            viewpager.currentItem = it.index
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+
+                // Animate back button
+                if (position == 0) {
+                    binding.onboardingBack.layoutParams = LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        positionOffset
+                    )
+                    binding.onboardingButtonsDivider.alpha = positionOffset
+                }
+            }
         })
+
+        viewModel.currentPage.observe(this) { page ->
+            viewpager.currentItem = page
+
+            binding.onboardingNext.text = if (page == 2) {
+                getString(R.string.start)
+            } else {
+                getString(R.string.next)
+            }
+        }
 
         viewModel.endOnboarding.observe(this, { endOnboarding ->
             if (endOnboarding) {
                 onCompleted()
             }
         })
+
+        binding.onboardingBack.setOnClickListener {
+            viewModel.previousPage()
+        }
+
+        binding.onboardingNext.setOnClickListener {
+            viewModel.nextPage()
+        }
     }
 
     private inner class OnboardingViewPagerAdapter(activity: AppCompatActivity) :
         FragmentStateAdapter(activity) {
 
-        override fun getItemCount() = 5
+        override fun getItemCount() = 3
 
         override fun createFragment(position: Int): Fragment {
             return when (position) {
-                0 -> OnboardingTitleFragment()
-                1 -> OnboardingGridsFragment()
-                2 -> OnboardingAnglesFragment()
-                3 -> OnboardingEndFragment()
-                4 -> OnboardingNSFragment()
-                else -> RulerFragment()
+                0 -> OnboardingFragment(R.layout.onboarding_title)
+                1 -> PreferenceFragment()
+                2 -> OnboardingFragment(R.layout.onboarding_end)
+                else -> throw IllegalStateException("Invalid onboarding page: $position")
             }
         }
     }

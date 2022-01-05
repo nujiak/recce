@@ -5,7 +5,6 @@
     <string name="pin_name">Pin Name</string>
     <string name="not_available">N/A</string>
     <string name="wgs_84">WGS 84</string>
-    <string name="lat_lng_full">Latitude / Longitude (WGS 84)</string>
     <string name="color">Color</string>
     <string name="group">Group</string>
     <string name="settings">Settings</string>
@@ -80,8 +79,6 @@
     <string name="new_group">New Group</string>
     <string name="group_name">Group name</string>
     <string name="none">None</string>
-    <string name="mgrs_string">MGRS String</string>
-    <string name="tap_enter_hint">Press \'Enter\' to update coordinates</string>
     <string name="description">Description</string>
     <!-- Errors -->
     <string name="name_blank_error">Name cannot be blank</string>
@@ -140,27 +137,15 @@
 
     <!-- Onboarding -->
     <string name="onboarding_title">You will now go through a set-up guide to choose your preferences.</string>
-    <string name="coord_sys_description">Choose a preferred coordinate system for projected grids. These grids will be displayed alongside Latitude &amp; Longitude throughout the app.</string>
-    <string name="angle_unit_description">Choose a preferred unit for displaying angles. This will be used throughout the app.</string>
-    <string name="get_started">Get Started</string>
-    <string name="next_angle_unit">Next: Angle Unit</string>
-    <string name="next_all_set">Next: All Set</string>
-    <string name="previous">Previous</string>
     <string name="back">Back</string>
     <string name="all_set">All Set!</string>
     <string name="onboarding_ready">You are now ready to start using Recce.
         \nYou can change your preferences at any time by opening Settings in the Pins tab.</string>
     <string name="start">Start</string>
-    <string name="nsf_nsmen">NSF / NSmen</string>
-    <string name="all_set_for_ns">All Set For NS!</string>
-    <string name="onboarding_ns"> Your preferences have been automatically set (Kertau RSO, NATO mils). Thank you for the support!
-        \n\nRemember: Do NOT input any sensitive/restricted information into the app.</string>
 
     <!--
       Guides
       -->
-
-    <string name="reset_preferences">Reset Preferences</string>
 
     <!-- Chains Guide -->
     <string name="guide_chains_undo">Tap to undo the previous node or exit line-plotting mode. Tap &amp; hold to discard all nodes and exit.</string>
