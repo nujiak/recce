@@ -20,7 +20,6 @@
             android:theme="@style/Theme.Recce.Preference"/>
         <activity
             android:name=".onboarding.OnboardingActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.Recce.Onboarding" />
         <activity
             android:name=".MainActivity"

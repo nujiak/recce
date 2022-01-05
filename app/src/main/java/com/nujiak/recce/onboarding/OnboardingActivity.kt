@@ -27,6 +27,7 @@ class OnboardingActivity : AppCompatActivity() {
         binding = ActivityOnboardingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
         viewpager = binding.onboardingViewpager
         viewpager.adapter = OnboardingViewPagerAdapter(this@OnboardingActivity)
         viewpager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -41,16 +42,12 @@ class OnboardingActivity : AppCompatActivity() {
                 positionOffsetPixels: Int
             ) {
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-
-                // Animate back button
-                if (position == 0) {
-                    binding.onboardingBack.layoutParams = LinearLayout.LayoutParams(
-                        0,
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        positionOffset
-                    )
-                    binding.onboardingButtonsDivider.alpha = positionOffset
-                }
+                binding.onboardingBack.layoutParams = LinearLayout.LayoutParams(
+                    0,
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    if (position == 0) positionOffset else 1f
+                )
+                binding.onboardingButtonsDivider.alpha = if (position == 0) positionOffset else 1f
             }
         })
 
@@ -64,12 +61,6 @@ class OnboardingActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.endOnboarding.observe(this, { endOnboarding ->
-            if (endOnboarding) {
-                onCompleted()
-            }
-        })
-
         binding.onboardingBack.setOnClickListener {
             viewModel.previousPage()
         }
@@ -79,6 +70,25 @@ class OnboardingActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        // Fix button size for configuration changes
+        binding.onboardingBack.layoutParams = LinearLayout.LayoutParams(
+            0,
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            if (viewpager.currentItem == 0) 0f else 1f
+        )
+        binding.onboardingButtonsDivider.alpha =
+            if (viewpager.currentItem == 0) 0f else 1f
+
+        viewModel.endOnboarding.observe(this, { endOnboarding ->
+            if (endOnboarding) {
+                onCompleted()
+            }
+        })
+    }
+
     private inner class OnboardingViewPagerAdapter(activity: AppCompatActivity) :
         FragmentStateAdapter(activity) {
 
@@ -86,9 +96,9 @@ class OnboardingActivity : AppCompatActivity() {
 
         override fun createFragment(position: Int): Fragment {
             return when (position) {
-                0 -> OnboardingFragment(R.layout.onboarding_title)
+                0 -> OnboardingFragment.newInstance(R.layout.onboarding_title)
                 1 -> PreferenceFragment()
-                2 -> OnboardingFragment(R.layout.onboarding_end)
+                2 -> OnboardingFragment.newInstance(R.layout.onboarding_end)
                 else -> throw IllegalStateException("Invalid onboarding page: $position")
             }
         }
