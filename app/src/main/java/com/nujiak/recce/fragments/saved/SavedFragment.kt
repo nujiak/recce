@@ -27,6 +27,7 @@ import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.FragmentSavedBinding
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.enums.SortBy
+import com.nujiak.recce.utils.animate
 import com.nujiak.recce.utils.spToPx
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter
@@ -102,17 +103,28 @@ class SavedFragment : Fragment() {
         })
 
         // Observe for recent multiple deletions made through action mode
-        viewModel.lastMultiDeletedItems.observe(viewLifecycleOwner, {
-            if (it != null) {
-                val size = (it.first?.size ?: 0) + (it.second?.size ?: 0)
-                val snackBar = Snackbar.make(
-                    binding.pinAppBar,
-                    resources.getQuantityString(R.plurals.number_deleted, size, size),
-                    Snackbar.LENGTH_LONG
-                ).setAction(R.string.undo) { viewModel.onRestoreLastDeletedPins() }
-                snackBar.show()
+        viewModel.lastMultiDeletedItems.observe(viewLifecycleOwner) {
+            if (it == null) {
+                return@observe
             }
-        })
+            val (pins, chains) = it
+            val size = (pins?.size ?: 0) + (chains?.size ?: 0)
+            val snackBar = Snackbar.make(
+                binding.pinAppBar,
+                resources.getQuantityString(R.plurals.number_deleted, size, size),
+                Snackbar.LENGTH_LONG
+            ).setAction(R.string.undo) { viewModel.onRestoreLastDeletedPins() }
+            snackBar.view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+                override fun onViewAttachedToWindow(p0: View?) {}
+
+                override fun onViewDetachedFromWindow(p0: View?) {
+                    animate(binding.pinFab.translationY, 0f) { animatedValue ->
+                        binding.pinFab.translationY = animatedValue
+                    }
+                }
+            })
+            snackBar.show()
+        }
 
         // Set up FAB
         binding.pinFab.setMenuListener(object : SimpleMenuListenerAdapter() {
