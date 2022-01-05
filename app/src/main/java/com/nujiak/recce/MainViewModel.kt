@@ -5,7 +5,6 @@ import android.app.Application
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.view.View
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
@@ -86,26 +85,9 @@ class MainViewModel @Inject constructor(
     /**
      * Current app theme
      */
-    var theme: ThemePreference
-        get() {
-            val index = sharedPreference.getInt(SharedPrefsKey.THEME_PREF.key, ThemePreference.AUTO.index)
-            return ThemePreference.atIndex(index)
-        }
-        set(value) {
-            // Commit new theme preference to shared preferences
-            sharedPreference.edit {
-                putInt(SharedPrefsKey.THEME_PREF.key, value.index)
-            }
-
-            val nightMode = when (value) {
-                ThemePreference.AUTO -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                ThemePreference.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
-                ThemePreference.DARK -> AppCompatDelegate.MODE_NIGHT_YES
-            }
-
-            // Set app theme
-            AppCompatDelegate.setDefaultNightMode(nightMode)
-        }
+    val theme = SharedPreferenceLiveData(sharedPreference, SharedPrefsKey.THEME_PREF).map {
+        ThemePreference.atIndex(it)
+    }
 
     /**
      * Order to sort the [Pin]s and [Chain]s by in Saved

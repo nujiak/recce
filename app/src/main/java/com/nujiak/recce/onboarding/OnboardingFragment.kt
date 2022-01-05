@@ -22,7 +22,7 @@ class OnboardingFragment : Fragment() {
 
         private const val BUNDLE_LAYOUT_KEY = "layout"
 
-        fun newInstance(@LayoutRes layout: Int) : OnboardingFragment {
+        fun newInstance(@LayoutRes layout: Int): OnboardingFragment {
             val bundle = Bundle()
             bundle.putInt(BUNDLE_LAYOUT_KEY, layout)
             val fragment = OnboardingFragment()
