@@ -19,7 +19,7 @@ android {
     defaultConfig {
         applicationId 'com.nujiak.recce'
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 4
         versionName '1.1.2'
 
