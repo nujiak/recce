@@ -55,7 +55,6 @@ android {
 dependencies {
     def room_version = '2.4.0'
     def lifecycle_version = '2.4.0'
-    def hilt_version = '2.32-alpha'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
