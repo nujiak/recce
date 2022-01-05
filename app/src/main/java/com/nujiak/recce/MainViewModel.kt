@@ -730,14 +730,14 @@ class MainViewModel @Inject constructor(
     /**
      * Backing property for [lastMultiDeletedItems]
      */
-    private val _lastMultiDeletedItems = MutableLiveData<Pair<List<Pin>?, List<Chain>?>>()
+    private val _lastMultiDeletedItems = MutableLiveData<Pair<List<Pin>?, List<Chain>?>?>()
 
     /**
      * [LiveData] holding the last [Pin]s and [Chain]s that were mass-deleted
      *
      * Observed by [SavedFragment][com.nujiak.recce.fragments.saved.SavedFragment] to allow for undoing
      */
-    val lastMultiDeletedItems: LiveData<Pair<List<Pin>?, List<Chain>?>>
+    val lastMultiDeletedItems: LiveData<Pair<List<Pin>?, List<Chain>?>?>
         get() = _lastMultiDeletedItems
 
     /**
