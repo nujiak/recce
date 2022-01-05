@@ -24,7 +24,8 @@
         <activity
             android:name=".MainActivity"
             android:theme="@style/SplashScreen"
-            android:windowSoftInputMode="adjustNothing">
+            android:windowSoftInputMode="adjustNothing"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
