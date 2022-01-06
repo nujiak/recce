@@ -255,5 +255,4 @@ open class Coordinate private constructor(
                 "${subsquare.first}${subsquare.second}${extendedSquare.first}${extendedSquare.second}"
         }
     }
-
 }
