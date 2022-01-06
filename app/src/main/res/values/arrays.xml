@@ -4,8 +4,15 @@
         <item>@string/utm</item>
         <item>@string/mgrs</item>
         <item>@string/kertau</item>
-        <item>@string/lat_lng</item>
+        <item>@string/wgs_84</item>
         <item>@string/bng</item>
+    </string-array>
+    <string-array name="coordinate_systems_full">
+        <item>@string/utm_full</item>
+        <item>@string/mgrs_full</item>
+        <item>@string/kertau</item>
+        <item>@string/wgs_84</item>
+        <item>@string/bng_full</item>
     </string-array>
 
     <string-array name="angle_units">

@@ -14,8 +14,6 @@
     <color name="pinDetailShade">#40000000</color>
     <color name="pinSelectionShade">#7F000000</color>
 
-    <color name="sgRed">#4D0E12</color>
-
     <color name="tagRed">#F53D3D</color>
     <color name="tagOrange">#F5993D</color>
     <color name="tagGreen">#66CC66</color>

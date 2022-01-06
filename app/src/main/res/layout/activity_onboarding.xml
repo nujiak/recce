@@ -1,13 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
     tools:context="com.nujiak.recce.onboarding.OnboardingActivity">
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/onboarding_viewpager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@android:color/white" />
+
+        <LinearLayout
+            android:id="@+id/onboarding_buttons_group"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@android:color/transparent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/onboarding_back"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:maxLines="1"
+                android:text="@string/back"
+                tools:layout_weight="1" />
+
+            <View
+                android:id="@+id/onboarding_buttons_divider"
+                android:layout_width="1px"
+                android:layout_height="match_parent"
+                android:alpha="0"
+                android:background="@android:color/white"
+                tools:alpha="1" />
+
+            <TextView
+                android:id="@+id/onboarding_next"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:text="@string/next" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
