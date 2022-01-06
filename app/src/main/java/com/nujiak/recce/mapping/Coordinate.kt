@@ -120,6 +120,16 @@ open class Coordinate private constructor(
         ): Coordinate {
             return BngCoordinate(latLng, majorLetter, minorLetter, x, y)
         }
+
+        fun of(
+            latLng: LatLng,
+            field: Pair<Char, Char>,
+            square: Pair<Char, Char>,
+            subsquare: Pair<Char, Char>,
+            extendedSquare: Pair<Char, Char>,
+        ): Coordinate {
+            return QthCoordinate(latLng, field, square, subsquare, extendedSquare)
+        }
     }
 
     /**
@@ -218,4 +228,32 @@ open class Coordinate private constructor(
             return "$majorLetter$minorLetter ${this.x.format(5, 0)} ${this.y.format(5, 0)}"
         }
     }
+
+    /**
+     * Represents a location in Maidenhead Locator System (QTH Locator)
+     *
+     * @property field pair of letter [Char]
+     * @property square pair of digit [Char]
+     * @property subsquare pair of letter [Char]
+     * @property extendedSquare pair of digit [Char]
+     * @constructor
+     * Creates a [QthCoordinate] for the given point
+     *
+     * @param latLng
+     * @param x
+     * @param y
+     */
+    private class QthCoordinate(
+        latLng: LatLng,
+        private val field: Pair<Char, Char>,
+        private val square: Pair<Char, Char>,
+        private val subsquare: Pair<Char, Char>,
+        private val extendedSquare: Pair<Char, Char>,
+    ) : Coordinate(latLng, Double.NaN, Double.NaN) {
+        override fun toString(): String {
+            return "${field.first}${field.second}${square.first}${square.second}" +
+                "${subsquare.first}${subsquare.second}${extendedSquare.first}${extendedSquare.second}"
+        }
+    }
+
 }

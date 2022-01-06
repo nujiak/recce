@@ -33,7 +33,14 @@ enum class CoordinateSystem(val index: Int) {
     /**
      * Ordnance Survey National Grid / British National Grid (BNG)
      */
-    BNG(4);
+    BNG(4),
+
+    /**
+     * Maidenhead Locator System (QTH Locator)
+     */
+    QTH(5),
+
+    ;
 
     companion object {
         private val map = values().associateBy(CoordinateSystem::index)
