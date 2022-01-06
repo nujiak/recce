@@ -23,6 +23,7 @@ object Mapping {
             CoordinateSystem.MGRS -> MgrsUtils.transform(latLng)
             CoordinateSystem.KERTAU -> KertauUtils.transform(latLng)
             CoordinateSystem.BNG -> BngUtils.transform(latLng)
+            CoordinateSystem.QTH -> QthUtils.transform(latLng)
         }
     }
 

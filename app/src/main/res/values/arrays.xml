@@ -6,6 +6,7 @@
         <item>@string/kertau</item>
         <item>@string/wgs_84</item>
         <item>@string/bng</item>
+        <item>@string/qth</item>
     </string-array>
     <string-array name="coordinate_systems_full">
         <item>@string/utm_full</item>
@@ -13,6 +14,7 @@
         <item>@string/kertau</item>
         <item>@string/wgs_84</item>
         <item>@string/bng_full</item>
+        <item>@string/qth_full</item>
     </string-array>
 
     <string-array name="angle_units">

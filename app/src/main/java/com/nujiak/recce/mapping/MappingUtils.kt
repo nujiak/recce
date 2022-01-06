@@ -547,3 +547,91 @@ object BngUtils {
         return Coordinate.of(latLng)
     }
 }
+
+object QthUtils {
+
+    private fun getLowercaseLetter(index: Int): Char? {
+        if (index < 0 || index > 25) {
+            return null
+        }
+        return (index + 97).toChar()
+    }
+
+    private fun getUppercaseLetter(index: Int): Char? {
+        if (index < 0 || index > 25) {
+            return null
+        }
+        return (index + 65).toChar()
+    }
+
+    private fun getIndex(letter: Char): Int? {
+        if (!letter.isLetter()) {
+            return null
+        }
+        return if (letter.code >= 97) {
+            letter.code - 97
+        } else {
+            letter.code - 65
+        }
+    }
+
+    fun transform(latLng: LatLng): Coordinate? {
+        var lng = latLng.longitude + 180
+        var lat = latLng.latitude + 90
+
+        if (lat < 0 || lng < 0 || lat > 180 || lng > 360) {
+            return null
+        }
+
+        val field = Pair(
+            getUppercaseLetter(floor(lng / 20).toInt())!!,
+            getUppercaseLetter(floor(lat / 10).toInt())!!
+        )
+
+        lng %= 20
+        lat %= 10
+
+        val square = Pair(
+            floor(lng / 2).toInt().digitToChar(),
+            floor(lat).toInt().digitToChar()
+        )
+
+        lng %= 2
+        lat %= 1
+
+        val subsquare = Pair(
+            getLowercaseLetter(floor(lng * 12).toInt())!!,
+            getLowercaseLetter(floor(lat * 24).toInt())!!
+        )
+
+        lng %= 1.0 / 12
+        lat %= 1.0 / 24
+
+        val extendedSquare = Pair(
+            floor(lng * 120).toInt().digitToChar(),
+            floor(lat * 240).toInt().digitToChar()
+        )
+
+        return Coordinate.of(latLng, field, square, subsquare, extendedSquare)
+    }
+
+    fun parse(field: Pair<Char, Char>, square: Pair<Char, Char>, subsquare: Pair<Char, Char>, extendedSquare: Pair<Char, Char>): Coordinate? {
+        var lng = 20.0 * (getIndex(field.first) ?: return null)
+        var lat = 10.0 * (getIndex(field.second) ?: return null)
+
+        lng += 2 * if (square.first.isDigit()) square.first.digitToInt() else return null
+        lat += 1 * if (square.second.isDigit()) square.second.digitToInt() else return null
+
+        lng += 1.0 / 12 * (getIndex(subsquare.first) ?: return null)
+        lat += 1.0 / 24 * (getIndex(subsquare.second) ?: return null)
+
+        lng += 1.0 / 120 * if (extendedSquare.first.isDigit()) extendedSquare.first.digitToInt() else return null
+        lat += 1.0 / 240 * if (extendedSquare.second.isDigit()) extendedSquare.second.digitToInt() else return null
+
+        lng -= 180
+        lat -= 90
+
+        val latLng = LatLng(lat, lng)
+        return Coordinate.of(latLng, field, square, subsquare, extendedSquare)
+    }
+}
