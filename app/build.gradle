@@ -6,6 +6,11 @@ apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'kotlinx-serialization'
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('D:\\OneDrive\\Documents\\AndroidProjects\\Reconnaissance\\keystore.jks')
+        }
+    }
     compileSdkVersion 31
     buildToolsVersion '30.0.2'
 
@@ -20,8 +25,8 @@ android {
         applicationId 'com.nujiak.recce'
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 4
-        versionName '1.1.2'
+        versionCode 5
+        versionName '2.0.0'
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
