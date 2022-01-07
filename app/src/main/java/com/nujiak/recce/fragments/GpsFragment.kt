@@ -108,8 +108,6 @@ class GpsFragment : Fragment() {
             val (latitude, longitude, altitude, accuracy) = locationData
             binding.gpsAccuracy.text = "±" + accuracy.formatAsDistanceString()
             binding.gpsAltitude.text = altitude.formatAsDistanceString()
-            binding.gpsLatLng.text =
-                viewModel.formatAsGrids(latitude, longitude, CoordinateSystem.WGS84)
             binding.gpsGrids.text = viewModel.formatAsGrids(latitude, longitude)
         }
     }

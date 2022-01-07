@@ -149,7 +149,7 @@ open class Coordinate private constructor(
         override fun toString(): String {
             val longLetter = if (x >= 0) 'E' else 'W'
             val latLetter = if (y >= 0) 'N' else 'S'
-            return "${abs(this.y).format(0, 5)}$latLetter ${abs(this.x).format(0, 5)}$longLetter"
+            return "${abs(this.y).format(0, 5)}° $latLetter ${abs(this.x).format(0, 5)}° $longLetter"
         }
     }
 
