@@ -16,7 +16,6 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.nujiak.recce.database.Chain
-import com.nujiak.recce.database.ChainNode
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.database.RecceData
 import com.nujiak.recce.database.RecceDatabaseDao
@@ -29,6 +28,7 @@ import com.nujiak.recce.enums.SortBy
 import com.nujiak.recce.enums.ThemePreference
 import com.nujiak.recce.fragments.ruler.RulerItem
 import com.nujiak.recce.fragments.ruler.generateRulerList
+import com.nujiak.recce.livedatas.ChainPlotLiveData
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.livedatas.RotationLiveData
 import com.nujiak.recce.livedatas.SharedPreferenceLiveData
@@ -541,36 +541,31 @@ class MainViewModel @Inject constructor(
     val toAddPinFromMap: LiveData<Boolean>
         get() = _toAddPinFromMap
 
-    /**
-     * Backing property for [isInPolylineMode]
-     */
-    private val _isInPolylineMode = MutableLiveData(false)
+    private val _chainPlot = ChainPlotLiveData()
+    val chainPlot: LiveData<ChainPlotLiveData.ChainPlot>
+        get() = _chainPlot
+
+    fun addToChainPlot(position: LatLng, name: String = "") {
+        _chainPlot.addPoint(position, name)
+    }
+
+    fun removeLastChainPlotPoint() {
+        _chainPlot.removeLastPoint()
+    }
+
+    fun clearChainPlot() {
+        _chainPlot.removeAll()
+    }
+
+    fun saveChainPlot() {
+        val chain = _chainPlot.getChain("")
+        this.openChainCreator(chain)
+    }
 
     /**
      * [LiveData] to determine whether the map is in polyline mode
      */
-    val isInPolylineMode: LiveData<Boolean>
-        get() = _isInPolylineMode
-
-    /**
-     * List of the points added to the polyline while the map is in polyline mode
-     */
-    val currentPolylinePoints = mutableListOf<ChainNode>()
-
-    /**
-     * Switches the app to polyline adding mode
-     */
-    fun enterPolylineMode() {
-        _isInPolylineMode.value = true
-    }
-
-    /**
-     * Switches the app out of polyline adding mode
-     */
-    fun exitPolylineMode() {
-        _isInPolylineMode.value = false
-        currentPolylinePoints.clear()
-    }
+    val isInPolylineMode: LiveData<Boolean> = chainPlot.map { it.size > 0 }
 
     /**
      * Backing property for [toUndoPolyline]
@@ -588,6 +583,9 @@ class MainViewModel @Inject constructor(
      */
     fun undoMapPolyline() {
         _toUndoPolyline.value = true
+    }
+
+    fun undoMapPolylineCompleted() {
         _toUndoPolyline.value = false
     }
 
@@ -730,14 +728,14 @@ class MainViewModel @Inject constructor(
     /**
      * Backing property for [lastMultiDeletedItems]
      */
-    private val _lastMultiDeletedItems = MutableLiveData<Pair<List<Pin>?, List<Chain>?>>()
+    private val _lastMultiDeletedItems = MutableLiveData<Pair<List<Pin>?, List<Chain>?>?>()
 
     /**
      * [LiveData] holding the last [Pin]s and [Chain]s that were mass-deleted
      *
      * Observed by [SavedFragment][com.nujiak.recce.fragments.saved.SavedFragment] to allow for undoing
      */
-    val lastMultiDeletedItems: LiveData<Pair<List<Pin>?, List<Chain>?>>
+    val lastMultiDeletedItems: LiveData<Pair<List<Pin>?, List<Chain>?>?>
         get() = _lastMultiDeletedItems
 
     /**

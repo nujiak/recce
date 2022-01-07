@@ -52,7 +52,7 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
         binding.pinName.text = pin.name
 
         binding.pinGridSystem.text =
-            binding.root.resources.getStringArray(R.array.coordinate_systems)[coordSys.index]
+            binding.root.resources.getString(coordSys.shortName)
 
         binding.pinGrid.text =
             formatAsGrids(pin.latitude, pin.longitude)

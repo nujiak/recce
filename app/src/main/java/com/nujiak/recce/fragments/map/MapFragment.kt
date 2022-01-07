@@ -1,4 +1,4 @@
-package com.nujiak.recce.fragments
+package com.nujiak.recce.fragments.map
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -297,36 +297,22 @@ class MapFragment :
 
         binding.mapPolylineUndo.apply {
             setOnClickListener {
-                undoPolyline()
+                viewModel.undoMapPolyline()
                 performHapticFeedback(
                     HapticFeedbackConstants.VIRTUAL_KEY,
                     HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
                 )
             }
             setOnLongClickListener {
-                viewModel.exitPolylineMode()
+                viewModel.clearChainPlot()
                 true
             }
         }
 
-        viewModel.isInPolylineMode.observe(viewLifecycleOwner, { isInPolylineMode ->
-            if (isInPolylineMode) {
-                onEnterPolylineMode()
-            } else {
-                onExitPolylineMode()
-            }
-        })
-
-        viewModel.toUndoPolyline.observe(viewLifecycleOwner, { toUndoPolyline ->
-            if (toUndoPolyline) {
-                undoPolyline()
-            }
-        })
-
-        binding.mapPolylineSave.setOnClickListener { onSavePolyline() }
+        binding.mapPolylineSave.setOnClickListener { viewModel.saveChainPlot() }
 
         // Show chains guide if device was rotated mid-guide
-        if (viewModel.isInPolylineMode.value!! && !viewModel.chainsGuideShown) {
+        if (viewModel.isInPolylineMode.value == true && !viewModel.chainsGuideShown) {
             showChainsGuide()
         }
 
@@ -364,63 +350,86 @@ class MapFragment :
     }
 
     override fun onMapReady(mMap: GoogleMap) {
-        if (mMap != null) {
-            mapMgr = MapManager(mMap)
+        mapMgr = MapManager(mMap)
 
-            val newMapType = viewModel.mapType
-            mapMgr?.changeMapType(newMapType)
-            binding.mapTypeGroup.check(
-                when (newMapType) {
-                    GoogleMap.MAP_TYPE_NORMAL -> R.id.map_normal_type
-                    GoogleMap.MAP_TYPE_HYBRID -> R.id.map_hybrid_type
-                    GoogleMap.MAP_TYPE_SATELLITE -> R.id.map_satellite_type
-                    else -> R.id.map_normal_type
-                }
-            )
-
-            // Set up show pin and checkpoint sequence
-            viewModel.pinInFocus.observe(viewLifecycleOwner, { pin -> focusOn(pin) })
-            viewModel.chainInFocus.observe(viewLifecycleOwner, { chain -> focusOn(chain) })
-
-            // Set up Go To sequence
-            viewModel.mapGoTo.observe(viewLifecycleOwner) {
-                mapMgr?.moveTo(target = it)
-                mapMgr?.stopShowingMyLocation()
+        val newMapType = viewModel.mapType
+        mapMgr?.changeMapType(newMapType)
+        binding.mapTypeGroup.check(
+            when (newMapType) {
+                GoogleMap.MAP_TYPE_NORMAL -> R.id.map_normal_type
+                GoogleMap.MAP_TYPE_HYBRID -> R.id.map_hybrid_type
+                GoogleMap.MAP_TYPE_SATELLITE -> R.id.map_satellite_type
+                else -> R.id.map_normal_type
             }
+        )
 
-            if (viewModel.isLocationGranted) {
-                onLocPermGranted()
-            }
+        // Set up show pin and checkpoint sequence
+        viewModel.pinInFocus.observe(viewLifecycleOwner, { pin -> focusOn(pin) })
+        viewModel.chainInFocus.observe(viewLifecycleOwner, { chain -> focusOn(chain) })
 
-            // Observe location to update Live Measurement
-            viewModel.fusedLocationData.observe(viewLifecycleOwner) {
-                updateLiveMeasurements()
-                mapMgr?.updateMyLocation(it)
-            }
-            viewModel.rotation.observe(viewLifecycleOwner) {
-                val (azimuth, pitch, roll) = it
-                mapMgr?.updateRotation(azimuth)
-            }
-
-            // Add markers
-            viewModel.allPins.observe(viewLifecycleOwner, { allPins ->
-                mapMgr?.drawMarkers(allPins)
-                togglePoiInfobar(false)
-            })
-
-            // Add polylines
-            viewModel.allChains.observe(viewLifecycleOwner, { allChains ->
-                mapMgr?.drawChains(allChains)
-                togglePoiInfobar(false)
-            })
-
-            // Draw current polyline if available. This is needed
-            // to restore the polyline after a rotation change
-            mapMgr?.drawCurrentPolyline(true)
-
-            updateGrids()
-            mapMgr?.drawMyLocation(viewModel.fusedLocationData.value)
+        // Set up Go To sequence
+        viewModel.mapGoTo.observe(viewLifecycleOwner) {
+            mapMgr?.moveTo(target = it)
+            mapMgr?.stopShowingMyLocation()
         }
+
+        if (viewModel.isLocationGranted) {
+            onLocPermGranted()
+        }
+
+        // Observe location to update Live Measurement
+        viewModel.fusedLocationData.observe(viewLifecycleOwner) {
+            updateLiveMeasurements()
+            mapMgr?.updateMyLocation(it)
+        }
+        viewModel.rotation.observe(viewLifecycleOwner) {
+            val (azimuth, pitch, roll) = it
+            mapMgr?.updateRotation(azimuth)
+        }
+
+        viewModel.chainPlot.observe(viewLifecycleOwner) {
+            mapMgr?.drawCurrentPolyline(it.points, it.checkpoints)
+
+            binding.mapPolylineSave.isEnabled = (it.size >= 2)
+
+            if (it.size == 0) {
+                onExitPolylineMode()
+                return@observe
+            }
+        }
+
+        viewModel.isInPolylineMode.observe(viewLifecycleOwner, { isInPolylineMode ->
+            when (isInPolylineMode) {
+                true -> onEnterPolylineMode()
+                false -> onExitPolylineMode()
+            }
+        })
+
+        viewModel.toUndoPolyline.observe(viewLifecycleOwner, { toUndoPolyline ->
+            if (toUndoPolyline) {
+                viewModel.removeLastChainPlotPoint()
+                viewModel.undoMapPolylineCompleted()
+            }
+        })
+
+        // Add markers
+        viewModel.allPins.observe(viewLifecycleOwner, { allPins ->
+            mapMgr?.drawMarkers(allPins)
+            togglePoiInfobar(false)
+        })
+
+        // Add polylines
+        viewModel.allChains.observe(viewLifecycleOwner, { allChains ->
+            mapMgr?.drawChains(allChains)
+            togglePoiInfobar(false)
+        })
+
+        // Draw current polyline if available. This is needed
+        // to restore the polyline after a rotation change
+        mapMgr?.redrawCurrentPolyline()
+
+        updateGrids()
+        mapMgr?.drawMyLocation(viewModel.fusedLocationData.value)
     }
 
     private fun onMyLocationPressed(resetRotation: Boolean) {
@@ -487,7 +496,7 @@ class MapFragment :
 
     private fun updateCardGridSystem(coordSys: CoordinateSystem) {
         binding.mapGridSystem.text =
-            resources.getStringArray(R.array.coordinate_systems)[coordSys.index]
+            resources.getString(coordSys.shortName)
     }
 
     private fun onAddPinFromMap(): Boolean {
@@ -906,15 +915,17 @@ class MapFragment :
     }
 
     private fun onEnterPolylineMode() {
+        if (!viewModel.chainsGuideShown) {
+            showChainsGuide()
+        }
+
         binding.mapPolylineUndo.isEnabled = true
         binding.mapPolylineAdd.isEnabled = true
-        binding.mapPolylineSave.isEnabled = false // Only enable when >1 node
         binding.mapChainFab.hide()
         toggleChainControls(true)
     }
 
     private fun onExitPolylineMode() {
-        mapMgr?.exitPolylineMode()
         binding.mapChainFab.show()
 
         // Disable all buttons
@@ -926,20 +937,9 @@ class MapFragment :
     }
 
     private fun onAddPolylinePoint(name: String = "") {
-        val mapMgr = this.mapMgr ?: return
-        if (!viewModel.isInPolylineMode.value!!) {
-            viewModel.enterPolylineMode()
-            if (!viewModel.chainsGuideShown) {
-                showChainsGuide()
-            }
-        }
-        viewModel.currentPolylinePoints.let {
-            it.add(ChainNode(name, mapMgr.getCameraTarget()))
-            if (it.size >= 2) {
-                binding.mapPolylineSave.isEnabled = true
-            }
-        }
-        mapMgr.drawCurrentPolyline(true)
+        val position = mapMgr?.getCameraTarget() ?: return
+        viewModel.addToChainPlot(position, name)
+        return
     }
 
     private fun onAddPolylineNamedPoint() {
@@ -972,16 +972,7 @@ class MapFragment :
                         inputLayout.error = getString(R.string.checkpoint_name_too_long_error)
                     }
                     else -> {
-                        // Group name is valid, add to ArrayAdapter and set in AutoCompleteTextView
                         onAddPolylinePoint(it.toString())
-
-                        // Enter Polyline mode if not already inside
-                        if (!viewModel.isInPolylineMode.value!!) {
-                            viewModel.enterPolylineMode()
-                            if (!viewModel.chainsGuideShown) {
-                                showChainsGuide()
-                            }
-                        }
                         alertDialog.dismiss()
                     }
                 }
@@ -1004,34 +995,12 @@ class MapFragment :
     }
 
     /**
-     * Removes the last added checkpoint or node in the polyline
-     *
-     * Exits polyline mode if there are no nodes left
-     */
-    private fun undoPolyline() {
-        if (isChainGuideShowing) {
-            return
-        }
-        viewModel.currentPolylinePoints.let {
-            it.removeLast()
-            mapMgr?.drawCurrentPolyline(true)
-
-            if (it.size == 0) {
-                viewModel.exitPolylineMode()
-            } else if (it.size < 2) {
-                binding.mapPolylineSave.isEnabled = false
-            }
-        }
-    }
-
-    private fun onSavePolyline() {
-        viewModel.openChainCreator(Chain("", viewModel.currentPolylinePoints))
-    }
-
-    /**
      * Displays the interactive guide for chains
      */
     private fun showChainsGuide() {
+        if (isChainGuideShowing) {
+            return
+        }
         isChainGuideShowing = true
         chainShowcaseView.start()
     }
@@ -1112,9 +1081,7 @@ class MapFragment :
             toggleMapCompass(false)
         }
 
-        if (viewModel.isInPolylineMode.value!!) {
-            mapMgr.drawCurrentPolyline()
-        }
+        mapMgr.redrawCurrentPolyline()
     }
 
     /**
@@ -1628,53 +1595,54 @@ class MapFragment :
             }
         }
 
-        fun drawCurrentPolyline(redrawCheckpoints: Boolean = false) {
-            if (currentPolyline == null) {
-                val polylineOptions = PolylineOptions()
-                for (point in viewModel.currentPolylinePoints) {
-                    polylineOptions.add(point.position)
-                }
-                polylineOptions.add(map.cameraPosition.target)
-                currentPolyline = map.addPolyline(polylineOptions)
-                currentPolyline?.apply {
-                    pattern = listOf(
-                        Dash(resources.dpToPx(8f)),
-                        Gap(resources.dpToPx(8f))
-                    )
-                    width = resources.dpToPx(6f)
-                    color = ContextCompat.getColor(requireContext(), R.color.colorPrimaryLight)
-                    jointType = JointType.ROUND
-                    endCap = ButtCap()
-                    isGeodesic = true
-                }
-            } else {
-                currentPolyline?.points = viewModel.currentPolylinePoints
-                    .map { it.position }
-                    .toMutableList().apply {
-                        add(map.cameraPosition.target)
-                    }
+        fun drawCurrentPolyline(points: List<LatLng>, checkpoints: List<ChainNode>) {
+            currentPolyline?.remove()
+
+            // Draw checkpoint markers
+            while (currentPolylineMarkers.isNotEmpty()) {
+                val marker = currentPolylineMarkers.removeLast()
+                marker.remove()
             }
 
-            if (redrawCheckpoints) {
-                for (marker in currentPolylineMarkers) {
-                    marker.remove()
-                }
-                currentPolylineMarkers.clear()
-
-                for (node in viewModel.currentPolylinePoints) {
-                    if (node.isCheckpoint) {
-                        val marker = map.addMarker(
-                            MarkerOptions()
-                                .position(node.position)
-                                .anchor(0.5f, 0.5f)
-                                .title(node.name)
-                                .flat(true)
-                                .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
-                        ) ?: continue
-                        currentPolylineMarkers.add(marker)
-                    }
-                }
+            for (node in checkpoints) {
+                val marker = map.addMarker(
+                    MarkerOptions()
+                        .position(node.position)
+                        .anchor(0.5f, 0.5f)
+                        .title(node.name)
+                        .flat(true)
+                        .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
+                ) ?: continue
+                currentPolylineMarkers.add(marker)
             }
+
+            // Draw polyline
+            if (points.isEmpty()) {
+                currentPolyline = null
+                return
+            }
+
+            val polylineOptions =
+                PolylineOptions().addAll(points).add(map.cameraPosition.target).clickable(true)
+            currentPolyline = map.addPolyline(polylineOptions)
+            currentPolyline?.apply {
+                pattern = listOf(
+                    Dash(resources.dpToPx(8f)),
+                    Gap(resources.dpToPx(8f))
+                )
+                width = resources.dpToPx(6f)
+                color = ContextCompat.getColor(requireContext(), R.color.colorPrimaryLight)
+                jointType = JointType.ROUND
+                endCap = ButtCap()
+                isGeodesic = true
+            }
+        }
+
+        fun redrawCurrentPolyline() {
+            val points = currentPolyline?.points ?: return
+            points.removeLastOrNull()
+            points.add(map.cameraPosition.target)
+            currentPolyline?.points = points
         }
 
         private fun resetZoomStack() {
@@ -1796,13 +1764,6 @@ class MapFragment :
         fun resetMapRotation() {
             isShowingMyLocationRotation = false
             moveTo(tilt = 0f, bearing = 0f)
-        }
-
-        fun exitPolylineMode() {
-            currentPolyline?.remove()
-            currentPolyline = null
-            currentPolylineMarkers.map { it.remove() }
-            currentPolylineMarkers.clear()
         }
 
         fun removeFocus() {
