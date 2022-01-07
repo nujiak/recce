@@ -23,16 +23,16 @@ enum class CoordinateSystem(@StringRes val shortName: Int, @StringRes val fullNa
     MGRS(R.string.mgrs, R.string.mgrs_full),
 
     /**
-     * Kertau 1948
-     */
-    KERTAU(R.string.kertau, R.string.kertau),
-
-    /**
      * World Geodetic System 1984
      *
      * Used in Google Maps
      */
     WGS84(R.string.wgs_84, R.string.wgs_84),
+
+    /**
+     * Kertau 1948
+     */
+    KERTAU(R.string.kertau, R.string.kertau),
 
     /**
      * Ordnance Survey National Grid / British National Grid (BNG)
