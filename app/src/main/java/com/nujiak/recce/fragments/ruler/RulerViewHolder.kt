@@ -37,7 +37,7 @@ class RulerPinViewHolder private constructor(private val binding: RulerPinItemBi
         binding.rulerPinName.isSelected = true
 
         // Grid System
-        binding.rulerPinGridSystem.text = binding.root.resources.getStringArray(R.array.coordinate_systems)[coordSys.index]
+        binding.rulerPinGridSystem.text = binding.root.resources.getString(coordSys.shortName)
         binding.rulerPinGrid.text = formatAsGrids(location.latitude, location.longitude)
 
         val context = binding.root.context

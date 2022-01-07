@@ -5,6 +5,7 @@ import android.util.TypedValue
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceFragmentCompat
 import com.nujiak.recce.R
+import com.nujiak.recce.enums.CoordinateSystem
 
 class PreferenceFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -16,7 +17,8 @@ class PreferenceFragment : PreferenceFragmentCompat() {
         val color = ContextCompat.getColor(requireContext(), colorRes)
 
         val coordSysPreference = findPreference<IntListPreference>("coordinate_system")
-        coordSysPreference?.let {
+        coordSysPreference?.let { it ->
+            it.entries = CoordinateSystem.fullNames.map(resources::getString).toTypedArray()
             it.entryValues = it.entries.mapIndexed { index, _ -> index.toString() }.toTypedArray()
             it.icon.setTint(color)
         }
