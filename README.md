@@ -1,13 +1,13 @@
 <h1 align="center">
 
-  [![MegaLinter](https://github.com/nujiak/recce/workflows/MegaLinter/badge.svg)](https://github.com/nujiak/recce/actions?query=workflow%3AMegaLinter)
+  [![MegaLinter](https://github.com/nujiak/recce/workflows/MegaLinter/badge.svg?branch=master)](https://github.com/nujiak/recce/actions?query=workflow%3AMegaLinter+branch%3Amaster)
 
   <img src="app/src/main/ic_launcher-playstore.png" width=160/>
 
   <b><i>Recce</b></i>
 </h1>
 
-*Recce* is a *Map Planning and Navigation* app for Android. It supports 4 commonly-used geographic/projected coordinate systems (see [Supported GCS/PCS](#supported-gcspcs)) and offers coordinate transformations in real-time.
+*Recce* is a *Map Planning and Navigation* app for Android. It supports 6 commonly-used geographic/projected coordinate systems (see [Supported GCS/PCS](#supported-gcspcs)) and offers coordinate transformations in real-time.
 
 ## Features
 
@@ -17,7 +17,7 @@
 <img src="docs/screenshots/map.png" height = 512>
 </p>
 
-*Recce* uses the Google Maps SDK (see [Libraries](#libraries)) to display a map for pinpointing and navigating. The Map lets you find the coordinate of any location in 4 different reference systems (see [Supported GCS/PCS](#supported-gcspcs)) down to 1m precision.
+*Recce* uses the Google Maps SDK (see [Libraries](#libraries)) to display a map for pinpointing and navigating. The Map lets you find the coordinate of any location in 6 different coordinate systems (see [Supported GCS/PCS](#supported-gcspcs)) down to 1m precision.
 
 There are 3 map types available: *Normal*, *Satellite* and *Hybrid*. The Map also allows you to save points and plot routes and regions.
 
@@ -45,13 +45,23 @@ The GPS page gives you convenient access to the coordinates of your current loca
 
 Saved points and routes can be added to the Ruler to compute cumulative and point-to-point direction and distance.
 
+### 🔠 Share Code
+
+<p align="center">
+<img src="docs/screenshots/share_code.png" height = 512>
+</p>
+
+Share Code allows conveninent exporting and importing of points, routes and areas for sharing or backing up.
+
 ### Supported GCS/PCS
 
 *Recce* offers the following GCS/PCS for displaying and inputting grids:
 1. **WGS 84 (EPSG:4326)**. As used by Google Maps for coordinates.
 2. **Universal Traverse Mercator (UTM)**. Automatic zone/band detection and conversion.
 3. **Military Grid Reference System (MGRS)**. Only for UTM coverage, does not include UPS. Automatic zone, band, row letter and column letter detection and conversion.
-4. **Kertau 1948**
+4. **Kertau 1948**. Used in West Malaysia and Singapore.
+5. **British National Grid (EPSG:27700)**. 2 grid letters and 10 grid digits.
+6. **Maidenhead Locator System (QTH Locator)**. Up to 8 digits.
 
 Since *Recce* uses `Proj4J`, new systems can be added easily in the future (see [Libraries](#libraries))
 
@@ -77,6 +87,10 @@ git clone https://github.com/nujiak/recce.git
 Alternatively, you can create a new project directly in Android Studio by going to *File > New > Project from Version Control...* and using `https://github.com/nujiak/recce.git` as the URL.
 
 **⚠️ Note: You will need to provide a Google Maps API key for the Google Maps SDK to work properly** (see [Google Maps API Key](#google-maps-api-key)).
+
+### Debug version
+
+You can also use the debug version of the app from [releases](https://github.com/nujiak/recce/releases). You can install this version in parallel with the release version from Google Play.
 
 ## Configuration
 
