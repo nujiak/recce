@@ -47,9 +47,6 @@ class PinAdapter(
             CHAIN(1),
             HEADER(2),
         }
-        const val SORT_BY_GROUP = 100
-        const val SORT_BY_NAME = 101
-        const val SORT_BY_TIME = 102
     }
 
     override fun getItemViewType(position: Int): Int {

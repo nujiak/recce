@@ -16,7 +16,6 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.nujiak.recce.database.Chain
-import com.nujiak.recce.database.ChainNode
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.database.RecceData
 import com.nujiak.recce.database.RecceDatabaseDao
@@ -567,11 +566,6 @@ class MainViewModel @Inject constructor(
      * [LiveData] to determine whether the map is in polyline mode
      */
     val isInPolylineMode: LiveData<Boolean> = chainPlot.map { it.size > 0 }
-
-    /**
-     * List of the points added to the polyline while the map is in polyline mode
-     */
-    val currentPolylinePoints = mutableListOf<ChainNode>()
 
     /**
      * Backing property for [toUndoPolyline]
