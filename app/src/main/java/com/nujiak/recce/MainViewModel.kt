@@ -16,7 +16,6 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.nujiak.recce.database.Chain
-import com.nujiak.recce.database.ChainNode
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.database.RecceData
 import com.nujiak.recce.database.RecceDatabaseDao

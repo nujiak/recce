@@ -1,7 +1,6 @@
 package com.nujiak.recce.utils
 
 import android.graphics.Color
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.nujiak.recce.R
 
 /**
