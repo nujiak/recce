@@ -23,11 +23,9 @@ class FusedLocationLiveData(context: Context) : LiveData<FusedLocationLiveData.L
     }
 
     private val locationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult?) {
-            locationResult?.let {
-                for (location in locationResult.locations) {
-                    setLocationData(location)
-                }
+        override fun onLocationResult(locationResult: LocationResult) {
+            for (location in locationResult.locations) {
+                setLocationData(location)
             }
         }
     }

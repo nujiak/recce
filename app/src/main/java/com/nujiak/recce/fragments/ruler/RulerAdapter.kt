@@ -3,7 +3,6 @@ package com.nujiak.recce.fragments.ruler
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
 
 private enum class RulerItemViewType(val index: Int) {
@@ -12,8 +11,11 @@ private enum class RulerItemViewType(val index: Int) {
     EMPTY(2),
 }
 
-class RulerAdapter(private var coordSys: CoordinateSystem, private var angleUnit: AngleUnit) :
-    androidx.recyclerview.widget.ListAdapter<RulerItem, RecyclerView.ViewHolder>(RulerDiffCallback()) {
+class RulerAdapter(
+    private var coordSys: CoordinateSystem,
+    private val formatAsAngle: (Float, Boolean) -> String,
+    private val formatAsGrids: (Double, Double) -> String
+) : androidx.recyclerview.widget.ListAdapter<RulerItem, RecyclerView.ViewHolder>(RulerDiffCallback()) {
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
@@ -35,11 +37,11 @@ class RulerAdapter(private var coordSys: CoordinateSystem, private var angleUnit
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is RulerPinViewHolder -> {
-                holder.bind(getItem(position) as RulerItem.RulerPointItem, coordSys)
+                holder.bind(getItem(position) as RulerItem.RulerPointItem, coordSys, formatAsGrids)
             }
             is RulerMeasurementViewHolder -> holder.bind(
                 getItem(position) as RulerItem.RulerMeasurementItem,
-                angleUnit
+                formatAsAngle
             )
             is RulerEmptyViewHolder -> holder.bind()
         }
@@ -48,13 +50,6 @@ class RulerAdapter(private var coordSys: CoordinateSystem, private var angleUnit
     fun updateCoordSys(newCoordSys: CoordinateSystem) {
         if (coordSys != newCoordSys) {
             coordSys = newCoordSys
-            notifyDataSetChanged()
-        }
-    }
-
-    fun updateAngleUnit(newAngleUnit: AngleUnit) {
-        if (angleUnit != newAngleUnit) {
-            angleUnit = newAngleUnit
             notifyDataSetChanged()
         }
     }

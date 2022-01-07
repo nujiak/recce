@@ -9,18 +9,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.nujiak.recce.MainViewModel
-import com.nujiak.recce.R
 import com.nujiak.recce.databinding.FragmentGpsBinding
-import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.livedatas.FusedLocationLiveData
-import com.nujiak.recce.livedatas.RotationLiveData
+import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.formatAsDistanceString
-import com.nujiak.recce.utils.getAngleString
-import com.nujiak.recce.utils.getGridString
 import com.nujiak.recce.utils.radToDeg
+import com.nujiak.recce.utils.spToPx
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.math.PI
 import kotlin.math.cos
 
 @AndroidEntryPoint
@@ -29,11 +25,7 @@ class GpsFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var binding: FragmentGpsBinding
 
-    private var lastRotationData: RotationLiveData.RotationData? = null
     private var lastLocationData: FusedLocationLiveData.LocationData? = null
-
-    private var coordSys = CoordinateSystem.atIndex(0)
-    private var angleUnit = AngleUnit.atIndex(0)
 
     private var lastUpdated = System.currentTimeMillis()
 
@@ -53,23 +45,26 @@ class GpsFragment : Fragment() {
             updateLocationUI(it)
         })
 
-        viewModel.rotationLiveData.observe(viewLifecycleOwner) {
-            lastRotationData = it
-            updateCompass()
+        viewModel.rotation.observe(viewLifecycleOwner) {
+            val (aziRad, pitRad, rolRad) = it
+            updateCompass(aziRad, pitRad, rolRad)
             updateOrientationUI()
         }
         // Observe for preferences changes
         viewModel.coordinateSystem.observe(viewLifecycleOwner, {
-            coordSys = it
             binding.gpsGridSystem.text =
-                resources.getStringArray(R.array.coordinate_systems)[coordSys.index]
+                resources.getString(CoordinateSystem.shortNames[it.index])
             updateLocationUI()
         })
         viewModel.angleUnit.observe(viewLifecycleOwner, {
-            angleUnit = it
             updateOrientationUI()
         })
 
+        // Change the layout column count depending on the screen width
+        resources.displayMetrics.widthPixels.let { screenWidth ->
+            binding.gpsParent.columnCount =
+                if (screenWidth / 2 > resources.dpToPx(288f) && screenWidth / 2 > resources.spToPx(344f)) 2 else 1
+        }
         return binding.root
     }
 
@@ -81,34 +76,25 @@ class GpsFragment : Fragment() {
             return
         }
 
-        val rotationData = lastRotationData ?: return
+        val (azimuth, pitch, roll) = viewModel.rotation.value ?: return
 
-        var (aziRad, pitRad, rolRad) = rotationData
-
-        if (aziRad < 0) {
-            aziRad += 2 * PI.toFloat()
-        }
-
-        binding.gpsAzimuth.text = getAngleString(aziRad, angleUnit, false)
-        binding.gpsPitch.text = getAngleString(-pitRad, angleUnit, true)
-        binding.gpsRoll.text = getAngleString(rolRad, angleUnit, true)
+        binding.gpsAzimuth.text = viewModel.formatAsAngle(azimuth, false)
+        binding.gpsPitch.text = viewModel.formatAsAngle(pitch, true)
+        binding.gpsRoll.text = viewModel.formatAsAngle(roll, true)
         lastUpdated = currentTime
     }
 
-    private fun updateCompass() {
-
-        val rotationData = lastRotationData ?: return
-
+    private fun updateCompass(azimuth: Float, pitch: Float, roll: Float) {
         val compassDrawable = binding.gpsCompassArrow.drawable
 
         val matrix = Matrix().apply {
             postRotate(
-                -radToDeg(rotationData.azimuth),
+                -radToDeg(azimuth),
                 compassDrawable!!.intrinsicWidth / 2f,
                 compassDrawable.intrinsicHeight / 2f
             )
             postScale(
-                cos(rotationData.roll), cos(rotationData.pitch),
+                cos(roll), cos(pitch),
                 compassDrawable.intrinsicWidth / 2f,
                 compassDrawable.intrinsicHeight / 2f
             )
@@ -122,9 +108,7 @@ class GpsFragment : Fragment() {
             val (latitude, longitude, altitude, accuracy) = locationData
             binding.gpsAccuracy.text = "±" + accuracy.formatAsDistanceString()
             binding.gpsAltitude.text = altitude.formatAsDistanceString()
-            binding.gpsLatLng.text =
-                getGridString(latitude, longitude, CoordinateSystem.WGS84, resources)
-            binding.gpsGrids.text = getGridString(latitude, longitude, coordSys, resources)
+            binding.gpsGrids.text = viewModel.formatAsGrids(latitude, longitude)
         }
     }
 }

@@ -3,6 +3,7 @@ package com.nujiak.recce.fragments.saved
 import android.app.AlertDialog
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -14,7 +15,8 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -24,10 +26,14 @@ import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.FragmentSavedBinding
 import com.nujiak.recce.enums.CoordinateSystem
-import com.nujiak.recce.enums.SharedPrefsKey
 import com.nujiak.recce.enums.SortBy
+import com.nujiak.recce.utils.animate
+import com.nujiak.recce.utils.spToPx
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class SavedFragment : Fragment() {
@@ -35,9 +41,6 @@ class SavedFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var binding: FragmentSavedBinding
     private lateinit var pinAdapter: PinAdapter
-
-    private var sortBy = SortBy.GROUP
-    private var sortAscending = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,22 +57,12 @@ class SavedFragment : Fragment() {
             { chain -> onChainClick(chain) },
             { chain -> onChainLongClick(chain) },
             viewModel.coordinateSystem.value ?: CoordinateSystem.atIndex(0),
-            resources
+            viewModel::formatAsGrids,
+            resources,
         )
         binding.pinRecyclerview.adapter = pinAdapter
-        val gridLayoutManager = GridLayoutManager(context, 2)
-        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return when (pinAdapter.getItemViewType(position)) {
-                    PinAdapter.Companion.ItemViewType.PIN.index -> 1
-                    PinAdapter.Companion.ItemViewType.CHAIN.index -> 2
-                    PinAdapter.Companion.ItemViewType.HEADER.index -> 2
-                    else -> throw IllegalArgumentException(
-                        "Invalid viewType: ${pinAdapter.getItemViewType(position)}"
-                    )
-                }
-            }
-        }
+        val gridLayoutManager = StaggeredGridLayoutManager(getSpanCount(), Configuration.ORIENTATION_PORTRAIT)
+        gridLayoutManager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
         binding.pinRecyclerview.layoutManager = gridLayoutManager
 
         // Observe for changes to pins and chains
@@ -110,21 +103,28 @@ class SavedFragment : Fragment() {
         })
 
         // Observe for recent multiple deletions made through action mode
-        viewModel.lastMultiDeletedItems.observe(viewLifecycleOwner, {
-            if (it != null) {
-                val size = (it.first?.size ?: 0) + (it.second?.size ?: 0)
-                val snackBar = Snackbar.make(
-                    binding.pinAppBar,
-                    resources.getQuantityString(R.plurals.number_deleted, size, size),
-                    Snackbar.LENGTH_LONG
-                ).setAction(R.string.undo) { viewModel.onRestoreLastDeletedPins() }
-                snackBar.show()
+        viewModel.lastMultiDeletedItems.observe(viewLifecycleOwner) {
+            if (it == null) {
+                return@observe
             }
-        })
+            val (pins, chains) = it
+            val size = (pins?.size ?: 0) + (chains?.size ?: 0)
+            val snackBar = Snackbar.make(
+                binding.pinAppBar,
+                resources.getQuantityString(R.plurals.number_deleted, size, size),
+                Snackbar.LENGTH_LONG
+            ).setAction(R.string.undo) { viewModel.onRestoreLastDeletedPins() }
+            snackBar.view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+                override fun onViewAttachedToWindow(p0: View?) {}
 
-        // Fetch sorting parameters
-        sortBy = SortBy.atIndex(viewModel.sharedPreference.getInt(SharedPrefsKey.SORT_BY.key, sortBy.index))
-        sortAscending = viewModel.sharedPreference.getBoolean(SharedPrefsKey.SORT_ASCENDING.key, sortAscending)
+                override fun onViewDetachedFromWindow(p0: View?) {
+                    animate(binding.pinFab.translationY, 0f) { animatedValue ->
+                        binding.pinFab.translationY = animatedValue
+                    }
+                }
+            })
+            snackBar.show()
+        }
 
         // Set up FAB
         binding.pinFab.setMenuListener(object : SimpleMenuListenerAdapter() {
@@ -151,32 +151,23 @@ class SavedFragment : Fragment() {
                     true
                 }
                 R.id.sort_by_alphabetical_asc -> {
-                    sortBy = SortBy.NAME
-                    sortAscending = true
-                    onSortList()
+                    onSortList(SortBy.NAME, true)
                     true
                 }
                 R.id.sort_by_alphabetical_dsc -> {
-                    sortBy = SortBy.NAME
-                    sortAscending = false
-                    onSortList()
+                    onSortList(SortBy.NAME, false)
                     true
                 }
                 R.id.sort_by_time_asc -> {
-                    sortBy = SortBy.TIME
-                    sortAscending = true
-                    onSortList()
+                    onSortList(SortBy.TIME, true)
                     true
                 }
                 R.id.sort_by_time_dsc -> {
-                    sortBy = SortBy.TIME
-                    sortAscending = false
-                    onSortList()
+                    onSortList(SortBy.TIME, false)
                     true
                 }
                 R.id.sort_by_group -> {
-                    sortBy = SortBy.GROUP
-                    onSortList()
+                    onSortList(SortBy.GROUP, false)
                     true
                 }
                 else -> false
@@ -193,6 +184,16 @@ class SavedFragment : Fragment() {
         })
 
         return binding.root
+    }
+
+    /**
+     * Calculates the span count by dividing the screen width by the width of each item
+     *
+     * @return
+     */
+    private fun getSpanCount(): Int {
+        val count = (resources.displayMetrics.widthPixels / resources.spToPx(196f)).toInt()
+        return if (count > 0) count else 1
     }
 
     private fun onPinClick(pin: Pin) {
@@ -231,11 +232,10 @@ class SavedFragment : Fragment() {
         return true
     }
 
-    private fun onSortList() {
-        viewModel.sharedPreference.edit()
-            .putInt(SharedPrefsKey.SORT_BY.key, sortBy.index)
-            .putBoolean(SharedPrefsKey.SORT_ASCENDING.key, sortAscending)
-            .apply()
+    private fun onSortList(sortBy: SortBy, sortAscending: Boolean) {
+        viewModel.sortBy = sortBy
+        viewModel.sortAscending = sortAscending
+
         refreshList()
         binding.pinRecyclerview.smoothScrollToPosition(0)
     }
@@ -248,8 +248,8 @@ class SavedFragment : Fragment() {
             newPins,
             newChains,
             viewModel.selectedIds,
-            sortBy,
-            sortAscending
+            viewModel.sortBy,
+            viewModel.sortAscending
         )
     }
 
@@ -264,15 +264,17 @@ class SavedFragment : Fragment() {
         val shareCodeInput = alertDialog.findViewById<TextInputEditText>(R.id.share_code_edit)
 
         alertDialog.findViewById<Button>(R.id.paste)?.setOnClickListener {
-            activity?.let { activity ->
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                 val clipboard =
-                    activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val item = clipboard.primaryClip?.getItemAt(0)
                 val pasteData = item?.text
-                if (pasteData != null) {
-                    shareCodeInput.setText(pasteData)
-                } else {
-                    Toast.makeText(context, R.string.paste_error, Toast.LENGTH_SHORT).show()
+                withContext(Dispatchers.Main) {
+                    if (pasteData != null) {
+                        shareCodeInput.setText(pasteData)
+                    } else {
+                        Toast.makeText(context, R.string.paste_error, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }

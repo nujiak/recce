@@ -141,79 +141,67 @@
             tools:text="0393.4 mils" />
     </LinearLayout>
 
-    <Space
-        android:id="@+id/infobar_space"
-        android:layout_width="wrap_content"
-        android:layout_height="40sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/map_live_measurement" />
-
-    <FrameLayout
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/map_checkpoint_infobar"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="296sp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/large_padding"
+        android:layout_marginTop="@dimen/large_padding"
         android:layout_marginEnd="@dimen/large_padding"
         android:background="@drawable/map_checkpoint_infobar_background"
         android:elevation="1dp"
+        android:foreground="?selectableItemBackground"
         android:gravity="bottom|center_horizontal"
         android:orientation="vertical"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/infobar_space"
+        app:cardCornerRadius="@dimen/large_padding"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:backgroundTint="@color/tagAzure"
+        app:layout_constraintTop_toTopOf="@id/map_live_measurement"
+        app:strokeWidth="2dp"
+        tools:strokeColor="@color/tagGreen"
         tools:visibility="visible">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+        <TextView
+            android:id="@+id/map_poi_infobar"
+            style="@style/TextAppearance.MaterialComponents.Headline6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
             android:gravity="center"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/small_padding">
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginBottom="@dimen/large_padding"
-                android:layout_weight="1"
-                android:background="@color/pinDetailShade" />
-
-            <TextView
-                android:id="@+id/map_checkpoint_chain"
-                style="@style/TextAppearance.MaterialComponents.Headline6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="marquee"
-                android:gravity="center"
-                android:singleLine="true"
-                android:textColor="@android:color/white"
-                tools:text="Route"
-                tools:textColor="@android:color/white" />
-        </LinearLayout>
+            android:singleLine="true"
+            android:textColor="?android:attr/textColorPrimary"
+            tools:text="Route"
+            android:layout_marginTop="20sp"
+            android:layout_marginStart="@dimen/small_padding"
+            android:layout_marginEnd="@dimen/small_padding"
+            android:layout_marginBottom="@dimen/small_padding"
+            android:layout_gravity="bottom|center"
+            tools:textColor="@android:color/white" />
 
         <ImageView
             android:id="@+id/route_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
+            android:layout_width="96sp"
+            android:layout_height="48sp"
+            android:layout_gravity="end|center"
             android:adjustViewBounds="true"
-            android:padding="@dimen/large_padding"
-            android:scaleType="fitCenter"
+            android:paddingStart="@dimen/large_padding"
+            android:paddingEnd="@dimen/large_padding"
+            android:scaleType="centerCrop"
             android:src="@drawable/ic_route" />
 
         <ImageView
             android:id="@+id/area_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
+            android:layout_width="96sp"
+            android:layout_height="48sp"
+            android:layout_gravity="end|center"
             android:adjustViewBounds="true"
-            android:padding="@dimen/large_padding"
-            android:scaleType="fitCenter"
+            android:paddingStart="@dimen/large_padding"
+            android:paddingEnd="@dimen/large_padding"
+            android:scaleType="centerCrop"
             android:src="@drawable/ic_area"
             android:visibility="invisible" />
-    </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/map_chain_fab"
@@ -223,8 +211,19 @@
         android:hapticFeedbackEnabled="true"
         android:src="@drawable/ic_baseline_timeline_24"
         app:backgroundTint="?attr/colorSurface"
+        app:layout_constraintBottom_toTopOf="@id/map_goto_fab"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="?android:attr/textColorPrimary" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/map_goto_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/map_fab"
         app:layout_constraintEnd_toEndOf="parent"
+        app:backgroundTint="?attr/colorSurface"
+        android:src="@drawable/ic_baseline_zoom_in_map_24"
+        android:layout_margin="@dimen/large_padding"
         app:tint="?android:attr/textColorPrimary" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -246,7 +245,7 @@
         android:visibility="invisible"
         app:cardCornerRadius="24dp"
         app:cardElevation="4dp"
-        app:layout_constraintBottom_toTopOf="@id/map_fab"
+        app:layout_constraintBottom_toTopOf="@id/map_goto_fab"
         app:layout_constraintEnd_toEndOf="@+id/map_fab"
         app:layout_constraintStart_toStartOf="@+id/map_fab"
         tools:visibility="visible">

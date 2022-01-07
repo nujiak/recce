@@ -1,6 +1,5 @@
 package com.nujiak.recce.database
 
-import com.nujiak.recce.utils.round
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
@@ -9,6 +8,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import kotlin.math.pow
 
 /*
 Static references to serializers for encoding and decoding
@@ -48,6 +48,11 @@ fun toShareCode(pins: List<Pin>?, chains: List<Chain>?): String {
 object PinSerializer : KSerializer<Pin> {
 
     override val descriptor: SerialDescriptor = PinSurrogate.serializer().descriptor
+
+    private fun Double.round(decimals: Int): Double {
+        val magnitude = 10.0.pow(decimals.toDouble())
+        return kotlin.math.round(this * magnitude) / magnitude
+    }
 
     override fun serialize(encoder: Encoder, value: Pin) {
         val surrogate = PinSurrogate(
