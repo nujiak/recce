@@ -15,16 +15,16 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?attr/colorSurface"
             android:paddingTop="24dp"
-            app:layout_scrollFlags="scroll|enterAlways|snap"
-            android:background="?attr/colorSurface">
+            app:layout_scrollFlags="scroll|enterAlways|snap">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/pin_app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:menu="@menu/pin_selector_options"
-                android:elevation="0dp"/>
+                android:elevation="0dp"
+                app:menu="@menu/pin_selector_options" />
 
 
             <TextView
@@ -37,11 +37,11 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:overScrollMode="ifContentScrolls"
         android:id="@+id/pin_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
+        android:overScrollMode="ifContentScrolls"
         android:padding="@dimen/small_padding"
         android:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -61,8 +61,8 @@
             android:layout_height="wrap_content"
             android:scaleType="center"
             android:src="@drawable/ic_no_pins"
-            app:tint="?attr/colorOnBackground"
-            android:visibility="visible" />
+            android:visibility="visible"
+            app:tint="?attr/colorOnBackground" />
 
         <TextView
             style="@style/TextAppearance.MaterialComponents.Subtitle2"
@@ -83,6 +83,7 @@
         app:fabDrawableTint="@color/colorPrimary"
         app:fabGravity="bottom_end"
         app:fabMenu="@menu/menu_fab_speed_dial"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:miniFabBackgroundTint="?attr/colorSurface"
         app:miniFabDrawableTint="@color/colorPrimary"
         app:miniFabTitleBackgroundTint="?attr/colorSurface"

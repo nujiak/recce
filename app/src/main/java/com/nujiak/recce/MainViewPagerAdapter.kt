@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.nujiak.recce.fragments.GpsFragment
-import com.nujiak.recce.fragments.MapFragment
+import com.nujiak.recce.fragments.map.MapFragment
 import com.nujiak.recce.fragments.ruler.RulerFragment
 import com.nujiak.recce.fragments.saved.SavedFragment
 
