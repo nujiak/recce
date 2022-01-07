@@ -143,25 +143,10 @@
                         android:background="@color/dividerGrey" />
 
                     <TextView
-                        style="@style/TextAppearance.Recce.GpsHeader"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/wgs_84" />
-
-                    <TextView
-                        android:id="@+id/gps_lat_lng"
-                        style="@style/TextAppearance.Recce.GpsNumber"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/not_available"
-                        tools:text="1.23545, 103.124545" />
-
-                    <TextView
                         android:id="@+id/gps_grid_system"
                         style="@style/TextAppearance.Recce.GpsHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/small_padding"
                         android:text="@string/utm" />
 
                     <TextView
