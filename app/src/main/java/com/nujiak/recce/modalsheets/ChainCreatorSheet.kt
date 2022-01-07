@@ -154,7 +154,7 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
                 true -> viewModel.updateChain(newChain)
                 false -> viewModel.addChain(newChain)
             }
-            viewModel.exitPolylineMode()
+            viewModel.clearChainPlot()
 
             // Open Chain Info
             when {

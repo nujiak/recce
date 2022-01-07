@@ -29,6 +29,7 @@ import com.nujiak.recce.enums.SortBy
 import com.nujiak.recce.enums.ThemePreference
 import com.nujiak.recce.fragments.ruler.RulerItem
 import com.nujiak.recce.fragments.ruler.generateRulerList
+import com.nujiak.recce.livedatas.ChainPlotLiveData
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.livedatas.RotationLiveData
 import com.nujiak.recce.livedatas.SharedPreferenceLiveData
@@ -541,36 +542,36 @@ class MainViewModel @Inject constructor(
     val toAddPinFromMap: LiveData<Boolean>
         get() = _toAddPinFromMap
 
-    /**
-     * Backing property for [isInPolylineMode]
-     */
-    private val _isInPolylineMode = MutableLiveData(false)
+    private val _chainPlot = ChainPlotLiveData()
+    val chainPlot: LiveData<ChainPlotLiveData.ChainPlot>
+        get() = _chainPlot
+
+    fun addToChainPlot(position: LatLng, name: String = "") {
+        _chainPlot.addPoint(position, name)
+    }
+
+    fun removeLastChainPlotPoint() {
+        _chainPlot.removeLastPoint()
+    }
+
+    fun clearChainPlot() {
+        _chainPlot.removeAll()
+    }
+
+    fun saveChainPlot() {
+        val chain = _chainPlot.getChain("")
+        this.openChainCreator(chain)
+    }
 
     /**
      * [LiveData] to determine whether the map is in polyline mode
      */
-    val isInPolylineMode: LiveData<Boolean>
-        get() = _isInPolylineMode
+    val isInPolylineMode: LiveData<Boolean> = chainPlot.map { it.size > 0 }
 
     /**
      * List of the points added to the polyline while the map is in polyline mode
      */
     val currentPolylinePoints = mutableListOf<ChainNode>()
-
-    /**
-     * Switches the app to polyline adding mode
-     */
-    fun enterPolylineMode() {
-        _isInPolylineMode.value = true
-    }
-
-    /**
-     * Switches the app out of polyline adding mode
-     */
-    fun exitPolylineMode() {
-        _isInPolylineMode.value = false
-        currentPolylinePoints.clear()
-    }
 
     /**
      * Backing property for [toUndoPolyline]
@@ -588,6 +589,9 @@ class MainViewModel @Inject constructor(
      */
     fun undoMapPolyline() {
         _toUndoPolyline.value = true
+    }
+
+    fun undoMapPolylineCompleted() {
         _toUndoPolyline.value = false
     }
 
