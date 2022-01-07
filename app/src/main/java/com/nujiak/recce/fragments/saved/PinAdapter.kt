@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.enums.CoordinateSystem
@@ -35,8 +34,7 @@ class PinAdapter(
     private val onChainClick: (Chain) -> Unit,
     private val onChainLongClick: (Chain) -> Boolean,
     private var coordSysId: CoordinateSystem,
-    private val formatAsGrids: (Double, Double) -> String,
-    private val resources: Resources,
+    private val resources: Resources
 ) : ListAdapter<SelectorItem, RecyclerView.ViewHolder>(PinDiffCallback()) {
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
@@ -47,6 +45,9 @@ class PinAdapter(
             CHAIN(1),
             HEADER(2),
         }
+        const val SORT_BY_GROUP = 100
+        const val SORT_BY_NAME = 101
+        const val SORT_BY_TIME = 102
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -67,19 +68,26 @@ class PinAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        // Set item to take up the full span if it is a chain or header (not a pin)
-        val layoutParams = holder.itemView.layoutParams as StaggeredGridLayoutManager.LayoutParams
-        layoutParams.isFullSpan = holder is HeaderViewHolder
-
         when (holder) {
             is PinViewHolder -> {
-                holder.bind(getItem(position) as PinWrapper, onPinClick, onPinLongClick, coordSysId, formatAsGrids)
+                holder.bind(
+                    getItem(position) as PinWrapper,
+                    onPinClick,
+                    onPinLongClick,
+                    coordSysId
+                )
             }
             is ChainViewHolder -> {
-                holder.bind(getItem(position) as ChainWrapper, onChainClick, onChainLongClick)
+                holder.bind(
+                    getItem(position) as ChainWrapper,
+                    onChainClick,
+                    onChainLongClick
+                )
             }
             is HeaderViewHolder -> {
-                holder.bind(getItem(position) as HeaderItem)
+                holder.bind(
+                    getItem(position) as HeaderItem
+                )
             }
         }
     }

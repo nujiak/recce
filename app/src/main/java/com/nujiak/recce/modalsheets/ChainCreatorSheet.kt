@@ -25,7 +25,6 @@ import com.nujiak.recce.databinding.SheetChainCreatorBinding
 import com.nujiak.recce.utils.COLORS
 import com.nujiak.recce.utils.PIN_CARD_DARK_BACKGROUNDS
 import com.nujiak.recce.utils.animateColor
-import com.nujiak.recce.utils.dpToPx
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -117,7 +116,7 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
         // Expand bottom sheet fully
         (dialog as BottomSheetDialog).behavior.apply {
             state = BottomSheetBehavior.STATE_EXPANDED
-            peekHeight = (resources.dpToPx(168f)).toInt()
+            peekHeight = (resources.displayMetrics.density * 168).toInt()
         }
 
         return binding.root
@@ -154,7 +153,7 @@ class ChainCreatorSheet : BottomSheetDialogFragment() {
                 true -> viewModel.updateChain(newChain)
                 false -> viewModel.addChain(newChain)
             }
-            viewModel.clearChainPlot()
+            viewModel.exitPolylineMode()
 
             // Open Chain Info
             when {

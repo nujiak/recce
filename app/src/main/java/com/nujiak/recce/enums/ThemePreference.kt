@@ -1,6 +1,5 @@
 package com.nujiak.recce.enums
 
-import androidx.appcompat.app.AppCompatDelegate
 import java.lang.IllegalArgumentException
 
 /**
@@ -8,21 +7,21 @@ import java.lang.IllegalArgumentException
  *
  * @property index
  */
-enum class ThemePreference(val index: Int, val mode: Int) {
+enum class ThemePreference(val index: Int) {
     /**
      * Automatic day/night theme
      */
-    AUTO(0, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
+    AUTO(0),
 
     /**
      * Light theme
      */
-    LIGHT(1, AppCompatDelegate.MODE_NIGHT_NO),
+    LIGHT(1),
 
     /**
      * Dark theme
      */
-    DARK(2, AppCompatDelegate.MODE_NIGHT_YES);
+    DARK(2);
 
     companion object {
         private val map = values().associateBy(ThemePreference::index)

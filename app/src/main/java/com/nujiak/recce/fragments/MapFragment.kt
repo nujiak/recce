@@ -1,7 +1,8 @@
-package com.nujiak.recce.fragments.map
+package com.nujiak.recce.fragments
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.FloatEvaluator
 import android.animation.ObjectAnimator
 import android.animation.TypeEvaluator
 import android.animation.ValueAnimator
@@ -61,14 +62,15 @@ import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.FragmentMapBinding
 import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
+import com.nujiak.recce.enums.SharedPrefsKey
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.PIN_VECTOR_DRAWABLE
-import com.nujiak.recce.utils.animate
 import com.nujiak.recce.utils.animateColor
 import com.nujiak.recce.utils.degToRad
-import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.formatAsDistanceString
+import com.nujiak.recce.utils.getAngleString
+import com.nujiak.recce.utils.getGridString
 import com.nujiak.recce.utils.withAlpha
 import dagger.hilt.android.AndroidEntryPoint
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence
@@ -76,6 +78,7 @@ import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig
 import java.text.NumberFormat
 import java.util.Locale
+import kotlin.collections.HashMap
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.hypot
@@ -97,15 +100,17 @@ class MapFragment :
     private var isCheckpointInfobarVisible = false
     private var isLiveMeasurementVisible = false
     private var isMapCompassVisible = false
-    private val compassImageDrawable: Drawable by lazy {
-        binding.mapCompassImg.drawable
-    }
+    private var compassImageDrawable: Drawable? = null
 
     private var isChainControlsVisible = false
 
     private lateinit var numberFormat: NumberFormat
 
-    private var isChainGuideShowing = false
+    private var lastDirectionUpdate = 0L
+    private var directionUpdateSum = 0f
+    private var directionUpdateCount = 0
+
+    private var isChainGiudeShowing = false
     private val chainShowcaseView: MaterialShowcaseSequence by lazy {
         // Colours needed for showcase
         val maskColour = withAlpha(
@@ -178,25 +183,24 @@ class MapFragment :
             // Set SharedPreference when last showcase is dismissed
             setOnItemDismissedListener { itemView, _ ->
                 if (itemView.equals(lastShowcase)) {
-                    isChainGuideShowing = false
+                    isChainGiudeShowing = false
                     viewModel.chainsGuideShown = true
+                    viewModel.sharedPreference.edit().putBoolean(SharedPrefsKey.CHAINS_GUIDE_SHOWN.key, true).apply()
                 }
             }
 
             setOnItemShownListener { itemView, _ ->
                 if (itemView.equals(lastShowcase)) {
-                    val currentLatLng = mapMgr?.getCameraTarget() ?: return@setOnItemShownListener
-                    mapMgr?.stopShowingMyLocation()
-                    mapMgr?.moveTo(LatLng(currentLatLng.latitude + 0.005, currentLatLng.longitude), duration = 700)
+                    mapMgr?.cameraPosition?.target?.let {
+                        mapMgr?.isShowingMyLocation = false
+                        mapMgr?.moveTo(LatLng(it.latitude + 0.005, it.longitude), duration = 700)
+                    }
                 }
             }
         }
     }
 
     companion object {
-
-        private operator fun LatLng.component1() = this.latitude
-        private operator fun LatLng.component2() = this.longitude
 
         // Lat Lng evaluator for animating myLocationMarker and myLocationCircle positions
         private val latLngEvaluator by lazy {
@@ -255,10 +259,7 @@ class MapFragment :
         }
 
         binding.mapLiveGrids.setOnClickListener {
-            viewModel.openSettings()
-        }
-        binding.mapGotoFab.setOnClickListener {
-            mapMgr?.getCameraTarget()?.let {
+            mapMgr?.cameraPosition?.target?.let {
                 viewModel.openGoTo(it.latitude, it.longitude)
             }
         }
@@ -297,45 +298,59 @@ class MapFragment :
 
         binding.mapPolylineUndo.apply {
             setOnClickListener {
-                viewModel.undoMapPolyline()
+                undoPolyline()
                 performHapticFeedback(
                     HapticFeedbackConstants.VIRTUAL_KEY,
                     HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
                 )
             }
             setOnLongClickListener {
-                viewModel.clearChainPlot()
+                viewModel.exitPolylineMode()
                 true
             }
         }
 
-        binding.mapPolylineSave.setOnClickListener { viewModel.saveChainPlot() }
+        viewModel.isInPolylineMode.observe(viewLifecycleOwner, { isInPolylineMode ->
+            if (isInPolylineMode) {
+                onEnterPolylineMode()
+            } else {
+                onExitPolylineMode()
+            }
+        })
+
+        viewModel.toUndoPolyline.observe(viewLifecycleOwner, { toUndoPolyline ->
+            if (toUndoPolyline) {
+                undoPolyline()
+            }
+        })
+
+        binding.mapPolylineSave.setOnClickListener { onSavePolyline() }
 
         // Show chains guide if device was rotated mid-guide
-        if (viewModel.isInPolylineMode.value == true && !viewModel.chainsGuideShown) {
+        if (viewModel.isInPolylineMode.value!! && !viewModel.chainsGuideShown) {
             showChainsGuide()
         }
 
         // Set up Coordinate System
-        viewModel.coordinateSystem.observe(viewLifecycleOwner) {
+        viewModel.coordinateSystem.observe(viewLifecycleOwner, {
             coordSys = it
             updateCardGridSystem(coordSys)
             updateGrids()
-        }
-        viewModel.angleUnit.observe(viewLifecycleOwner) {
+        })
+        viewModel.angleUnit.observe(viewLifecycleOwner, {
             angleUnit = it
             updateLiveMeasurements()
-        }
+        })
 
         // Set up Map Type toggle buttons
         binding.mapNormalType.setOnClickListener {
-            mapMgr?.changeMapType(GoogleMap.MAP_TYPE_NORMAL)
+            mapMgr?.mapType = GoogleMap.MAP_TYPE_NORMAL
         }
         binding.mapHybridType.setOnClickListener {
-            mapMgr?.changeMapType(GoogleMap.MAP_TYPE_HYBRID)
+            mapMgr?.mapType = GoogleMap.MAP_TYPE_HYBRID
         }
         binding.mapSatelliteType.setOnClickListener {
-            mapMgr?.changeMapType(GoogleMap.MAP_TYPE_SATELLITE)
+            mapMgr?.mapType = GoogleMap.MAP_TYPE_SATELLITE
         }
 
         // NumberFormat used to format distances in Live Measurements
@@ -346,94 +361,129 @@ class MapFragment :
         // Set up Map rotation reset
         binding.mapCompass.setOnClickListener { mapMgr?.resetMapRotation() }
 
+        viewModel.chainsGuideShown =
+            viewModel.sharedPreference.getBoolean(SharedPrefsKey.CHAINS_GUIDE_SHOWN.key, false)
+
         return binding.root
     }
 
-    override fun onMapReady(mMap: GoogleMap) {
-        mapMgr = MapManager(mMap)
+    override fun onMapReady(mMap: GoogleMap?) {
+        if (mMap != null) {
+            mapMgr = MapManager(mMap)
 
-        val newMapType = viewModel.mapType
-        mapMgr?.changeMapType(newMapType)
-        binding.mapTypeGroup.check(
-            when (newMapType) {
-                GoogleMap.MAP_TYPE_NORMAL -> R.id.map_normal_type
-                GoogleMap.MAP_TYPE_HYBRID -> R.id.map_hybrid_type
-                GoogleMap.MAP_TYPE_SATELLITE -> R.id.map_satellite_type
-                else -> R.id.map_normal_type
+            val newMapType =
+                viewModel.sharedPreference.getInt(SharedPrefsKey.MAP_TYPE.key, GoogleMap.MAP_TYPE_HYBRID)
+            mapMgr?.mapType = newMapType
+            binding.mapTypeGroup.check(
+                when (newMapType) {
+                    GoogleMap.MAP_TYPE_NORMAL -> R.id.map_normal_type
+                    GoogleMap.MAP_TYPE_HYBRID -> R.id.map_hybrid_type
+                    GoogleMap.MAP_TYPE_SATELLITE -> R.id.map_satellite_type
+                    else -> R.id.map_normal_type
+                }
+            )
+
+            // Set up show pin and checkpoint sequence
+            viewModel.pinInFocus.observe(viewLifecycleOwner, { pin -> focusOn(pin) })
+            viewModel.chainInFocus.observe(viewLifecycleOwner, { chain -> focusOn(chain) })
+
+            // Set up Go To sequence
+            viewModel.mapGoTo.observe(viewLifecycleOwner) {
+                mapMgr?.moveTo(target = it)
+                mapMgr?.isShowingMyLocation = false
             }
-        )
 
-        // Set up show pin and checkpoint sequence
-        viewModel.pinInFocus.observe(viewLifecycleOwner, { pin -> focusOn(pin) })
-        viewModel.chainInFocus.observe(viewLifecycleOwner, { chain -> focusOn(chain) })
-
-        // Set up Go To sequence
-        viewModel.mapGoTo.observe(viewLifecycleOwner) {
-            mapMgr?.moveTo(target = it)
-            mapMgr?.stopShowingMyLocation()
-        }
-
-        if (viewModel.isLocationGranted) {
-            onLocPermGranted()
-        }
-
-        // Observe location to update Live Measurement
-        viewModel.fusedLocationData.observe(viewLifecycleOwner) {
-            updateLiveMeasurements()
-            mapMgr?.updateMyLocation(it)
-        }
-        viewModel.rotation.observe(viewLifecycleOwner) {
-            val (azimuth, pitch, roll) = it
-            mapMgr?.updateRotation(azimuth)
-        }
-
-        viewModel.chainPlot.observe(viewLifecycleOwner) {
-            mapMgr?.drawCurrentPolyline(it.points, it.checkpoints)
-
-            binding.mapPolylineSave.isEnabled = (it.size >= 2)
-
-            if (it.size == 0) {
-                onExitPolylineMode()
-                return@observe
+            if (viewModel.isLocationGranted) {
+                onLocPermGranted()
             }
+
+            // Observe location to update Live Measurement
+            viewModel.fusedLocationData.observe(viewLifecycleOwner) {
+                updateLiveMeasurements()
+                mapMgr?.updateMyLocation(it)
+            }
+            viewModel.rotationLiveData.observe(viewLifecycleOwner) {
+                val mMapMgr = mapMgr ?: return@observe
+                val marker = mMapMgr.myLocationDirection ?: return@observe
+                val currentTime = System.currentTimeMillis()
+
+                // Add current update to the cumulative sum
+                directionUpdateSum += it.azimuth
+                directionUpdateCount++
+
+                var newRotation = directionUpdateSum / directionUpdateCount * 180 / Math.PI.toFloat() - 90
+                val currentRotation = marker.rotation
+                val difference = newRotation - currentRotation
+
+                // Update marker if this is the first time, or if 100ms has passed since last
+                // update and difference is larger than .7 degrees
+                if (currentTime == 0L ||
+                    (currentTime - lastDirectionUpdate > 100 && abs(difference) > .7)
+                ) {
+
+                    directionUpdateSum = 0f
+                    directionUpdateCount = 0
+
+                    // Record tilt for updating map compass
+                    val tilt = mMapMgr.cameraPosition.tilt
+
+                    // Correction for rotation past 0 or 360 degrees
+                    newRotation = when {
+                        difference > 180 -> currentRotation - (360 - difference)
+                        difference < -180 -> currentRotation + (360 + difference)
+                        else -> newRotation
+                    }
+
+                    ValueAnimator.ofObject(FloatEvaluator(), currentRotation, newRotation).apply {
+                        duration = 100
+                        addUpdateListener { valAnim ->
+                            val rotation = valAnim.animatedValue as Float
+                            marker.rotation = rotation
+                            if (mapMgr != null && mapMgr!!.isShowingMyLocationRotation) {
+                                mapMgr?.moveTo(
+                                    bearing = rotation + 90,
+                                    duration = 0,
+                                    zoom = mapMgr!!.targetPosition.zoom
+                                )
+                                // Update map compass
+                                updateMapCompass(rotation + 90, tilt)
+                            }
+                        }
+                        interpolator = LinearInterpolator()
+                        start()
+                    }
+                    lastDirectionUpdate = currentTime
+                } else if (currentTime - lastDirectionUpdate > 500) {
+                    // Dispose outdated rotation information
+                    directionUpdateSum = 0f
+                    directionUpdateCount = 0
+                    lastDirectionUpdate = currentTime
+                }
+            }
+
+            // Add markers
+            viewModel.allPins.observe(viewLifecycleOwner, { allPins ->
+                mapMgr?.drawMarkers(allPins)
+                toggleCheckpointInfobar(false)
+            })
+
+            // Add polylines
+            viewModel.allChains.observe(viewLifecycleOwner, { allChains ->
+                mapMgr?.drawChains(allChains)
+                toggleCheckpointInfobar(false)
+            })
+
+            // Draw current polyline if available. This is needed
+            // to restore the polyline after a rotation change
+            mapMgr?.drawCurrentPolyline(true)
+
+            updateGrids()
+            mapMgr?.drawMyLocation(viewModel.fusedLocationData.value)
         }
-
-        viewModel.isInPolylineMode.observe(viewLifecycleOwner, { isInPolylineMode ->
-            when (isInPolylineMode) {
-                true -> onEnterPolylineMode()
-                false -> onExitPolylineMode()
-            }
-        })
-
-        viewModel.toUndoPolyline.observe(viewLifecycleOwner, { toUndoPolyline ->
-            if (toUndoPolyline) {
-                viewModel.removeLastChainPlotPoint()
-                viewModel.undoMapPolylineCompleted()
-            }
-        })
-
-        // Add markers
-        viewModel.allPins.observe(viewLifecycleOwner, { allPins ->
-            mapMgr?.drawMarkers(allPins)
-            togglePoiInfobar(false)
-        })
-
-        // Add polylines
-        viewModel.allChains.observe(viewLifecycleOwner, { allChains ->
-            mapMgr?.drawChains(allChains)
-            togglePoiInfobar(false)
-        })
-
-        // Draw current polyline if available. This is needed
-        // to restore the polyline after a rotation change
-        mapMgr?.redrawCurrentPolyline()
-
-        updateGrids()
-        mapMgr?.drawMyLocation(viewModel.fusedLocationData.value)
     }
 
     private fun onMyLocationPressed(resetRotation: Boolean) {
-        togglePoiInfobar(false)
+        toggleCheckpointInfobar(false)
         mapMgr?.goToMyLocation(resetRotation)
     }
 
@@ -468,20 +518,23 @@ class MapFragment :
         if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
             removeFocus()
         }
-        if (reason != GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION) {
-            mapMgr?.onCameraMoveByUser()
+        if (reason != GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION || mapMgr?.isShowingPin == true) {
+            mapMgr?.isShowingMyLocation = false
+            toggleLiveMeasurement(true)
         }
     }
 
     @SuppressLint("SetTextI18n")
     private fun updateGrids(latitude: Double? = null, longitude: Double? = null) {
         if (latitude != null && longitude != null) {
-            binding.mapCurrentGrids.text = viewModel.formatAsGrids(latitude, longitude)
+            binding.mapCurrentGrids.text = getGridString(latitude, longitude, coordSys, resources)
             updateLiveMeasurements(latitude, longitude)
-        } else if (mapMgr != null) {
+        } else if (mapMgr != null && mapMgr?.isShowingPin != true) {
             // Update grids and live measurement only if not showing Pin
-            val (lat, lng) = mapMgr?.getCameraTarget() ?: return
-            binding.mapCurrentGrids.text = viewModel.formatAsGrids(lat, lng)
+            val cameraTarget = mapMgr!!.cameraPosition.target
+            val lat = cameraTarget.latitude
+            val lng = cameraTarget.longitude
+            binding.mapCurrentGrids.text = getGridString(lat, lng, coordSys, resources)
             updateLiveMeasurements(lat, lng)
         }
     }
@@ -494,14 +547,43 @@ class MapFragment :
         }
     }
 
+    @SuppressLint("SetTextI18n")
+    private fun updateLiveMeasurements(lat: Double? = null, lng: Double? = null) {
+        val fusedLocationData = viewModel.fusedLocationData.value ?: return
+        var targetLat = lat
+        var targetLng = lng
+        if ((targetLat == null || targetLng == null)) {
+            if (mapMgr != null) {
+                val mapTarget = mapMgr!!.cameraPosition.target
+                targetLat = mapTarget.latitude
+                targetLng = mapTarget.longitude
+            } else {
+                return
+            }
+        }
+
+        val myLatLng = LatLng(fusedLocationData.latitude, fusedLocationData.longitude)
+        val targetLatLng = LatLng(targetLat, targetLng)
+
+        val distance = SphericalUtil.computeDistanceBetween(myLatLng, targetLatLng)
+        var direction = SphericalUtil.computeHeading(myLatLng, targetLatLng)
+        if (direction < 0) {
+            direction += 360
+        }
+
+        binding.mapCurrentDistance.text = distance.formatAsDistanceString()
+        binding.mapCurrentDirection.text = getAngleString(degToRad(direction).toFloat(), angleUnit, false)
+    }
+
     private fun updateCardGridSystem(coordSys: CoordinateSystem) {
         binding.mapGridSystem.text =
-            resources.getString(coordSys.shortName)
+            resources.getStringArray(R.array.coordinate_systems)[coordSys.index]
     }
 
     private fun onAddPinFromMap(): Boolean {
         val mapMgr = this.mapMgr ?: return true
-        val target = mapMgr.getCameraTarget()
+        val cameraPosition = mapMgr.cameraPosition
+        val target = cameraPosition.target
         val pinLat = target.latitude.toString().toDouble()
         val pinLong = target.longitude.toString().toDouble()
 
@@ -510,12 +592,7 @@ class MapFragment :
         return true
     }
 
-    /**
-     * Activates live measurement and colors the fab
-     *
-     * @param color
-     */
-    private fun focusOn(color: Int) {
+    private fun focusOn(lat: Double, lng: Double, color: Int) {
         toggleLiveMeasurement(true)
 
         // update currentPinColor
@@ -524,38 +601,30 @@ class MapFragment :
         // Set card background color
         val cardColor = ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[color])
         updateFab(cardColor)
+
+        // Set card coordinates
+        updateGrids(lat, lng)
     }
 
-    /**
-     * Moves the map to focus on a [ChainNode] checkpoint
-     *
-     * @param checkpoint
-     */
     private fun focusOn(checkpoint: ChainNode) {
-        updatePoiInfobar(checkpoint)
-        togglePoiInfobar(true)
+        updateCheckpointInfobar(checkpoint)
+        toggleCheckpointInfobar(true)
         val parentChain = checkpoint.parentChain
         mapMgr?.moveTo(checkpoint)
-        focusOn(parentChain?.color ?: currentPinColor)
+        focusOn(
+            checkpoint.position.latitude,
+            checkpoint.position.longitude,
+            parentChain?.color ?: currentPinColor,
+        )
     }
 
-    /**
-     * Moves the map to focus on a [Pin]
-     *
-     * @param pin
-     */
     private fun focusOn(pin: Pin) {
         mapMgr?.moveTo(pin)
-        updatePoiInfobar(pin)
-        togglePoiInfobar(true)
-        focusOn(pin.color)
+        updateCheckpointInfobar(pin)
+        toggleCheckpointInfobar(true)
+        focusOn(pin.latitude, pin.longitude, pin.color)
     }
 
-    /**
-     * Moves the map to focus on a [Chain]
-     *
-     * @param chain
-     */
     private fun focusOn(chain: Chain) {
         if (chain.cyclical) {
             removeFocus()
@@ -565,59 +634,30 @@ class MapFragment :
         }
     }
 
-    /**
-     * Removes the map focus
-     *
-     * Called when the user moves the map manually
-     */
     private fun removeFocus() {
         mapMgr?.removeFocus()
-        togglePoiInfobar(false)
+        toggleCheckpointInfobar(false)
     }
 
-    /**
-     * Updates the information in the POI infobar
-     *
-     * @param name
-     * @param colorId
-     */
-    private fun updatePoiInfobar(name: String, colorId: Int?) {
-        binding.mapPoiInfobar.text = name
-        binding.mapPoiInfobar.isSelected = true
+    private fun updateCheckpointInfobar(name: String, colorId: Int?) {
+        binding.mapCheckpointChain.text = name
+        binding.mapCheckpointChain.isSelected = true
 
-        val color = if (colorId != null) {
-            ContextCompat.getColor(requireContext(), PIN_CARD_BACKGROUNDS[colorId])
-        } else {
-            ContextCompat.getColor(requireContext(), android.R.color.black)
-        }
-
-        val currentColor: Int? = binding.mapPoiInfobar.tag as Int?
-
-        if (currentColor == null) {
-            binding.mapPoiInfobar.tag = color
-            binding.mapPoiInfobar.setTextColor(color)
-            val colorStateList = ColorStateList.valueOf(color)
-            binding.mapCheckpointInfobar.setStrokeColor(colorStateList)
-            binding.areaIcon.imageTintList = colorStateList
-            binding.routeIcon.imageTintList = colorStateList
-        } else {
-            binding.mapCheckpointInfobar.setStrokeColor(ColorStateList.valueOf(color))
-            animateColor(currentColor, color, 150) {
-                binding.mapPoiInfobar.tag = it
-                binding.mapPoiInfobar.setTextColor(it)
-                val colorStateList = ColorStateList.valueOf(it)
-                binding.areaIcon.imageTintList = colorStateList
-                binding.routeIcon.imageTintList = colorStateList
+        val bgColor =
+            if (colorId != null) {
+                ContextCompat.getColor(
+                    requireContext(), PIN_CARD_BACKGROUNDS[colorId]
+                )
+            } else {
+                ContextCompat.getColor(requireContext(), android.R.color.black)
             }
+
+        animateColor(binding.mapCheckpointInfobar.backgroundTintList, bgColor, 150) {
+            binding.mapCheckpointInfobar.backgroundTintList = ColorStateList.valueOf(it)
         }
     }
 
-    /**
-     * Updates the information in the POI infobar to show the details of a [ChainNode] checkpoint
-     *
-     * @param checkpoint
-     */
-    private fun updatePoiInfobar(checkpoint: ChainNode) {
+    private fun updateCheckpointInfobar(checkpoint: ChainNode) {
         val name = if (checkpoint.name.isEmpty()) {
             checkpoint.parentChain?.name ?: getString(R.string.unnamed)
         } else {
@@ -645,16 +685,11 @@ class MapFragment :
             binding.mapCheckpointInfobar.isClickable = false
         }
 
-        updatePoiInfobar(name, checkpoint.parentChain?.color)
+        updateCheckpointInfobar(name, checkpoint.parentChain?.color)
     }
 
-    /**
-     * Updates the information in the POI infobar to show the details of a [Pin]
-     *
-     * @param pin
-     */
-    private fun updatePoiInfobar(pin: Pin) {
-        updatePoiInfobar(pin.name, pin.color)
+    private fun updateCheckpointInfobar(pin: Pin) {
+        updateCheckpointInfobar(pin.name, pin.color)
 
         binding.areaIcon.visibility = View.INVISIBLE
         binding.routeIcon.visibility = View.INVISIBLE
@@ -662,12 +697,7 @@ class MapFragment :
         binding.mapCheckpointInfobar.setOnClickListener { viewModel.showPinInfo(pin.pinId) }
     }
 
-    /**
-     * Animates the POI infobar in and out of view
-     *
-     * @param makeVisible
-     */
-    private fun togglePoiInfobar(makeVisible: Boolean = true) {
+    private fun toggleCheckpointInfobar(makeVisible: Boolean = true) {
         if (isCheckpointInfobarVisible == makeVisible) {
             return
         }
@@ -726,16 +756,12 @@ class MapFragment :
         }
     }
 
-    /**
-     * Animates the live measurement bar in and out of view
-     *
-     * @param makeVisible
-     */
     private fun toggleLiveMeasurement(makeVisible: Boolean = true) {
 
         // Return with no changes if LiveMeasurement visibility is already equal to make_visible
         // or if location is not granted.
-        if (isLiveMeasurementVisible == makeVisible || (makeVisible && !viewModel.isLocationGranted)) {
+        if (isLiveMeasurementVisible == makeVisible || (makeVisible && !viewModel.isLocationGranted)
+        ) {
             return
         }
 
@@ -793,67 +819,26 @@ class MapFragment :
         }
     }
 
-    /**
-     * Updates the live measurement information
-     *
-     * @param lat latitude of the camera target
-     * @param lng longitude of the camera target
-     */
-    @SuppressLint("SetTextI18n")
-    private fun updateLiveMeasurements(lat: Double? = null, lng: Double? = null) {
-        val fusedLocationData = viewModel.fusedLocationData.value ?: return
-        var targetLat = lat
-        var targetLng = lng
-        if ((targetLat == null || targetLng == null)) {
-            if (mapMgr != null) {
-                val mapTarget = mapMgr!!.getCameraTarget()
-                targetLat = mapTarget.latitude
-                targetLng = mapTarget.longitude
-            } else {
-                return
-            }
-        }
-
-        val myLatLng = LatLng(fusedLocationData.latitude, fusedLocationData.longitude)
-        val targetLatLng = LatLng(targetLat, targetLng)
-
-        val distance = SphericalUtil.computeDistanceBetween(myLatLng, targetLatLng)
-        var direction = SphericalUtil.computeHeading(myLatLng, targetLatLng)
-        if (direction < 0) {
-            direction += 360
-        }
-
-        binding.mapCurrentDistance.text = distance.formatAsDistanceString()
-        binding.mapCurrentDirection.text = viewModel.formatAsAngle(degToRad(direction).toFloat(), false)
-    }
-
-    /**
-     * Rotates the mini map compass to suit the map camera bearing and tilt
-     *
-     * @param bearing
-     * @param tilt
-     */
     private fun updateMapCompass(bearing: Float, tilt: Float) {
+
+        if (compassImageDrawable == null) {
+            compassImageDrawable = binding.mapCompassImg.drawable
+        }
         val matrix = Matrix().apply {
             postRotate(
                 -bearing,
-                compassImageDrawable.intrinsicWidth / 2f,
-                compassImageDrawable.intrinsicHeight / 2f
+                compassImageDrawable!!.intrinsicWidth / 2f,
+                compassImageDrawable!!.intrinsicHeight / 2f
             )
             postScale(
                 1f, cos(degToRad(tilt)),
-                compassImageDrawable.intrinsicWidth / 2f,
-                compassImageDrawable.intrinsicHeight / 2f
+                compassImageDrawable!!.intrinsicWidth / 2f,
+                compassImageDrawable!!.intrinsicHeight / 2f
             )
         }
         binding.mapCompassImg.imageMatrix = matrix
     }
 
-    /**
-     * Animates the mini map compass in and out of view
-     *
-     * @param makeVisible
-     */
     private fun toggleMapCompass(makeVisible: Boolean = true) {
 
         if (isMapCompassVisible == makeVisible) {
@@ -915,17 +900,15 @@ class MapFragment :
     }
 
     private fun onEnterPolylineMode() {
-        if (!viewModel.chainsGuideShown) {
-            showChainsGuide()
-        }
-
         binding.mapPolylineUndo.isEnabled = true
         binding.mapPolylineAdd.isEnabled = true
+        binding.mapPolylineSave.isEnabled = false // Only enable when >1 node
         binding.mapChainFab.hide()
         toggleChainControls(true)
     }
 
     private fun onExitPolylineMode() {
+        mapMgr?.exitPolylineMode()
         binding.mapChainFab.show()
 
         // Disable all buttons
@@ -937,9 +920,20 @@ class MapFragment :
     }
 
     private fun onAddPolylinePoint(name: String = "") {
-        val position = mapMgr?.getCameraTarget() ?: return
-        viewModel.addToChainPlot(position, name)
-        return
+        val mapMgr = this.mapMgr ?: return
+        if (!viewModel.isInPolylineMode.value!!) {
+            viewModel.enterPolylineMode()
+            if (!viewModel.chainsGuideShown) {
+                showChainsGuide()
+            }
+        }
+        viewModel.currentPolylinePoints.let {
+            it.add(ChainNode(name, mapMgr.cameraPosition.target))
+            if (it.size >= 2) {
+                binding.mapPolylineSave.isEnabled = true
+            }
+        }
+        mapMgr.drawCurrentPolyline(true)
     }
 
     private fun onAddPolylineNamedPoint() {
@@ -972,7 +966,16 @@ class MapFragment :
                         inputLayout.error = getString(R.string.checkpoint_name_too_long_error)
                     }
                     else -> {
+                        // Group name is valid, add to ArrayAdapter and set in AutoCompleteTextView
                         onAddPolylinePoint(it.toString())
+
+                        // Enter Polyline mode if not already inside
+                        if (!viewModel.isInPolylineMode.value!!) {
+                            viewModel.enterPolylineMode()
+                            if (!viewModel.chainsGuideShown) {
+                                showChainsGuide()
+                            }
+                        }
                         alertDialog.dismiss()
                     }
                 }
@@ -982,26 +985,40 @@ class MapFragment :
 
     private fun onPolylineClick(polyline: Polyline) {
         val mapMgr = this.mapMgr ?: return
-        mapMgr.getChain(polyline)?.let {
+        mapMgr.polylinesMap[polyline]?.let {
             viewModel.showChainInfo(it.chainId)
         }
     }
 
     private fun onPolygonClick(polygon: Polygon) {
         val mapMgr = this.mapMgr ?: return
-        mapMgr.getChain(polygon)?.let {
+        mapMgr.polygonsMap[polygon]?.let {
             viewModel.showChainInfo(it.chainId)
         }
     }
 
-    /**
-     * Displays the interactive guide for chains
-     */
-    private fun showChainsGuide() {
-        if (isChainGuideShowing) {
+    private fun undoPolyline() {
+        if (isChainGiudeShowing) {
             return
         }
-        isChainGuideShowing = true
+        viewModel.currentPolylinePoints.let {
+            it.removeLast()
+            mapMgr?.drawCurrentPolyline(true)
+
+            if (it.size == 0) {
+                viewModel.exitPolylineMode()
+            } else if (it.size < 2) {
+                binding.mapPolylineSave.isEnabled = false
+            }
+        }
+    }
+
+    private fun onSavePolyline() {
+        viewModel.openChainCreator(Chain("", viewModel.currentPolylinePoints))
+    }
+
+    private fun showChainsGuide() {
+        isChainGiudeShowing = true
         chainShowcaseView.start()
     }
 
@@ -1072,8 +1089,9 @@ class MapFragment :
 
         updateGrids()
 
-        val bearing = mapMgr.getCameraBearing()
-        val tilt = mapMgr.getCameraTilt()
+        val position = mapMgr.cameraPosition
+        val bearing = position.bearing
+        val tilt = position.tilt
         if (bearing != 0f || tilt != 0f) {
             toggleMapCompass(true)
             updateMapCompass(bearing, tilt)
@@ -1081,7 +1099,9 @@ class MapFragment :
             toggleMapCompass(false)
         }
 
-        mapMgr.redrawCurrentPolyline()
+        if (viewModel.isInPolylineMode.value!!) {
+            mapMgr.drawCurrentPolyline()
+        }
     }
 
     /**
@@ -1125,40 +1145,28 @@ class MapFragment :
         binding.mapView.onResume()
     }
 
-    /**
-     * Abstracts the operations of the map to handle movements and animations
-     *
-     * @property map [GoogleMap] used for displaying the map in MapView
-     */
     @SuppressLint("PotentialBehaviorOverride")
     private inner class MapManager(var map: GoogleMap) {
         private var markersMap = HashMap<Marker, Pin>()
-        private var polylinesMap = HashMap<Polyline, Chain>()
-        private var polygonsMap = HashMap<Polygon, Chain>()
+        var polylinesMap = HashMap<Polyline, Chain>()
+        var polygonsMap = HashMap<Polygon, Chain>()
         private var checkpointsMap = HashMap<Marker, ChainNode>()
 
         private var myLocationMarker: Marker? = null
         private var myLocationCircle: Circle? = null
-        private var myLocationDirection: Marker? = null
+        var myLocationDirection: Marker? = null
         private var currentPolyline: Polyline? = null
         private val currentPolylineMarkers = mutableListOf<Marker>()
 
-        private var lastDirectionUpdate = 0L
-        private var directionUpdateSum = 0f
-        private var directionUpdateCount = 0
-
-        private var isShowingPin = false
-        private var isShowingMyLocation = false
-            private set(value) {
-                if (field == value) {
-                    return
-                }
+        var isShowingPin = false
+        var isShowingMyLocation = false
+            set(value) {
+                field = value
                 if (!value) {
                     isShowingMyLocationRotation = false
                 }
-                field = value
             }
-        private var isShowingMyLocationRotation = false
+        var isShowingMyLocationRotation = false
             private set(value) {
                 val lightGreen =
                     ContextCompat.getColor(requireContext(), R.color.colorPrimaryRipple)
@@ -1202,27 +1210,42 @@ class MapFragment :
                         true
                     )
 
-                    val colorSurface = ContextCompat.getColor(requireContext(), colorSurfaceTypedValue.resourceId)
-                    val colorOnSurface = ContextCompat.getColor(requireContext(), colorOnSurfaceTypedValue.resourceId)
+                    val colorSurface =
+                        ContextCompat.getColor(requireContext(), colorSurfaceTypedValue.resourceId)
+                    val colorOnSurface = ContextCompat.getColor(
+                        requireContext(),
+                        colorOnSurfaceTypedValue.resourceId
+                    )
 
                     animateColor(compass.backgroundTintList, colorSurface, 350) { color ->
                         binding.mapCompass.backgroundTintList = ColorStateList.valueOf(color)
                     }
-                    animateColor(binding.mapCompassImg.imageTintList, colorOnSurface, 350) { color ->
+                    animateColor(
+                        binding.mapCompassImg.imageTintList,
+                        colorOnSurface,
+                        350
+                    ) { color ->
                         binding.mapCompassImg.imageTintList = ColorStateList.valueOf(color)
                     }
                 }
                 field = value
             }
-        private var isShowingCheckpoint = false
-        @Volatile private var zoomStack = 0f
+        var isShowingCheckpoint = false
+        private var zoomStack = 0f
 
         private var isAnimating = false
 
-        private var mapType: Int = map.mapType
+        var mapType: Int = map.mapType
+            set(value) {
+                if (field != value) {
+                    map.mapType = value
+                    viewModel.sharedPreference.edit().putInt(SharedPrefsKey.MAP_TYPE.key, value).apply()
+                    field = value
+                }
+            }
 
-        @Volatile private var targetPosition: CameraPosition = map.cameraPosition
-        private val cameraPosition: CameraPosition
+        var targetPosition: CameraPosition = map.cameraPosition
+        val cameraPosition: CameraPosition
             get() = map.cameraPosition
 
         init {
@@ -1234,6 +1257,7 @@ class MapFragment :
                 setOnPolygonClickListener { onPolygonClick(it) }
                 isIndoorEnabled = false
                 setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style))
+                uiSettings.isZoomControlsEnabled = true
             }
 
             map.uiSettings.apply {
@@ -1243,66 +1267,6 @@ class MapFragment :
             }
         }
 
-        /**
-         * Changes the map type
-         *
-         * @param mapType either one of [GoogleMap.MAP_TYPE_NORMAL], [GoogleMap.MAP_TYPE_SATELLITE], [GoogleMap.MAP_TYPE_HYBRID]
-         */
-        fun changeMapType(mapType: Int) {
-            if (this.mapType != mapType) {
-                map.mapType = mapType
-                this.mapType = mapType
-                viewModel.mapType = mapType
-            }
-        }
-
-        /**
-         * Shows the live measurement bar and sets [isShowingMyLocation] to false
-         *
-         * Called when the user moves the map.
-         *
-         */
-        fun onCameraMoveByUser() {
-            if (isShowingPin) {
-                return
-            }
-
-            mapMgr?.isShowingMyLocation = false
-            toggleLiveMeasurement(true)
-        }
-
-        /**
-         * Returns the target destination lat lng if [isShowingPin], otherwise returns the map camera target lat lng
-         *
-         * @return
-         */
-        fun getCameraTarget(): LatLng {
-            return if (isShowingPin) {
-                LatLng(targetPosition.target.latitude, targetPosition.target.longitude)
-            } else {
-                LatLng(map.cameraPosition.target.latitude, map.cameraPosition.target.longitude)
-            }
-        }
-
-        fun getCameraBearing(): Float {
-            return map.cameraPosition.bearing
-        }
-
-        fun getCameraTilt(): Float {
-            return map.cameraPosition.tilt
-        }
-
-        /**
-         * Animates the map camera to the target, bearing, tilt and zoom
-         *
-         * @param target
-         * @param bearing
-         * @param tilt
-         * @param zoom
-         * @param duration
-         * @param onAnimFinish callback to execute when animation finishes
-         * @param onAnimCancel callback to execute when animation is canceled
-         */
         fun moveTo(
             target: LatLng? = null,
             bearing: Float? = null,
@@ -1359,11 +1323,6 @@ class MapFragment :
             }
         }
 
-        /**
-         * Animates map to a pin
-         *
-         * @param pin
-         */
         fun moveTo(pin: Pin) {
             isShowingPin = true
             isShowingCheckpoint = false
@@ -1371,11 +1330,6 @@ class MapFragment :
             moveTo(target = LatLng(pin.latitude, pin.longitude))
         }
 
-        /**
-         * Animates map to a route/area
-         *
-         * @param chain route or area
-         */
         fun moveTo(chain: Chain) {
             isShowingCheckpoint = false
             isShowingPin = false
@@ -1388,7 +1342,7 @@ class MapFragment :
                         include(node.position)
                     }
                 }.build()
-                val padding = resources.dpToPx(64f)
+                val padding = 64 * resources.displayMetrics.density
                 map.animateCamera(
                     CameraUpdateFactory.newLatLngBounds(bounds, padding.toInt()),
                     350,
@@ -1400,11 +1354,6 @@ class MapFragment :
             }
         }
 
-        /**
-         * Animates the map to a [ChainNode] on a route or area
-         *
-         * @param node
-         */
         fun moveTo(node: ChainNode) {
             isShowingPin = true
             isShowingCheckpoint = true
@@ -1428,7 +1377,7 @@ class MapFragment :
             // Marker represents a current polyline checkpoint
             if (currentPolylineMarkers.contains(marker)) {
                 val position = marker.position
-                val checkpointNode = ChainNode(marker.title ?: "", position, null)
+                val checkpointNode = ChainNode(marker.title, position, null)
                 focusOn(checkpointNode)
                 return true
             }
@@ -1455,7 +1404,7 @@ class MapFragment :
                         .position(LatLng(pin.latitude, pin.longitude))
                         .title(pin.name)
                         .icon(bitmapDescriptorFromVector(PIN_VECTOR_DRAWABLE[pin.color]))
-                ) ?: continue
+                )
                 markersMap[marker] = pin
             }
         }
@@ -1470,6 +1419,7 @@ class MapFragment :
             polygonsMap.keys.forEach { it.remove() }
             polygonsMap.clear()
 
+            val scale = resources.displayMetrics.density
             for (chain in allChains) {
                 val chainNodes = chain.nodes
                 val points = chainNodes.map { it.position }
@@ -1480,7 +1430,7 @@ class MapFragment :
                     points.forEach { polygonOptions.add(it) }
                     polygonOptions.apply {
                         strokeColor(color)
-                        strokeWidth(8f)
+                        strokeWidth(2 * scale)
                         fillColor(withAlpha(color, 50))
                         strokeJointType(JointType.ROUND)
                         clickable(true)
@@ -1496,7 +1446,7 @@ class MapFragment :
                                 requireContext(),
                                 PIN_CARD_BACKGROUNDS[chain.color]
                             )
-                        width = resources.dpToPx(4f)
+                        width = 4 * scale
                         jointType = JointType.ROUND
                         startCap = ButtCap()
                         endCap = startCap
@@ -1515,7 +1465,7 @@ class MapFragment :
                                 .anchor(0.5f, 0.5f)
                                 .flat(true)
                                 .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
-                        ) ?: continue
+                        )
                         checkpointsMap[marker] = node
                     }
                 }
@@ -1562,24 +1512,25 @@ class MapFragment :
             val position = LatLng(locationData.latitude, locationData.longitude)
             if (myLocationMarker != null && myLocationCircle != null && myLocationDirection != null) {
                 // Marker positions animator
-                ValueAnimator.ofObject(latLngEvaluator, myLocationMarker!!.position, position).apply {
-                    duration = 750
-                    addUpdateListener {
-                        val newPosition = it.animatedValue as LatLng
-                        if (isShowingMyLocation) {
-                            moveTo(
-                                target = newPosition,
-                                duration = 0,
-                                zoom = targetPosition.zoom
-                            )
+                ValueAnimator.ofObject(latLngEvaluator, myLocationMarker!!.position, position)
+                    .apply {
+                        duration = 750
+                        addUpdateListener {
+                            val newPosition = it.animatedValue as LatLng
+                            if (isShowingMyLocation) {
+                                moveTo(
+                                    target = newPosition,
+                                    duration = 0,
+                                    zoom = targetPosition.zoom
+                                )
+                            }
+                            myLocationMarker?.position = newPosition
+                            myLocationDirection?.position = newPosition
+                            myLocationCircle?.center = newPosition
                         }
-                        myLocationMarker?.position = newPosition
-                        myLocationDirection?.position = newPosition
-                        myLocationCircle?.center = newPosition
+                        interpolator = AccelerateDecelerateInterpolator()
+                        start()
                     }
-                    interpolator = AccelerateDecelerateInterpolator()
-                    start()
-                }
                 // MyLocation accuracy radius animator
                 ObjectAnimator.ofObject(
                     doubleEvaluator, myLocationCircle!!.radius, locationData.accuracy.toDouble()
@@ -1595,66 +1546,64 @@ class MapFragment :
             }
         }
 
-        fun drawCurrentPolyline(points: List<LatLng>, checkpoints: List<ChainNode>) {
-            currentPolyline?.remove()
-
-            // Draw checkpoint markers
-            while (currentPolylineMarkers.isNotEmpty()) {
-                val marker = currentPolylineMarkers.removeLast()
-                marker.remove()
+        fun drawCurrentPolyline(redrawCheckpoints: Boolean = false) {
+            if (currentPolyline == null) {
+                val polylineOptions = PolylineOptions()
+                for (point in viewModel.currentPolylinePoints) {
+                    polylineOptions.add(point.position)
+                }
+                polylineOptions.add(map.cameraPosition.target)
+                currentPolyline = map.addPolyline(polylineOptions)
+                val scale = resources.displayMetrics.density
+                currentPolyline?.apply {
+                    pattern = listOf(
+                        Dash(8 * scale),
+                        Gap(4 * scale)
+                    )
+                    width = 6 * scale
+                    color = ContextCompat.getColor(requireContext(), R.color.colorPrimaryLight)
+                    jointType = JointType.ROUND
+                    endCap = ButtCap()
+                    isGeodesic = true
+                }
+            } else {
+                currentPolyline?.points = viewModel.currentPolylinePoints
+                    .map { it.position }
+                    .toMutableList().apply {
+                        add(map.cameraPosition.target)
+                    }
             }
 
-            for (node in checkpoints) {
-                val marker = map.addMarker(
-                    MarkerOptions()
-                        .position(node.position)
-                        .anchor(0.5f, 0.5f)
-                        .title(node.name)
-                        .flat(true)
-                        .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
-                ) ?: continue
-                currentPolylineMarkers.add(marker)
-            }
+            if (redrawCheckpoints) {
+                for (marker in currentPolylineMarkers) {
+                    marker.remove()
+                }
+                currentPolylineMarkers.clear()
 
-            // Draw polyline
-            if (points.isEmpty()) {
-                currentPolyline = null
-                return
-            }
-
-            val polylineOptions =
-                PolylineOptions().addAll(points).add(map.cameraPosition.target).clickable(true)
-            currentPolyline = map.addPolyline(polylineOptions)
-            currentPolyline?.apply {
-                pattern = listOf(
-                    Dash(resources.dpToPx(8f)),
-                    Gap(resources.dpToPx(8f))
-                )
-                width = resources.dpToPx(6f)
-                color = ContextCompat.getColor(requireContext(), R.color.colorPrimaryLight)
-                jointType = JointType.ROUND
-                endCap = ButtCap()
-                isGeodesic = true
+                for (node in viewModel.currentPolylinePoints) {
+                    if (node.isCheckpoint) {
+                        val marker = map.addMarker(
+                            MarkerOptions()
+                                .position(node.position)
+                                .anchor(0.5f, 0.5f)
+                                .title(node.name)
+                                .flat(true)
+                                .icon(bitmapDescriptorFromVector(R.drawable.ic_map_checkpoint))
+                        )
+                        currentPolylineMarkers.add(marker)
+                    }
+                }
             }
         }
 
-        fun redrawCurrentPolyline() {
-            val points = currentPolyline?.points ?: return
-            points.removeLastOrNull()
-            points.add(map.cameraPosition.target)
-            currentPolyline?.points = points
-        }
-
-        private fun resetZoomStack() {
-            zoomStack = 0f
-        }
+        private val resetZoomStack = { zoomStack = 0f }
 
         fun zoomIn() {
             if (isShowingMyLocationRotation) {
                 moveTo(
                     zoom = targetPosition.zoom + 1,
                     duration = 0,
-                    onAnimFinish = this::resetZoomStack
+                    onAnimFinish = resetZoomStack
                 )
             } else {
                 zoomStack = if (zoomStack <= 0) 1f else zoomStack + 1
@@ -1669,7 +1618,7 @@ class MapFragment :
                 moveTo(
                     zoom = targetPosition.zoom + zoomStack,
                     duration = 300,
-                    onAnimFinish = this::resetZoomStack,
+                    onAnimFinish = resetZoomStack,
                     onAnimCancel = onCancel
                 )
             }
@@ -1680,7 +1629,7 @@ class MapFragment :
                 moveTo(
                     zoom = targetPosition.zoom - 1,
                     duration = 0,
-                    onAnimFinish = this::resetZoomStack
+                    onAnimFinish = resetZoomStack
                 )
             } else {
                 zoomStack = if (zoomStack >= 0) -1f else zoomStack - 1
@@ -1695,7 +1644,7 @@ class MapFragment :
                 moveTo(
                     zoom = targetPosition.zoom + zoomStack,
                     duration = 300,
-                    onAnimFinish = this::resetZoomStack,
+                    onAnimFinish = resetZoomStack,
                     onAnimCancel = onCancel
                 )
             }
@@ -1753,83 +1702,21 @@ class MapFragment :
             }
         }
 
-        fun getChain(polyline: Polyline): Chain? {
-            return polylinesMap[polyline]
-        }
-
-        fun getChain(polygon: Polygon): Chain? {
-            return polygonsMap[polygon]
-        }
-
         fun resetMapRotation() {
             isShowingMyLocationRotation = false
             moveTo(tilt = 0f, bearing = 0f)
         }
 
+        fun exitPolylineMode() {
+            currentPolyline?.remove()
+            currentPolyline = null
+            currentPolylineMarkers.map { it.remove() }
+            currentPolylineMarkers.clear()
+        }
+
         fun removeFocus() {
             isShowingPin = false
             isShowingCheckpoint = false
-        }
-
-        /**
-         * Updates the rotation of [myLocationDirection]
-         *
-         * @param azimuth latest azimuth of the device
-         */
-        fun updateRotation(azimuth: Float) {
-
-            val marker = this.myLocationDirection ?: return
-            val currentTime = System.currentTimeMillis()
-
-            // Add current update to the cumulative sum
-            directionUpdateSum += azimuth
-            directionUpdateCount++
-
-            var newRotation = directionUpdateSum / directionUpdateCount * 180 / Math.PI.toFloat() - 90
-            val currentRotation = marker.rotation
-            val difference = newRotation - currentRotation
-
-            // Update marker if this is the first time, or if 100ms has passed since last
-            // update and difference is larger than .7 degrees
-            if (currentTime == 0L || (currentTime - lastDirectionUpdate > 100 && abs(difference) > .7)) {
-                directionUpdateSum = 0f
-                directionUpdateCount = 0
-
-                // Record tilt for updating map compass
-                val tilt = this.cameraPosition.tilt
-
-                // Correction for rotation past 0 or 360 degrees
-                newRotation = when {
-                    difference > 180 -> currentRotation - (360 - difference)
-                    difference < -180 -> currentRotation + (360 + difference)
-                    else -> newRotation
-                }
-
-                animate(currentRotation, newRotation, 150, LinearInterpolator()) { rotation ->
-                    marker.rotation = rotation
-                    if (isShowingMyLocationRotation) {
-                        moveTo(
-                            target = myLocationMarker?.position,
-                            bearing = rotation + 90,
-                            duration = 0,
-                            zoom = targetPosition.zoom
-                        )
-                        // Update map compass
-                        updateMapCompass(rotation + 90, tilt)
-                    }
-                }
-
-                lastDirectionUpdate = currentTime
-            } else if (currentTime - lastDirectionUpdate > 500) {
-                // Dispose outdated rotation information
-                directionUpdateSum = 0f
-                directionUpdateCount = 0
-                lastDirectionUpdate = currentTime
-            }
-        }
-
-        fun stopShowingMyLocation() {
-            isShowingMyLocation = false
         }
     }
 }

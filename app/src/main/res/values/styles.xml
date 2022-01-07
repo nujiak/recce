@@ -48,7 +48,7 @@
     </style>
 
     <style name="Theme.Recce.Tags" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="fontFamily">@font/open_sans</item>
+        <item name="fontFamily">@font/open_sans_extrabold</item>
     </style>
 
     <style name="ThemeOverlay.Recce.ActionBar" parent="ThemeOverlay.MaterialComponents.ActionBar">
@@ -93,7 +93,7 @@
         <item name="colorOnPrimary">@color/colorPrimary</item>
     </style>
 
-    <style name="TextAppearance.Recce.PinName" parent="TextAppearance.MaterialComponents.Headline6">
+    <style name="TextAppearance.Recce.PinName" parent="TextAppearance.MaterialComponents.Headline5">
         <item name="android:textColor">@android:color/white</item>
     </style>
 
@@ -141,12 +141,7 @@
         <item name="android:windowAnimationStyle">@style/Animation.Recce.InfoDialogs</item>
         <item name="android:layout_width">match_parent</item>
     </style>
-
-    <style name="Theme.Recce.Preference" parent="Theme.Recce">
-        <item name="tint">?android:attr/textColorPrimary</item>
-        <item name="dialogCornerRadius">@dimen/small_padding</item>
-    </style>
-
+    
     <style name="Animation.Recce.InfoDialogs" parent="@android:style/Animation.Activity">
         <item name="android:windowEnterAnimation">@anim/info_dialog_enter_animation</item>
         <item name="android:windowExitAnimation">@anim/info_dialog_exit_animation</item>

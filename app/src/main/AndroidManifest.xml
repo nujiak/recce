@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name=".RecceApp"
+        android:name="com.nujiak.recce.RecceApp"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -15,17 +15,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Recce">
         <activity
-            android:name=".PreferenceActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Recce.Preference"/>
+            android:name="com.nujiak.recce.onboarding.OnboardingActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Recce.Onboarding"/>
         <activity
-            android:name=".onboarding.OnboardingActivity"
-            android:theme="@style/Theme.Recce.Onboarding" />
-        <activity
-            android:name=".MainActivity"
-            android:theme="@style/SplashScreen"
+            android:name="com.nujiak.recce.MainActivity"
             android:windowSoftInputMode="adjustNothing"
-            android:exported="true">
+            android:theme="@style/SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -2,7 +2,6 @@ package com.nujiak.recce.hilt
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,6 +15,6 @@ class SharedPreferencesModule {
     @Provides
     @Singleton
     fun provideSharedPreferences(@ApplicationContext appContext: Context): SharedPreferences {
-        return PreferenceManager.getDefaultSharedPreferences(appContext)
+        return appContext.getSharedPreferences("com.nujiak.recce", Context.MODE_PRIVATE)
     }
 }

@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:background="@color/colorPrimaryDark">
+    android:background="@color/sgRed">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -20,14 +19,15 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_onboarding_start"/>
+            android:layout_margin="@dimen/large_padding"
+            app:srcCompat="@drawable/ic_onboarding_ns"/>
         <TextView
-            style="@style/TextAppearance.MaterialComponents.Headline3"
+            style="@style/TextAppearance.MaterialComponents.Headline5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/app_name"
-            android:textColor="@color/textColorLight"/>
+            android:textColor="@color/textColorLight"
+            android:text="@string/all_set_for_ns" />
         <TextView
             style="@style/TextAppearance.Recce.Onboarding.Description"
             android:layout_width="wrap_content"
@@ -35,26 +35,23 @@
             android:layout_marginTop="@dimen/large_padding"
             android:gravity="center"
             android:textColor="@color/textColorLight"
-            android:text="@string/onboarding_title" />
+            android:text="@string/onboarding_ns" />
 
         <Button
-            android:id="@+id/onboarding_title_next"
-            style="?attr/materialButtonOutlinedStyle"
+            android:id="@+id/onboarding_ns_start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/large_padding"
-            android:text="@string/get_started"
+            android:backgroundTint="@android:color/white"
+            android:text="@string/start"
+            android:textColor="@color/sgRed"/>
+
+        <Button
+            android:id="@+id/onboarding_ns_back"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/back"
             android:textColor="@color/textColorLight"/>
     </LinearLayout>
-    <Button
-        android:id="@+id/onboarding_title_ns"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/large_padding"
-        android:text="@string/nsf_nsmen"
-        android:textColor="@color/textColorLight"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

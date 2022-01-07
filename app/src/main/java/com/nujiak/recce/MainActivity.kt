@@ -28,6 +28,9 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.appcompat.view.ActionMode
 import androidx.core.app.ActivityCompat
@@ -39,11 +42,14 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.nujiak.recce.database.Chain
 import com.nujiak.recce.database.Pin
+import com.nujiak.recce.enums.SharedPrefsKey
+import com.nujiak.recce.enums.ThemePreference
 import com.nujiak.recce.fragments.ChainInfoFragment
 import com.nujiak.recce.fragments.GoToFragment
 import com.nujiak.recce.fragments.PinInfoFragment
 import com.nujiak.recce.modalsheets.ChainCreatorSheet
 import com.nujiak.recce.modalsheets.PinCreatorSheet
+import com.nujiak.recce.modalsheets.SettingsSheet
 import com.nujiak.recce.onboarding.OnboardingActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -83,14 +89,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Run Onboarding
-        if (!viewModel.isOnboardingCompleted) {
+        if (!viewModel.sharedPreference.getBoolean(SharedPrefsKey.ONBOARDING_COMPLETED.key, false)) {
             startActivity(Intent(this, OnboardingActivity::class.java))
             finish()
         }
 
-        // Set app theme
-        viewModel.theme.observe(this) {
-            setDefaultNightMode(it.mode)
+        // Set app theme (auto/light/dark)
+        viewModel.sharedPreference.getInt(SharedPrefsKey.THEME_PREF.key, 0).let {
+            setDefaultNightMode(
+                when (ThemePreference.atIndex(it)) {
+                    ThemePreference.AUTO -> MODE_NIGHT_FOLLOW_SYSTEM
+                    ThemePreference.LIGHT -> MODE_NIGHT_NO
+                    ThemePreference.DARK -> MODE_NIGHT_YES
+                }
+            )
         }
 
         // Set up ViewPager2
@@ -409,8 +421,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openSettings() {
-        val intent = Intent(this, PreferenceActivity::class.java)
-        startActivity(intent)
+        val settingsSheet = SettingsSheet()
+        settingsSheet.show(supportFragmentManager, settingsSheet.tag)
         viewModel.finishedOpenSettings()
     }
 

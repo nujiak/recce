@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="coordinate_systems">
+        <item>@string/utm</item>
+        <item>@string/mgrs</item>
+        <item>@string/kertau</item>
+        <item>@string/lat_lng</item>
+    </string-array>
+
     <string-array name="angle_units">
         <item>@string/degrees</item>
         <item>@string/nato_mils</item>

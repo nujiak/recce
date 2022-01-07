@@ -1,8 +1,6 @@
 package com.nujiak.recce.fragments.saved
 
 import android.annotation.SuppressLint
-import android.content.res.ColorStateList
-import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,12 +15,9 @@ import com.nujiak.recce.databinding.PinListHeaderItemBinding
 import com.nujiak.recce.databinding.PinListItemBinding
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
-import com.nujiak.recce.utils.dpToPx
 import com.nujiak.recce.utils.formatAsAreaString
 import com.nujiak.recce.utils.formatAsDistanceString
-
-private const val STROKE_SIZE_DP: Float = 2f
-private const val STROKE_SIZE_SELECTED_DP: Float = 4f
+import com.nujiak.recce.utils.getGridString
 
 class PinViewHolder private constructor(private val binding: PinListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
@@ -39,29 +34,27 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
         item: PinWrapper,
         onItemClick: (Pin) -> Unit,
         onItemLongClick: (Pin) -> Boolean,
-        coordSys: CoordinateSystem,
-        formatAsGrids: (Double, Double) -> String
+        coordSys: CoordinateSystem
     ) {
         val pin = item.pin
         if (pin.group != "") {
             binding.pinGroup.text = pin.group
             binding.pinGroup.visibility = View.VISIBLE
         } else {
-            binding.pinGroup.visibility = View.GONE
+            binding.pinGroup.visibility = View.INVISIBLE
         }
         binding.pinName.text = pin.name
 
         binding.pinGridSystem.text =
-            binding.root.resources.getString(coordSys.shortName)
+            binding.root.resources.getStringArray(R.array.coordinate_systems)[coordSys.index]
 
         binding.pinGrid.text =
-            formatAsGrids(pin.latitude, pin.longitude)
+            getGridString(pin.latitude, pin.longitude, coordSys, binding.root.resources)
 
         val context = binding.root.context
         val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[pin.color])
-        binding.pinName.setTextColor(color)
-        binding.pinListItemParent.strokeColor = color
-        (binding.pinGroup.background as GradientDrawable).setStroke(context.resources.dpToPx(STROKE_SIZE_DP).toInt(), color)
+        binding.pinListItemParent.setCardBackgroundColor(color)
+        binding.pinGroup.setTextColor(color)
 
         binding.pinListItemParent.setOnClickListener { onItemClick(pin) }
         binding.pinListItemParent.setOnLongClickListener { onItemLongClick(pin) }
@@ -71,13 +64,9 @@ class PinViewHolder private constructor(private val binding: PinListItemBinding)
             binding.pinSelectedIndex.text = (item.selectionIndex + 1).toString()
             binding.pinSelectedIndex.setTextColor(color)
             binding.selectionShade.visibility = View.VISIBLE
-            binding.pinListItemParent.cardElevation = 0f
-            binding.pinListItemParent.strokeWidth = context.resources.dpToPx(STROKE_SIZE_SELECTED_DP).toInt()
         } else {
             binding.pinSelectedIndex.visibility = View.INVISIBLE
             binding.selectionShade.visibility = View.GONE
-            binding.pinListItemParent.cardElevation = context.resources.dpToPx(8f)
-            binding.pinListItemParent.strokeWidth = context.resources.dpToPx(STROKE_SIZE_DP).toInt()
         }
     }
 }
@@ -104,18 +93,17 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
             binding.chainGroup.text = chain.group
             binding.chainGroup.visibility = View.VISIBLE
         } else {
-            binding.chainGroup.visibility = View.GONE
+            binding.chainGroup.visibility = View.INVISIBLE
         }
         binding.chainName.text = chain.name
 
         val context = binding.root.context
         val color = ContextCompat.getColor(context, PIN_CARD_BACKGROUNDS[chain.color])
-        binding.pinListChainItemParent.strokeColor = color
-        binding.chainName.setTextColor(color)
-        (binding.chainGroup.background as GradientDrawable).setStroke(context.resources.dpToPx(STROKE_SIZE_DP).toInt(), color)
+        binding.pinListItemParent.setCardBackgroundColor(color)
+        binding.chainGroup.setTextColor(color)
 
-        binding.pinListChainItemParent.setOnClickListener { onItemClick(chain) }
-        binding.pinListChainItemParent.setOnLongClickListener { onItemLongClick(chain) }
+        binding.pinListItemParent.setOnClickListener { onItemClick(chain) }
+        binding.pinListItemParent.setOnLongClickListener { onItemLongClick(chain) }
 
         val chainNodes = chain.nodes
         val checkpoints = mutableListOf<String>()
@@ -141,20 +129,14 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
             binding.chainDistance.text =
                 SphericalUtil.computeArea(chainNodes.map { it.position }).formatAsAreaString()
             binding.chainDistanceDesc.text = binding.root.resources.getString(R.string.area)
-            binding.areaIcon.apply {
-                visibility = View.VISIBLE
-                imageTintList = ColorStateList.valueOf(color)
-            }
+            binding.areaIcon.visibility = View.VISIBLE
             binding.routeIcon.visibility = View.INVISIBLE
         } else {
             // Route
             binding.chainDistance.text = distance.formatAsDistanceString()
             binding.chainDistanceDesc.text = binding.root.resources.getString(R.string.distance)
             binding.areaIcon.visibility = View.INVISIBLE
-            binding.routeIcon.apply {
-                visibility = View.VISIBLE
-                imageTintList = ColorStateList.valueOf(color)
-            }
+            binding.routeIcon.visibility = View.VISIBLE
         }
 
         if (item.selectionIndex >= 0) {
@@ -162,13 +144,9 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
             binding.chainSelectedIndex.setTextColor(color)
             binding.chainSelectedIndex.text = (item.selectionIndex + 1).toString()
             binding.selectionShade.visibility = View.VISIBLE
-            binding.pinListChainItemParent.cardElevation = 0f
-            binding.pinListChainItemParent.strokeWidth = context.resources.dpToPx(STROKE_SIZE_SELECTED_DP).toInt()
         } else {
             binding.chainSelectedIndex.visibility = View.INVISIBLE
             binding.selectionShade.visibility = View.GONE
-            binding.pinListChainItemParent.cardElevation = context.resources.dpToPx(8f)
-            binding.pinListChainItemParent.strokeWidth = context.resources.dpToPx(STROKE_SIZE_DP).toInt()
         }
     }
 }

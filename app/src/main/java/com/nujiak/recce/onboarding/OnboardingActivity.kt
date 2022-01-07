@@ -1,88 +1,38 @@
 package com.nujiak.recce.onboarding
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.nujiak.recce.MainActivity
 import com.nujiak.recce.R
-import com.nujiak.recce.databinding.ActivityOnboardingBinding
-import com.nujiak.recce.preference.PreferenceFragment
-import dagger.hilt.android.AndroidEntryPoint
+import com.nujiak.recce.fragments.ruler.RulerFragment
 
-@AndroidEntryPoint
 class OnboardingActivity : AppCompatActivity() {
 
     private lateinit var viewpager: ViewPager2
-    private lateinit var binding: ActivityOnboardingBinding
-
-    val viewModel: OnboardingViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityOnboardingBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_onboarding)
 
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        val viewModel: OnboardingViewModel by viewModels()
+        viewModel.sharedPreference =
+            getSharedPreferences("com.nujiak.recce", Context.MODE_PRIVATE)
 
-        viewpager = binding.onboardingViewpager
-        viewpager.adapter = OnboardingViewPagerAdapter(this@OnboardingActivity)
-        viewpager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                viewModel.gotoPage(position)
-            }
+        viewpager = findViewById(R.id.onboarding_viewpager)
+        viewpager.apply {
+            adapter = OnboardingViewPagerAdapter(this@OnboardingActivity)
+            isUserInputEnabled = false
+        }
 
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                binding.onboardingBack.layoutParams = LinearLayout.LayoutParams(
-                    0,
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    if (position == 0) positionOffset else 1f
-                )
-                binding.onboardingButtonsDivider.alpha = if (position == 0) positionOffset else 1f
-            }
+        viewModel.changePage.observe(this, {
+            viewpager.currentItem = it.index
         })
-
-        viewModel.currentPage.observe(this) { page ->
-            viewpager.currentItem = page
-
-            binding.onboardingNext.text = if (page == 2) {
-                getString(R.string.start)
-            } else {
-                getString(R.string.next)
-            }
-        }
-
-        binding.onboardingBack.setOnClickListener {
-            viewModel.previousPage()
-        }
-
-        binding.onboardingNext.setOnClickListener {
-            viewModel.nextPage()
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        // Fix button size for configuration changes
-        binding.onboardingBack.layoutParams = LinearLayout.LayoutParams(
-            0,
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            if (viewpager.currentItem == 0) 0f else 1f
-        )
-        binding.onboardingButtonsDivider.alpha =
-            if (viewpager.currentItem == 0) 0f else 1f
 
         viewModel.endOnboarding.observe(this, { endOnboarding ->
             if (endOnboarding) {
@@ -94,14 +44,16 @@ class OnboardingActivity : AppCompatActivity() {
     private inner class OnboardingViewPagerAdapter(activity: AppCompatActivity) :
         FragmentStateAdapter(activity) {
 
-        override fun getItemCount() = 3
+        override fun getItemCount() = 5
 
         override fun createFragment(position: Int): Fragment {
             return when (position) {
-                0 -> OnboardingFragment.newInstance(R.layout.onboarding_title)
-                1 -> PreferenceFragment()
-                2 -> OnboardingFragment.newInstance(R.layout.onboarding_end)
-                else -> throw IllegalStateException("Invalid onboarding page: $position")
+                0 -> OnboardingTitleFragment()
+                1 -> OnboardingGridsFragment()
+                2 -> OnboardingAnglesFragment()
+                3 -> OnboardingEndFragment()
+                4 -> OnboardingNSFragment()
+                else -> RulerFragment()
             }
         }
     }

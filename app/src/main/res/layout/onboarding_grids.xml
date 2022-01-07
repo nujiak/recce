@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    tools:background="@color/colorPrimaryDark">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="32dp"
+        android:src="@drawable/ic_coord_sys" />
+
+    <TextView
+        style="@style/TextAppearance.MaterialComponents.Headline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:text="@string/coordinate_system"
+        android:textColor="@color/textColorLight" />
+
+    <TextView
+        style="@style/TextAppearance.Recce.Onboarding.Description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="@dimen/large_padding"
+        android:textColor="@color/textColorLight"
+        android:text="@string/coord_sys_description"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+            <RadioGroup
+                android:id="@+id/onboarding_grids_radio_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp">
+
+                <RadioButton
+                    android:id="@+id/onboarding_radio_utm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/colorPrimaryLight"
+                    android:textColor="@color/textColorLight"
+                    android:text="@string/utm" />
+
+                <RadioButton
+                    android:id="@+id/onboarding_radio_mgrs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/colorPrimaryLight"
+                    android:textColor="@color/textColorLight"
+                    android:text="@string/mgrs" />
+
+                <RadioButton
+                    android:id="@+id/onboarding_radio_kertau"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/colorPrimaryLight"
+                    android:textColor="@color/textColorLight"
+                    android:text="@string/kertau_full" />
+
+                <RadioButton
+                    android:id="@+id/onboarding_radio_latlng"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/colorPrimaryLight"
+                    android:textColor="@color/textColorLight"
+                    android:text="@string/lat_lng_full" />
+            </RadioGroup>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/large_padding">
+
+
+        <Button
+            android:id="@+id/onboarding_grids_prev"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="@string/previous"
+            android:textColor="@color/colorPrimaryLight"  />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/onboarding_grids_next"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="@string/next_angle_unit"
+            android:textColor="@color/textColorLight"/>
+    </LinearLayout>
+</LinearLayout>

@@ -11,8 +11,7 @@
     app:cardCornerRadius="16dp"
     app:cardElevation="1dp"
     app:cardPreventCornerOverlap="true"
-    app:strokeWidth="2dp"
-    tools:strokeColor="@color/tagRed">
+    tools:cardBackgroundColor="@color/tagRed">
 
     <ImageView
         android:id="@+id/route_icon"
@@ -49,12 +48,38 @@
             android:gravity="end"
             android:orientation="horizontal">
 
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/pin_group"
+                    style="@style/Theme.Recce.Tags"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/tag_background"
+                    android:elevation="0dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxWidth="100sp"
+                    android:maxLines="1"
+                    android:paddingStart="@dimen/tiny_padding"
+                    android:paddingEnd="@dimen/tiny_padding"
+                    android:textAllCaps="true"
+                    android:textStyle="bold"
+                    tools:text="Buildings"
+                    tools:textColor="#000000" />
+            </FrameLayout>
+
             <Button
                 android:id="@+id/pin_map"
                 style="@style/Widget.Recce.Button.TextButton.IconOnly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_map_white_24dp"/>
+                app:icon="@drawable/ic_map_white_24dp"
+                app:iconTint="@android:color/white" />
 
             <Button
                 android:id="@+id/pin_edit"
@@ -62,8 +87,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                app:icon="@drawable/ic_baseline_edit_24"/>
+                app:icon="@drawable/ic_baseline_edit_24"
+                app:iconTint="@android:color/white" />
         </LinearLayout>
+
 
         <TextView
             android:id="@+id/pin_name"
@@ -72,9 +99,12 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="bottom"
+            android:lines="2"
+            android:maxLines="2"
             android:paddingStart="@dimen/large_padding"
+            android:paddingTop="@dimen/small_padding"
             android:paddingEnd="@dimen/large_padding"
-            android:textColor="?android:attr/textColorPrimary"
+            android:paddingBottom="@dimen/small_padding"
             tools:text="Name" />
 
         <ScrollView
@@ -84,6 +114,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/pin_background_lower"
                 android:orientation="vertical">
 
 
@@ -95,8 +126,7 @@
                     android:layout_marginStart="@dimen/large_padding"
                     android:layout_marginTop="@dimen/small_padding"
                     android:layout_marginEnd="@dimen/large_padding"
-                    android:text="@string/description"
-                    android:textColor="?android:attr/textColorPrimary" />
+                    android:text="@string/description" />
 
                 <TextView
                     android:id="@+id/chain_description"
@@ -105,8 +135,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/large_padding"
                     android:layout_marginEnd="@dimen/large_padding"
-                    tools:text="Description of the chain"
-                    android:textColor="?android:attr/textColorPrimary" />
+                    tools:text="Description of the chain" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -116,7 +145,7 @@
                     android:paddingStart="@dimen/large_padding"
                     android:paddingTop="@dimen/small_padding"
                     android:paddingEnd="@dimen/large_padding"
-                    android:paddingBottom="@dimen/large_padding"
+                    android:paddingBottom="@dimen/small_padding"
                     tools:ignore="RtlSymmetry">
 
 
@@ -124,16 +153,14 @@
                         style="@style/TextAppearance.Recce.NumberHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/checkpoints"
-                        android:textColor="?android:attr/textColorPrimary" />
+                        android:text="@string/checkpoints" />
 
                     <TextView
                         android:id="@+id/chain_checkpoints"
                         style="@style/TextAppearance.Recce.Number"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        tools:text="Audi, Benz, Chevy"
-                        android:textColor="?android:attr/textColorPrimary" />
+                        tools:text="Audi, Benz, Chevy" />
 
                     <TextView
                         android:id="@+id/chain_distance_desc"
@@ -141,33 +168,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/small_padding"
-                        android:text="@string/distance"
-                        android:textColor="?android:attr/textColorPrimary" />
+                        android:text="@string/distance" />
 
                     <TextView
                         android:id="@+id/chain_distance"
                         style="@style/TextAppearance.Recce.Number"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        tools:text="395930 503850"
-                        android:textColor="?android:attr/textColorPrimary" />
+                        tools:text="395930 503850" />
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
-        <TextView
-            android:id="@+id/pin_group"
-            style="@style/Theme.Recce.Tags"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/tag_background"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:maxLines="1"
-            android:paddingTop="@dimen/tiny_padding"
-            android:paddingBottom="@dimen/tiny_padding"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textStyle="italic"
-            tools:backgroundTint="@color/tagRed"
-            tools:text="Buildings"/>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

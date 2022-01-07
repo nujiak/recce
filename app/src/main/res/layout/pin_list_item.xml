@@ -7,39 +7,66 @@
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/tiny_padding"
     android:elevation="2dp"
-    app:cardCornerRadius="@dimen/large_padding"
-    app:cardElevation="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="1dp"
     app:cardPreventCornerOverlap="true"
-    app:strokeWidth="1dp"
-    tools:strokeColor="@color/tagRed">
+    tools:cardBackgroundColor="@color/tagRed">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/pin_group"
+            style="@style/Theme.Recce.Tags"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/small_padding"
+            android:background="@drawable/tag_background"
+            android:elevation="0dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxWidth="100sp"
+            android:maxLines="1"
+            android:paddingStart="@dimen/tiny_padding"
+            android:paddingEnd="@dimen/tiny_padding"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            tools:text="Buildings"
+            tools:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/pin_name"
+            style="@style/TextAppearance.Recce.PinName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="bottom"
+            android:lines="2"
+            android:maxLines="2"
+            android:paddingStart="@dimen/large_padding"
+            android:paddingTop="@dimen/small_padding"
+            android:paddingEnd="@dimen/large_padding"
+            android:paddingBottom="@dimen/small_padding"
+            tools:text="Name" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/pin_background_lower"
             android:orientation="vertical"
-            android:padding="@dimen/large_padding">
-
+            android:paddingStart="@dimen/large_padding"
+            android:paddingTop="@dimen/small_padding"
+            android:paddingBottom="@dimen/small_padding"
+            tools:ignore="RtlSymmetry">
             <TextView
-                android:id="@+id/pin_name"
-                style="@style/TextAppearance.Recce.PinName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/small_padding"
-                android:ellipsize="end"
-                android:textColor="?android:attr/textColorPrimary"
-                tools:text="Name" />
-
-            <TextView
-                android:id="@+id/pin_grid_system"
                 style="@style/TextAppearance.Recce.NumberHeader"
+                android:id="@+id/pin_grid_system"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorPrimary"
+                app:fontFamily="@font/open_sans"
                 tools:text="@string/utm" />
 
             <TextView
@@ -47,25 +74,8 @@
                 style="@style/TextAppearance.Recce.Number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorPrimary"
                 tools:text="395930 503850" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/pin_group"
-            style="@style/Theme.Recce.Tags"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/tag_background"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:maxLines="1"
-            android:paddingTop="@dimen/tiny_padding"
-            android:paddingBottom="@dimen/tiny_padding"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textStyle="italic"
-            tools:backgroundTint="@color/tagRed"
-            tools:text="Buildings"/>
     </LinearLayout>
 
     <View

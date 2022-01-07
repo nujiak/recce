@@ -1,57 +1,37 @@
 package com.nujiak.recce.enums
 
-import androidx.annotation.StringRes
-import com.nujiak.recce.R
 import java.lang.IllegalArgumentException
 
 /**
  * Coordinate System used by the application
  *
- * The ordering of the enums affects the ordering of the coordinate system in the app
- *
  * @property index index of the coordinate system in any collection
  */
-enum class CoordinateSystem(@StringRes val shortName: Int, @StringRes val fullName: Int) {
+enum class CoordinateSystem(val index: Int) {
     /**
      * Universal Traverse Mercator
      */
-    UTM(R.string.utm, R.string.utm_full),
+    UTM(0),
 
     /**
      * Military Grid Reference System
      */
-    MGRS(R.string.mgrs, R.string.mgrs_full),
+    MGRS(1),
+
+    /**
+     * Kertau 1948
+     */
+    KERTAU(2),
 
     /**
      * World Geodetic System 1984
      *
      * Used in Google Maps
      */
-    WGS84(R.string.wgs_84, R.string.wgs_84),
-
-    /**
-     * Kertau 1948
-     */
-    KERTAU(R.string.kertau, R.string.kertau),
-
-    /**
-     * Ordnance Survey National Grid / British National Grid (BNG)
-     */
-    BNG(R.string.bng, R.string.bng_full),
-
-    /**
-     * Maidenhead Locator System (QTH Locator)
-     */
-    QTH(R.string.qth, R.string.qth_full),
-
-    ;
+    WGS84(3);
 
     companion object {
-        private val map = values().withIndex().associateBy { it.index }
-        private val indices = values().withIndex().associateBy { it.value }
-
-        val shortNames: List<Int> = values().map(CoordinateSystem::shortName)
-        val fullNames = values().map(CoordinateSystem::fullName)
+        private val map = values().associateBy(CoordinateSystem::index)
 
         /**
          * Returns the [CoordinateSystem] at the given index
@@ -60,13 +40,7 @@ enum class CoordinateSystem(@StringRes val shortName: Int, @StringRes val fullNa
          * @return
          */
         fun atIndex(index: Int): CoordinateSystem {
-            return map[index]?.value ?: throw IllegalArgumentException("Invalid CoordinateSystem index: $index")
+            return map[index] ?: throw IllegalArgumentException("Invalid CoordinateSystem index: $index")
         }
     }
-
-    /**
-     * The index of the [CoordinateSystem]
-     */
-    val index: Int
-        get() = indices[this]!!.index
 }
