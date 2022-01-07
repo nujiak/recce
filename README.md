@@ -60,7 +60,7 @@ Share Code allows conveninent exporting and importing of points, routes and area
 2. **Universal Traverse Mercator (UTM)**. Automatic zone/band detection and conversion.
 3. **Military Grid Reference System (MGRS)**. Only for UTM coverage, does not include UPS. Automatic zone, band, row letter and column letter detection and conversion.
 4. **Kertau 1948**. Used in West Malaysia and Singapore.
-5. **British National Grid**. As specified in [EPSG:27700](https://epsg.org/crs_27700/OSGB36-British-National-Grid.html) with 2 letters and 10 digits.
+5. **British National Grid (EPSG:27700)**. 2 grid letters and 10 grid digits.
 6. **Maidenhead Locator System (QTH Locator)**. Up to 8 digits.
 
 Since *Recce* uses `Proj4J`, new systems can be added easily in the future (see [Libraries](#libraries))
