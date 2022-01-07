@@ -6,11 +6,6 @@ apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'kotlinx-serialization'
 
 android {
-    signingConfigs {
-        debug {
-            storeFile file('D:\\OneDrive\\Documents\\AndroidProjects\\Reconnaissance\\keystore.jks')
-        }
-    }
     compileSdkVersion 31
     buildToolsVersion '30.0.2'
 
