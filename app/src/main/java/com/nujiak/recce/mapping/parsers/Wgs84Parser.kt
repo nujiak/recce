@@ -7,8 +7,8 @@ import com.nujiak.recce.mapping.Coordinate
  * Parses WGS 84 coordinates
  */
 object Wgs84Parser : Parser {
-    private val regex1 = Regex("^\\s*([0123456789.]+)([NSns])\\s*([0123456789.]+)([EWew])\\s*$")
-    private val regex2 = Regex("^\\s*([-+0123456789.]+)\\s+([-+0123456789.]+)\\s*$")
+    private val regex1 = Regex("^\\s*([0123456789.]+)\\s*°?\\s*([NSns])\\s*([0123456789.]+)\\s*°?\\s*([EWew])\\s*$")
+    private val regex2 = Regex("^\\s*([-+0123456789.]+)\\s*°?\\s+([-+0123456789.]+)\\s*°?\\s*$")
 
     private fun checkRegex1(s: String): LatLng? {
         val match = regex1.find(s.uppercase()) ?: return null
