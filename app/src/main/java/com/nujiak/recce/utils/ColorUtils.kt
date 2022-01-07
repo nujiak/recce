@@ -1,5 +1,6 @@
 package com.nujiak.recce.utils
 
+import android.graphics.Color
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.nujiak.recce.R
 
@@ -12,14 +13,6 @@ val COLORS = arrayOf(
     "Green",
     "Blue",
     "Purple"
-)
-
-val PIN_COLOR_HUES = arrayOf(
-    BitmapDescriptorFactory.HUE_RED,
-    BitmapDescriptorFactory.HUE_ORANGE,
-    BitmapDescriptorFactory.HUE_GREEN,
-    BitmapDescriptorFactory.HUE_AZURE,
-    BitmapDescriptorFactory.HUE_VIOLET
 )
 
 val PIN_CARD_BACKGROUNDS = arrayOf(
@@ -44,3 +37,11 @@ val PIN_VECTOR_DRAWABLE = arrayOf(
     R.drawable.ic_map_pin_azure,
     R.drawable.ic_map_pin_violet
 )
+
+fun withAlpha(color: Int, alpha: Int): Int {
+    val r = Color.red(color)
+    val g = Color.green(color)
+    val b = Color.blue(color)
+
+    return Color.argb(alpha, r, g, b)
+}

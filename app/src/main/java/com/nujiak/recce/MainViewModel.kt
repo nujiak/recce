@@ -569,11 +569,6 @@ class MainViewModel @Inject constructor(
     val isInPolylineMode: LiveData<Boolean> = chainPlot.map { it.size > 0 }
 
     /**
-     * List of the points added to the polyline while the map is in polyline mode
-     */
-    val currentPolylinePoints = mutableListOf<ChainNode>()
-
-    /**
      * Backing property for [toUndoPolyline]
      */
     private val _toUndoPolyline = MutableLiveData(false)
