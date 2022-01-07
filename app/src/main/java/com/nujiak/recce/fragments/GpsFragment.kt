@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.nujiak.recce.MainViewModel
-import com.nujiak.recce.R
 import com.nujiak.recce.databinding.FragmentGpsBinding
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.livedatas.FusedLocationLiveData
@@ -54,7 +53,7 @@ class GpsFragment : Fragment() {
         // Observe for preferences changes
         viewModel.coordinateSystem.observe(viewLifecycleOwner, {
             binding.gpsGridSystem.text =
-                resources.getStringArray(R.array.coordinate_systems)[it.index]
+                resources.getString(CoordinateSystem.shortNames[it.index])
             updateLocationUI()
         })
         viewModel.angleUnit.observe(viewLifecycleOwner, {

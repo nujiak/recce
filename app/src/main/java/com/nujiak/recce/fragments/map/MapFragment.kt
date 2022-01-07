@@ -496,7 +496,7 @@ class MapFragment :
 
     private fun updateCardGridSystem(coordSys: CoordinateSystem) {
         binding.mapGridSystem.text =
-            resources.getStringArray(R.array.coordinate_systems)[coordSys.index]
+            resources.getString(coordSys.shortName)
     }
 
     private fun onAddPinFromMap(): Boolean {
