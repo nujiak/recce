@@ -1,10 +1,7 @@
 <h1 align="center">
+  <img src="docs/banner.png"/>
 
-  [![MegaLinter](https://github.com/nujiak/recce/workflows/MegaLinter/badge.svg?branch=master)](https://github.com/nujiak/recce/actions?query=workflow%3AMegaLinter+branch%3Amaster)
-
-  <img src="app/src/main/ic_launcher-playstore.png" width=160/>
-
-  <b><i>Recce</b></i>
+  [![MegaLinter](https://github.com/nujiak/recce/workflows/MegaLinter/badge.svg?branch=master)](https://github.com/nujiak/recce/actions?query=workflow%3AMegaLinter+branch%3Amaster) ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/nujiak/recce?color=brightgreen&include_prereleases)
 </h1>
 
 *Recce* is a *Map Planning and Navigation* app for Android. It supports 6 commonly-used geographic/projected coordinate systems (see [Supported GCS/PCS](#supported-gcspcs)) and offers coordinate transformations in real-time.
