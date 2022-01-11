@@ -186,7 +186,7 @@ class MapFragment :
             setOnItemShownListener { itemView, _ ->
                 if (itemView.equals(lastShowcase)) {
                     val currentLatLng = mapMgr?.getCameraTarget() ?: return@setOnItemShownListener
-                    mapMgr?.stopShowingMyLocation()
+                    mapMgr?.onCameraMoveByUser()
                     mapMgr?.moveTo(LatLng(currentLatLng.latitude + 0.005, currentLatLng.longitude), duration = 700)
                 }
             }
@@ -370,7 +370,7 @@ class MapFragment :
         // Set up Go To sequence
         viewModel.mapGoTo.observe(viewLifecycleOwner) {
             mapMgr?.moveTo(target = it)
-            mapMgr?.stopShowingMyLocation()
+            mapMgr?.onCameraMoveByUser()
         }
 
         if (viewModel.isLocationGranted) {
@@ -557,9 +557,11 @@ class MapFragment :
      * @param chain
      */
     private fun focusOn(chain: Chain) {
+        updatePoiInfobar(chain)
+        togglePoiInfobar(true)
         if (chain.cyclical) {
-            removeFocus()
             mapMgr?.moveTo(chain)
+            focusOn(chain.color)
         } else {
             focusOn(chain.nodes[0])
         }
@@ -646,6 +648,28 @@ class MapFragment :
         }
 
         updatePoiInfobar(name, checkpoint.parentChain?.color)
+    }
+
+    /**
+     * Updates the information in the POI infobar to show the details of a [Chain]
+     *
+     * @param checkpoint
+     */
+    private fun updatePoiInfobar(chain: Chain) {
+        if (chain.cyclical) {
+            // Area
+            binding.areaIcon.visibility = View.VISIBLE
+            binding.routeIcon.visibility = View.INVISIBLE
+        } else {
+            // Route
+            binding.areaIcon.visibility = View.INVISIBLE
+            binding.routeIcon.visibility = View.VISIBLE
+        }
+        binding.mapCheckpointInfobar.setOnClickListener {
+            viewModel.showChainInfo(chain.chainId)
+        }
+
+        updatePoiInfobar(chain.name, chain.color)
     }
 
     /**
@@ -1084,6 +1108,61 @@ class MapFragment :
         mapMgr.redrawCurrentPolyline()
     }
 
+    private fun tintCompass(toTint: Boolean) {
+        val lightGreen =
+            ContextCompat.getColor(requireContext(), R.color.colorPrimaryRipple)
+        val clear = ContextCompat.getColor(requireContext(), android.R.color.transparent)
+        if (toTint) {
+            animateColor(clear, lightGreen, 350) { color ->
+                val colorState = ColorStateList.valueOf(color)
+                binding.mapLocationButton.backgroundTintList = colorState
+                binding.mapCompass.foregroundTintList = colorState
+            }
+            val compass = binding.mapCompass
+
+            val green = ContextCompat.getColor(requireContext(), R.color.colorPrimary)
+            val white = ContextCompat.getColor(requireContext(), android.R.color.white)
+
+            animateColor(compass.backgroundTintList, green, 350) { color ->
+                binding.mapCompass.backgroundTintList = ColorStateList.valueOf(color)
+            }
+            animateColor(binding.mapCompassImg.imageTintList, white, 350) { color ->
+                binding.mapCompassImg.imageTintList = ColorStateList.valueOf(color)
+            }
+        } else {
+            animateColor(lightGreen, clear, 350) { color ->
+                val colorState = ColorStateList.valueOf(color)
+                binding.mapLocationButton.backgroundTintList = colorState
+                binding.mapCompass.foregroundTintList = colorState
+            }
+
+            val compass = binding.mapCompass
+            val colorSurfaceTypedValue = TypedValue()
+            val colorOnSurfaceTypedValue = TypedValue()
+
+            requireContext().theme.resolveAttribute(
+                R.attr.colorSurface,
+                colorSurfaceTypedValue,
+                true
+            )
+            requireContext().theme.resolveAttribute(
+                R.attr.colorOnSurface,
+                colorOnSurfaceTypedValue,
+                true
+            )
+
+            val colorSurface = ContextCompat.getColor(requireContext(), colorSurfaceTypedValue.resourceId)
+            val colorOnSurface = ContextCompat.getColor(requireContext(), colorOnSurfaceTypedValue.resourceId)
+
+            animateColor(compass.backgroundTintList, colorSurface, 350) { color ->
+                binding.mapCompass.backgroundTintList = ColorStateList.valueOf(color)
+            }
+            animateColor(binding.mapCompassImg.imageTintList, colorOnSurface, 350) { color ->
+                binding.mapCompassImg.imageTintList = ColorStateList.valueOf(color)
+            }
+        }
+    }
+
     /**
      * Functions below are to forward lifecycle
      * events to MapView
@@ -1125,6 +1204,15 @@ class MapFragment :
         binding.mapView.onResume()
     }
 
+    private enum class MapState {
+        SHOWING_PIN,
+        SHOWING_CHAIN,
+        SHOWING_CHECKPOINT,
+        SHOWING_MY_LOCATION,
+        SHOWING_MY_LOCATION_ROTATION,
+        FREE_MOVEMENT,
+    }
+
     /**
      * Abstracts the operations of the map to handle movements and animations
      *
@@ -1147,74 +1235,19 @@ class MapFragment :
         private var directionUpdateSum = 0f
         private var directionUpdateCount = 0
 
-        private var isShowingPin = false
-        private var isShowingMyLocation = false
-            private set(value) {
+        @Volatile private var mapState = MapState.FREE_MOVEMENT
+            set(value) {
                 if (field == value) {
                     return
                 }
-                if (!value) {
-                    isShowingMyLocationRotation = false
+                if (field == MapState.SHOWING_MY_LOCATION && value == MapState.SHOWING_MY_LOCATION_ROTATION) {
+                    tintCompass(true)
+                } else if (field == MapState.SHOWING_MY_LOCATION_ROTATION) {
+                    tintCompass(false)
                 }
                 field = value
             }
-        private var isShowingMyLocationRotation = false
-            private set(value) {
-                val lightGreen =
-                    ContextCompat.getColor(requireContext(), R.color.colorPrimaryRipple)
-                val clear = ContextCompat.getColor(requireContext(), android.R.color.transparent)
-                if (value && field != value) {
-                    animateColor(clear, lightGreen, 350) { color ->
-                        val colorState = ColorStateList.valueOf(color)
-                        binding.mapLocationButton.backgroundTintList = colorState
-                        binding.mapCompass.foregroundTintList = colorState
-                    }
-                    val compass = binding.mapCompass
 
-                    val green = ContextCompat.getColor(requireContext(), R.color.colorPrimary)
-                    val white = ContextCompat.getColor(requireContext(), android.R.color.white)
-
-                    animateColor(compass.backgroundTintList, green, 350) { color ->
-                        binding.mapCompass.backgroundTintList = ColorStateList.valueOf(color)
-                    }
-                    animateColor(binding.mapCompassImg.imageTintList, white, 350) { color ->
-                        binding.mapCompassImg.imageTintList = ColorStateList.valueOf(color)
-                    }
-                } else if (!value && field != value) {
-                    animateColor(lightGreen, clear, 350) { color ->
-                        val colorState = ColorStateList.valueOf(color)
-                        binding.mapLocationButton.backgroundTintList = colorState
-                        binding.mapCompass.foregroundTintList = colorState
-                    }
-
-                    val compass = binding.mapCompass
-                    val colorSurfaceTypedValue = TypedValue()
-                    val colorOnSurfaceTypedValue = TypedValue()
-
-                    requireContext().theme.resolveAttribute(
-                        R.attr.colorSurface,
-                        colorSurfaceTypedValue,
-                        true
-                    )
-                    requireContext().theme.resolveAttribute(
-                        R.attr.colorOnSurface,
-                        colorOnSurfaceTypedValue,
-                        true
-                    )
-
-                    val colorSurface = ContextCompat.getColor(requireContext(), colorSurfaceTypedValue.resourceId)
-                    val colorOnSurface = ContextCompat.getColor(requireContext(), colorOnSurfaceTypedValue.resourceId)
-
-                    animateColor(compass.backgroundTintList, colorSurface, 350) { color ->
-                        binding.mapCompass.backgroundTintList = ColorStateList.valueOf(color)
-                    }
-                    animateColor(binding.mapCompassImg.imageTintList, colorOnSurface, 350) { color ->
-                        binding.mapCompassImg.imageTintList = ColorStateList.valueOf(color)
-                    }
-                }
-                field = value
-            }
-        private var isShowingCheckpoint = false
         @Volatile private var zoomStack = 0f
 
         private var isAnimating = false
@@ -1257,27 +1290,27 @@ class MapFragment :
         }
 
         /**
-         * Shows the live measurement bar and sets [isShowingMyLocation] to false
+         * Shows the live measurement bar and sets [mapState] to [MapState.FREE_MOVEMENT]
          *
          * Called when the user moves the map.
          *
          */
         fun onCameraMoveByUser() {
-            if (isShowingPin) {
+            if (mapState == MapState.SHOWING_PIN) {
                 return
             }
 
-            mapMgr?.isShowingMyLocation = false
+            mapState = MapState.FREE_MOVEMENT
             toggleLiveMeasurement(true)
         }
 
         /**
-         * Returns the target destination lat lng if [isShowingPin], otherwise returns the map camera target lat lng
+         * Returns the target destination lat lng if showing pin, otherwise returns the map camera target lat lng
          *
          * @return
          */
         fun getCameraTarget(): LatLng {
-            return if (isShowingPin) {
+            return if (mapState == MapState.SHOWING_PIN) {
                 LatLng(targetPosition.target.latitude, targetPosition.target.longitude)
             } else {
                 LatLng(map.cameraPosition.target.latitude, map.cameraPosition.target.longitude)
@@ -1365,9 +1398,7 @@ class MapFragment :
          * @param pin
          */
         fun moveTo(pin: Pin) {
-            isShowingPin = true
-            isShowingCheckpoint = false
-            isShowingMyLocation = false
+            mapState = MapState.SHOWING_PIN
             moveTo(target = LatLng(pin.latitude, pin.longitude))
         }
 
@@ -1377,9 +1408,7 @@ class MapFragment :
          * @param chain route or area
          */
         fun moveTo(chain: Chain) {
-            isShowingCheckpoint = false
-            isShowingPin = false
-            isShowingMyLocation = false
+            mapState = MapState.SHOWING_CHAIN
             val nodes = chain.nodes
             if (chain.cyclical) {
                 // Area
@@ -1389,8 +1418,9 @@ class MapFragment :
                     }
                 }.build()
                 val padding = resources.dpToPx(64f)
+                val update = CameraUpdateFactory.newLatLngBounds(bounds, padding.toInt())
                 map.animateCamera(
-                    CameraUpdateFactory.newLatLngBounds(bounds, padding.toInt()),
+                    update,
                     350,
                     null
                 )
@@ -1406,9 +1436,7 @@ class MapFragment :
          * @param node
          */
         fun moveTo(node: ChainNode) {
-            isShowingPin = true
-            isShowingCheckpoint = true
-            isShowingMyLocation = false
+            mapState = MapState.SHOWING_CHECKPOINT
             moveTo(target = LatLng(node.position.latitude, node.position.longitude))
         }
 
@@ -1566,7 +1594,7 @@ class MapFragment :
                     duration = 750
                     addUpdateListener {
                         val newPosition = it.animatedValue as LatLng
-                        if (isShowingMyLocation) {
+                        if (mapState == MapState.SHOWING_MY_LOCATION) {
                             moveTo(
                                 target = newPosition,
                                 duration = 0,
@@ -1650,7 +1678,7 @@ class MapFragment :
         }
 
         fun zoomIn() {
-            if (isShowingMyLocationRotation) {
+            if (mapState == MapState.SHOWING_MY_LOCATION_ROTATION) {
                 moveTo(
                     zoom = targetPosition.zoom + 1,
                     duration = 0,
@@ -1676,7 +1704,7 @@ class MapFragment :
         }
 
         fun zoomOut() {
-            if (isShowingMyLocationRotation) {
+            if (mapState == MapState.SHOWING_MY_LOCATION_ROTATION) {
                 moveTo(
                     zoom = targetPosition.zoom - 1,
                     duration = 0,
@@ -1703,18 +1731,18 @@ class MapFragment :
 
         private val goToMyLocationOnFinish = {
             toggleLiveMeasurement(false)
-            isShowingMyLocation = true
+            mapState = MapState.SHOWING_MY_LOCATION
         }
 
         fun goToMyLocation(resetRotation: Boolean) {
 
             var newBearing = map.cameraPosition.bearing
 
-            if (isShowingMyLocationRotation) {
-                isShowingMyLocationRotation = false
+            if (mapState == MapState.SHOWING_MY_LOCATION_ROTATION) {
+                mapState = MapState.SHOWING_MY_LOCATION
                 newBearing = 0f
-            } else if (isShowingMyLocation && !resetRotation) {
-                isShowingMyLocationRotation = true
+            } else if (mapState == MapState.SHOWING_MY_LOCATION && !resetRotation) {
+                mapState = MapState.SHOWING_MY_LOCATION_ROTATION
             }
             val location = viewModel.fusedLocationData.value
             if (location != null) {
@@ -1726,7 +1754,7 @@ class MapFragment :
                         duration = 500,
                         onAnimFinish = goToMyLocationOnFinish
                     )
-                    isShowingMyLocationRotation -> {
+                    mapState == MapState.SHOWING_MY_LOCATION_ROTATION -> {
                         // Turn to direction of the myLocationDirection marker
                         val bearing = if (myLocationDirection != null) {
                             myLocationDirection!!.rotation + 90
@@ -1762,13 +1790,17 @@ class MapFragment :
         }
 
         fun resetMapRotation() {
-            isShowingMyLocationRotation = false
+            if (mapState == MapState.SHOWING_MY_LOCATION_ROTATION) {
+                mapState = MapState.SHOWING_MY_LOCATION
+            }
             moveTo(tilt = 0f, bearing = 0f)
         }
 
         fun removeFocus() {
-            isShowingPin = false
-            isShowingCheckpoint = false
+            when (mapState) {
+                MapState.SHOWING_PIN, MapState.SHOWING_CHAIN, MapState.SHOWING_CHECKPOINT -> mapState = MapState.FREE_MOVEMENT
+                else -> return
+            }
         }
 
         /**
@@ -1807,7 +1839,7 @@ class MapFragment :
 
                 animate(currentRotation, newRotation, 150, LinearInterpolator()) { rotation ->
                     marker.rotation = rotation
-                    if (isShowingMyLocationRotation) {
+                    if (mapState == MapState.SHOWING_MY_LOCATION_ROTATION) {
                         moveTo(
                             target = myLocationMarker?.position,
                             bearing = rotation + 90,
@@ -1826,10 +1858,6 @@ class MapFragment :
                 directionUpdateCount = 0
                 lastDirectionUpdate = currentTime
             }
-        }
-
-        fun stopShowingMyLocation() {
-            isShowingMyLocation = false
         }
     }
 }
