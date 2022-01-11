@@ -87,7 +87,7 @@
                     android:layout_marginStart="@dimen/large_padding"
                     android:layout_marginTop="@dimen/small_padding"
                     android:layout_marginEnd="@dimen/large_padding"
-                    android:textColor="?android:attr/textColorPrimary" />
+                    android:textColor="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/pin_description"
@@ -122,7 +122,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/wgs_84"
-                            android:textColor="?android:attr/textColorPrimary"
+                            android:textColor="?android:attr/textColorSecondary"
                             app:fontFamily="@font/open_sans" />
 
                         <TextView
@@ -141,7 +141,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/small_padding"
                             android:text="@string/mgrs"
-                            android:textColor="?android:attr/textColorPrimary"
+                            android:textColor="?android:attr/textColorSecondary"
                             app:fontFamily="@font/open_sans" />
 
                         <TextView
@@ -164,7 +164,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/utm"
-                            android:textColor="?android:attr/textColorPrimary"
+                            android:textColor="?android:attr/textColorSecondary"
                             app:fontFamily="@font/open_sans" />
 
                         <TextView
@@ -182,7 +182,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/small_padding"
                             android:text="@string/kertau"
-                            android:textColor="?android:attr/textColorPrimary"
+                            android:textColor="?android:attr/textColorSecondary"
                             app:fontFamily="@font/open_sans" />
 
                         <TextView

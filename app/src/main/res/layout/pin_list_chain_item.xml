@@ -58,7 +58,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/checkpoints"
-                    android:textColor="?android:attr/textColorPrimary"/>
+                    android:textColor="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/chain_checkpoints"
@@ -75,7 +75,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/small_padding"
                     android:text="@string/distance"
-                    android:textColor="?android:attr/textColorPrimary"/>
+                    android:textColor="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/chain_distance"

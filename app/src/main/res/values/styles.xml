@@ -110,6 +110,7 @@
     <style name="TextAppearance.Recce.GpsSectionHeader" parent="TextAppearance.MaterialComponents.Headline5"/>
     <style name="TextAppearance.Recce.GpsHeader" parent="TextAppearance.MaterialComponents.Subtitle1">
         <item name="fontFamily">@font/open_sans_semibold</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
     <style name="TextAppearance.Recce.GpsNumber" parent="TextAppearance.MaterialComponents.Headline6"/>

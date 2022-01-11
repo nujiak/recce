@@ -39,7 +39,7 @@
                 style="@style/TextAppearance.Recce.NumberHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorPrimary"
+                android:textColor="?android:attr/textColorSecondary"
                 tools:text="@string/utm" />
 
             <TextView

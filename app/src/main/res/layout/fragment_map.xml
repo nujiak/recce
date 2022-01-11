@@ -313,7 +313,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/small_padding"
                     android:text="@string/utm"
-                    android:textColor="?android:attr/textColorPrimary" />
+                    android:textColor="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/map_current_grids"
