@@ -21,13 +21,6 @@ val PIN_CARD_BACKGROUNDS = arrayOf(
     R.color.tagAzure,
     R.color.tagViolet
 )
-val PIN_CARD_DARK_BACKGROUNDS = arrayOf(
-    R.color.tagRedDark,
-    R.color.tagOrangeDark,
-    R.color.tagGreenDark,
-    R.color.tagAzureDark,
-    R.color.tagVioletDark
-)
 
 val PIN_VECTOR_DRAWABLE = arrayOf(
     R.drawable.ic_map_pin_red,

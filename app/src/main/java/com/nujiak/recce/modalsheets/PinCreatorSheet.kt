@@ -26,7 +26,7 @@ import com.nujiak.recce.databinding.SheetPinCreatorBinding
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.mapping.Mapping
 import com.nujiak.recce.utils.COLORS
-import com.nujiak.recce.utils.PIN_CARD_DARK_BACKGROUNDS
+import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.animateColor
 import com.nujiak.recce.utils.dpToPx
 import dagger.hilt.android.AndroidEntryPoint
@@ -267,7 +267,7 @@ class PinCreatorSheet : BottomSheetDialogFragment() {
 
     private fun updateSheetColor(colorIdx: Int = 0) {
         context?.let {
-            val color = ContextCompat.getColor(it, PIN_CARD_DARK_BACKGROUNDS[colorIdx])
+            val color = ContextCompat.getColor(it, PIN_CARD_BACKGROUNDS[colorIdx])
 
             animateColor(binding.root.background, color, 150) { intermediateColor ->
                 binding.root.setBackgroundColor(intermediateColor)
