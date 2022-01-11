@@ -1300,6 +1300,8 @@ class MapFragment :
                 return
             }
 
+            targetPosition = map.cameraPosition
+
             mapState = MapState.FREE_MOVEMENT
             toggleLiveMeasurement(true)
         }
