@@ -55,27 +55,28 @@
                 app:icon="@drawable/ic_baseline_edit_24" />
         </LinearLayout>
 
-
-        <TextView
-            android:id="@+id/pin_name"
-            style="@style/TextAppearance.Recce.PinName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:gravity="bottom"
-            android:layout_marginStart="@dimen/large_padding"
-            android:layout_marginEnd="@dimen/large_padding"
-            android:textColor="?android:attr/textColorPrimary"
-            tools:text="Name" />
-
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:overScrollMode="never">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/pin_name"
+                    style="@style/TextAppearance.Recce.PinName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="bottom"
+                    android:layout_marginStart="@dimen/large_padding"
+                    android:layout_marginEnd="@dimen/large_padding"
+                    android:textColor="?android:attr/textColorPrimary"
+                    tools:text="Name" />
 
 
                 <TextView
@@ -99,117 +100,28 @@
                     tools:text="Description of the pin"
                     android:textColor="?android:attr/textColorPrimary" />
 
-                <LinearLayout
+                <GridLayout
+                    android:id="@+id/pin_grid_layout"
+                    android:layout_width="match_parent"
+                    android:padding="@dimen/small_padding"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/pin_group"
+                    style="@style/Theme.Recce.Tags"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:baselineAligned="false"
-                    android:orientation="horizontal"
-                    android:paddingStart="@dimen/large_padding"
-                    android:paddingTop="@dimen/small_padding"
-                    android:paddingEnd="@dimen/large_padding"
-                    android:paddingBottom="@dimen/large_padding"
+                    android:background="@drawable/tag_background"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingTop="@dimen/tiny_padding"
+                    android:paddingBottom="@dimen/tiny_padding"
                     android:textColor="?android:attr/textColorPrimary"
-                    tools:ignore="RtlSymmetry">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            style="@style/TextAppearance.Recce.NumberHeader"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/wgs_84"
-                            android:textColor="?android:attr/textColorSecondary"
-                            app:fontFamily="@font/open_sans" />
-
-                        <TextView
-                            android:id="@+id/pin_lat_lng"
-                            style="@style/TextAppearance.Recce.Number"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="none"
-                            android:singleLine="true"
-                            android:textColor="?android:attr/textColorPrimary"
-                            tools:text="1.363566 103.245243" />
-
-                        <TextView
-                            style="@style/TextAppearance.Recce.NumberHeader"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/small_padding"
-                            android:text="@string/mgrs"
-                            android:textColor="?android:attr/textColorSecondary"
-                            app:fontFamily="@font/open_sans" />
-
-                        <TextView
-                            android:id="@+id/pin_mgrs_grid"
-                            style="@style/TextAppearance.Recce.Number"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="?android:attr/textColorPrimary"
-                            tools:text="395930 503850" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/large_padding"
-                        android:orientation="vertical">
-
-                        <TextView
-                            style="@style/TextAppearance.Recce.NumberHeader"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/utm"
-                            android:textColor="?android:attr/textColorSecondary"
-                            app:fontFamily="@font/open_sans" />
-
-                        <TextView
-                            android:id="@+id/pin_utm_grid"
-                            style="@style/TextAppearance.Recce.Number"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="?android:attr/textColorPrimary"
-                            tools:text="395930 503850" />
-
-
-                        <TextView
-                            style="@style/TextAppearance.Recce.NumberHeader"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/small_padding"
-                            android:text="@string/kertau"
-                            android:textColor="?android:attr/textColorSecondary"
-                            app:fontFamily="@font/open_sans" />
-
-                        <TextView
-                            android:id="@+id/pin_kertau_grid"
-                            style="@style/TextAppearance.Recce.Number"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="?android:attr/textColorPrimary"
-                            tools:text="395930 503850" />
-                    </LinearLayout>
-                </LinearLayout>
+                    android:textStyle="italic"
+                    tools:backgroundTint="@color/tagRed"
+                    tools:text="Buildings"/>
             </LinearLayout>
         </ScrollView>
-        <TextView
-            android:id="@+id/pin_group"
-            style="@style/Theme.Recce.Tags"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/tag_background"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:maxLines="1"
-            android:paddingTop="@dimen/tiny_padding"
-            android:paddingBottom="@dimen/tiny_padding"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textStyle="italic"
-            tools:backgroundTint="@color/tagRed"
-            tools:text="Buildings"/>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
