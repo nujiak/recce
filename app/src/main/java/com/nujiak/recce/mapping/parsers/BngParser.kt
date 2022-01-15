@@ -8,7 +8,7 @@ import com.nujiak.recce.mapping.intsFromGridString
 /**
  * Parses BNG grids
  */
-object BngParser : Parser {
+object BngParser : Parser() {
 
     private val utmRegex = Regex("(^[JHONST])([A-HJ-Z])(\\d{1,12})$")
 

@@ -2,12 +2,21 @@ package com.nujiak.recce.mapping.parsers
 
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.mapping.Coordinate
+import java.text.NumberFormat
 
 /**
  * Parses an input coordinate string to a [Coordinate]
  */
-sealed interface Parser {
-    fun parse(s: String): Coordinate?
+abstract class Parser {
+    abstract fun parse(s: String): Coordinate?
+
+    protected fun String.toDoubleOrNull(numberFormat: NumberFormat): Double? {
+        return try {
+            numberFormat.parse(this)?.toDouble()
+        } catch (e: NumberFormatException) {
+            null
+        }
+    }
 
     companion object {
         /**

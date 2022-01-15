@@ -8,7 +8,7 @@ import kotlin.math.pow
 /**
  * Parses Kertau 1948 grids
  */
-object KertauParser : Parser {
+object KertauParser : Parser() {
     override fun parse(s: String): Coordinate? {
         val groups = s.trim().split("[,;\\s]+".toRegex())
         if (groups.size != 2) {

@@ -8,7 +8,7 @@ import com.nujiak.recce.mapping.intsFromGridString
 /**
  * Parses UTM grids
  */
-object UtmParser : Parser {
+object UtmParser : Parser() {
 
     private val utmRegex = Regex("(^\\d{1,2})([NSns])(\\d{1,12})$")
 
