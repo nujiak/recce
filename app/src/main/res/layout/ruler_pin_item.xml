@@ -10,7 +10,6 @@
     app:cardCornerRadius="16dp"
     app:cardElevation="4dp"
     app:cardPreventCornerOverlap="true"
-    app:strokeColor="@color/pinDetailShade"
     app:strokeWidth="2dp">
 
     <LinearLayout

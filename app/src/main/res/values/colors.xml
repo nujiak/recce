@@ -11,19 +11,13 @@
 
     <color name="myLocationFill">#33178520</color>
 
-    <color name="pinDetailShade">#40000000</color>
+    <color name="shade">#3F000000</color>
     <color name="pinSelectionShade">#7F000000</color>
 
-    <color name="tagRed">#F53D3D</color>
-    <color name="tagOrange">#F5993D</color>
-    <color name="tagGreen">#66CC66</color>
-    <color name="tagAzure">#4799EB</color>
-    <color name="tagViolet">#A64DFF</color>
-
-    <color name="tagRedDark">#661A1A</color>
-    <color name="tagOrangeDark">#66401A</color>
-    <color name="tagGreenDark">#1A661A</color>
-    <color name="tagAzureDark">#1A4066</color>
-    <color name="tagVioletDark">#401A66</color>
+    <color name="tagRed">#EF5350</color>
+    <color name="tagOrange">#FFA726</color>
+    <color name="tagGreen">#66BB6A</color>
+    <color name="tagAzure">#5C7DC0</color>
+    <color name="tagViolet">#AB47BC</color>
 
 </resources>

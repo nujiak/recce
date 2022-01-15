@@ -8,7 +8,7 @@ import com.nujiak.recce.mapping.intsFromGridString
 /**
  * Parses MGRS grids
  */
-object MgrsParser : Parser {
+object MgrsParser : Parser() {
 
     override fun parse(s: String): Coordinate? {
         val matchResult =

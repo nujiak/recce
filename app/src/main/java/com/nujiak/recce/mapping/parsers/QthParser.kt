@@ -6,7 +6,7 @@ import com.nujiak.recce.mapping.QthUtils
 /**
  * Parses Maidenhead coding
  */
-object QthParser : Parser {
+object QthParser : Parser() {
 
     private val regex = Regex("^[A-Ra-r]{2}([0-9]{2}([A-Xa-x]{2}([0-9]{2})?)?)?$")
 

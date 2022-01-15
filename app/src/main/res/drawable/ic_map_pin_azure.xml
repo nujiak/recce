@@ -10,27 +10,14 @@
       android:fillColor="#ffffff"/>
   <path
       android:pathData="M6.1762,0.5343C4.8562,0.5844 3.6363,1.5304 3.2485,2.7912 2.9242,3.7988 3.1217,4.9385 3.7231,5.8037 4.4079,6.8135 5.315,7.6627 5.9049,8.7394 6.0732,9.0386 6.2256,9.3475 6.3488,9.6681 6.7835,8.5191 7.5723,7.5593 8.3529,6.6294 8.9529,5.9176 9.5175,5.097 9.5865,4.1398 9.72,2.9774 9.1748,1.77 8.2059,1.1115 7.6183,0.6988 6.8927,0.4952 6.1762,0.5343Z"
-      android:strokeWidth="0.0779455">
-    <aapt:attr name="android:fillColor">
-      <gradient 
-          android:startY="1.8716221"
-          android:startX="11.052095"
-          android:endY="1.8716221"
-          android:type="linear"
-          android:endX="36.73701">
-        <item android:offset="0" android:color="#FF4799EB"/>
-        <item android:offset="1" android:color="#FF4799EB"/>
-      </gradient>
-    </aapt:attr>
-  </path>
+      android:strokeWidth="0.0779455"
+      android:fillColor="@color/tagAzure"/>
   <path
       android:pathData="M7.2512,4.0341A0.9012,0.9012 0,0 1,6.35 4.9353,0.9012 0.9012,0 0,1 5.4488,4.0341 0.9012,0.9012 0,0 1,6.35 3.1329,0.9012 0.9012,0 0,1 7.2512,4.0341Z"
       android:strokeWidth="0.0178637"
-      android:fillColor="#000000"
-      android:fillAlpha="0.25098"/>
+      android:fillColor="@color/shade"/>
   <path
       android:pathData="m4.4654,6.7758c0.5148,0.6297 1.047,1.2468 1.4397,1.9637 0.1683,0.2992 0.3207,0.6079 0.4439,0.9286 0.4108,-1.0859 1.1388,-2.0012 1.8764,-2.8835A15.1793,5.7749 90,0 1,6.35 7.6073,15.1793 5.7749,90 0,1 4.4654,6.7758Z"
       android:strokeWidth="0.294597"
-      android:fillColor="#000000"
-      android:fillAlpha="0.2509804"/>
+      android:fillColor="@color/shade"/>
 </vector>

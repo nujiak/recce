@@ -9,17 +9,22 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.button.MaterialButton
 import com.nujiak.recce.MainViewModel
 import com.nujiak.recce.R
 import com.nujiak.recce.database.Pin
 import com.nujiak.recce.databinding.DialogPinInfoBinding
 import com.nujiak.recce.enums.CoordinateSystem
+import com.nujiak.recce.mapping.Mapping
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.dpToPx
+import com.nujiak.recce.utils.spToPx
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -75,15 +80,6 @@ class PinInfoFragment : DialogFragment() {
             binding.pinGroup.text = pin.group
         }
 
-        binding.pinLatLng.text =
-            viewModel.formatAsGrids(pin.latitude, pin.longitude, CoordinateSystem.WGS84)
-        binding.pinUtmGrid.text =
-            viewModel.formatAsGrids(pin.latitude, pin.longitude, CoordinateSystem.UTM)
-        binding.pinMgrsGrid.text =
-            viewModel.formatAsGrids(pin.latitude, pin.longitude, CoordinateSystem.MGRS)
-        binding.pinKertauGrid.text =
-            viewModel.formatAsGrids(pin.latitude, pin.longitude, CoordinateSystem.KERTAU)
-
         if (pin.description.isNotEmpty()) {
             binding.pinDescriptionHeading.visibility = View.VISIBLE
             binding.pinDescription.visibility = View.VISIBLE
@@ -113,6 +109,26 @@ class PinInfoFragment : DialogFragment() {
         binding.pinEdit.setOnClickListener {
             viewModel.openPinCreator(pin)
             dismiss()
+        }
+
+        binding.pinGridLayout.columnCount =
+            (resources.displayMetrics.widthPixels / resources.spToPx(196f))
+                .toInt()
+                .coerceAtMost(4)
+
+        val tinyPadding = resources.getDimension(R.dimen.tiny_padding).toInt()
+        val smallPadding = resources.getDimension(R.dimen.small_padding).toInt()
+        val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        layoutParams.setMargins(smallPadding, tinyPadding, smallPadding, tinyPadding)
+
+        for (coordinateSystem in CoordinateSystem.values()) {
+            val coordinate = Mapping.transformTo(coordinateSystem, LatLng(pin.latitude, pin.longitude))
+
+            val view = layoutInflater.inflate(R.layout.pin_info_grids_item, binding.pinGridLayout, false)
+            view.findViewById<TextView>(R.id.pin_grid_system).setText(coordinateSystem.shortName)
+            view.findViewById<TextView>(R.id.pin_grid).text = coordinate?.toString() ?: getString(R.string.not_available)
+            view.layoutParams = layoutParams
+            binding.pinGridLayout.addView(view)
         }
     }
 }

@@ -222,7 +222,7 @@
         app:layout_constraintBottom_toTopOf="@id/map_fab"
         app:layout_constraintEnd_toEndOf="parent"
         app:backgroundTint="?attr/colorSurface"
-        android:src="@drawable/ic_baseline_zoom_in_map_24"
+        android:src="@drawable/ic_round_travel_explore_24"
         android:layout_margin="@dimen/large_padding"
         app:tint="?android:attr/textColorPrimary" />
 
@@ -313,7 +313,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/small_padding"
                     android:text="@string/utm"
-                    android:textColor="?android:attr/textColorPrimary" />
+                    android:textColor="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/map_current_grids"

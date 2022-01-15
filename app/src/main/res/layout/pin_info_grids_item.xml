@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="start"
+    android:layout_margin="@dimen/small_padding"
+    android:layout_weight="1"
+    android:clipToPadding="false"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/pin_grid_system"
+        style="@style/TextAppearance.Recce.NumberHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:textColor="?android:attr/textColorSecondary"
+        tools:text="@string/utm" />
+
+    <TextView
+        android:id="@+id/pin_grid"
+        style="@style/TextAppearance.Recce.Number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:textColor="?android:attr/textColorPrimary"
+        tools:text="395930 503850" />
+</LinearLayout>
