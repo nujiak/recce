@@ -37,7 +37,7 @@ class PinAdapter(
     private var coordSysId: CoordinateSystem,
     private val formatAsGrids: (Double, Double) -> String,
     private val formatAsDistance: (Double) -> String,
-    private val formatAsArea:  (Double) -> String,
+    private val formatAsArea: (Double) -> String,
     private val resources: Resources,
 ) : ListAdapter<SelectorItem, RecyclerView.ViewHolder>(PinDiffCallback()) {
 

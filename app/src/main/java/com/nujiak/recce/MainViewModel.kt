@@ -315,7 +315,7 @@ class MainViewModel @Inject constructor(
     /**
      * Backing property for [toOpenSettings]
      */
-    private val _toOpenSettings = MutableLiveData<Boolean>(false)
+    private val _toOpenSettings = MutableLiveData(false)
 
     /**
      * LiveData to determine whether to open Settings sheet
@@ -391,15 +391,6 @@ class MainViewModel @Inject constructor(
      */
     fun mapGoTo(latLng: LatLng) {
         _mapGoTo.value = latLng
-    }
-
-    /**
-     * Acknowledges that the map has been moved to the Go To location
-     *
-     * Called by [MapFragment][com.nujiak.recce.fragments.MapFragment] after moving the map
-     */
-    fun finishedMapGoTo() {
-        _mapGoTo.value = null
     }
 
     /*

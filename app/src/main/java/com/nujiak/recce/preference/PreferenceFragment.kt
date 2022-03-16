@@ -39,7 +39,7 @@ class PreferenceFragment : PreferenceFragmentCompat() {
         val lengthUnitPreference = findPreference<IntListPreference>("length_unit")
         lengthUnitPreference?.apply {
             entries = LengthUnit.names.map(resources::getString).toTypedArray()
-            entryValues = LengthUnit.names.mapIndexed{ index, _ -> index.toString() }.toTypedArray()
+            entryValues = LengthUnit.names.mapIndexed { index, _ -> index.toString() }.toTypedArray()
         }
     }
 }

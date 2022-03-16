@@ -1,5 +1,6 @@
 package com.nujiak.recce.fragments.ruler
 
+import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -49,6 +50,7 @@ class RulerAdapter(
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateCoordSys(newCoordSys: CoordinateSystem) {
         if (coordSys != newCoordSys) {
             coordSys = newCoordSys
