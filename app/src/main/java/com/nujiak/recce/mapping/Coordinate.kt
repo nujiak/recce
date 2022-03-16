@@ -173,7 +173,7 @@ open class Coordinate private constructor(
         y: Double,
     ) : Coordinate(latLng, x, y) {
         override fun toString(): String {
-            return "$zone${band.letter} ${this.x.format(6, 0)} ${this.y.format(6, 0)}"
+            return "$zone${band.letter} ${this.x.format(7, 0)} ${this.y.format(7, 0)}"
         }
     }
 

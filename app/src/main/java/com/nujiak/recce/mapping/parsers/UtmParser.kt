@@ -10,7 +10,7 @@ import com.nujiak.recce.mapping.intsFromGridString
  */
 object UtmParser : Parser() {
 
-    private val utmRegex = Regex("(^\\d{1,2})([NSns])(\\d{1,12})$")
+    private val utmRegex = Regex("(^\\d{1,2})([NSns])(\\d{1,14})$")
 
     override fun parse(s: String): Coordinate? {
         val match = utmRegex.find(s.filterWhitespaces()) ?: return null
@@ -24,7 +24,7 @@ object UtmParser : Parser() {
                 else -> return null
             }
         }
-        val (easting, northing) = intsFromGridString(matchGroups[3], 6) ?: return null
+        val (easting, northing) = intsFromGridString(matchGroups[3], 7) ?: return null
 
         return UtmUtils.parse(zone, band, easting, northing)
     }
