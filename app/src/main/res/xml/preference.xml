@@ -11,9 +11,15 @@
         <com.nujiak.recce.preference.IntListPreference
             app:defaultValue="0"
             app:entries="@array/angle_units"
-            app:icon="@drawable/ic_baseline_square_foot_24"
+            app:icon="@drawable/ic_round_explore_24"
             app:key="angle_unit"
             app:title="@string/angle_unit"
+            app:useSimpleSummaryProvider="true" />
+        <com.nujiak.recce.preference.IntListPreference
+            app:defaultValue="0"
+            app:icon="@drawable/ic_baseline_square_foot_24"
+            app:key="length_unit"
+            app:title="@string/length_unit"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/app">

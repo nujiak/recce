@@ -61,7 +61,7 @@ class RulerMeasurementViewHolder private constructor(private val binding: RulerM
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(rulerMeasurementItem: RulerItem.RulerMeasurementItem, formatAsAngle: (Float, Boolean) -> String) {
+    fun bind(rulerMeasurementItem: RulerItem.RulerMeasurementItem, formatAsAngle: (Float, Boolean) -> String, formatAsDistance: (Double) -> String) {
         val points = rulerMeasurementItem.points
         binding.rulerFrom.text = rulerMeasurementItem.startName
         binding.rulerTo.text = rulerMeasurementItem.endName
@@ -76,7 +76,7 @@ class RulerMeasurementViewHolder private constructor(private val binding: RulerM
             heading += 360
         }
 
-        binding.rulerDist.text = "%.2fm".format(distance)
+        binding.rulerDist.text = formatAsDistance(distance)
         binding.rulerDir.text = formatAsAngle(degToRad(heading).toFloat(), false)
         if (points.size > 2) {
             binding.rulerIntermediate.text = binding.root.resources.getQuantityString(

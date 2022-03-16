@@ -1,5 +1,6 @@
 package com.nujiak.recce.fragments.ruler
 
+import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +15,8 @@ private enum class RulerItemViewType(val index: Int) {
 class RulerAdapter(
     private var coordSys: CoordinateSystem,
     private val formatAsAngle: (Float, Boolean) -> String,
-    private val formatAsGrids: (Double, Double) -> String
+    private val formatAsGrids: (Double, Double) -> String,
+    private val formatAsDistance: (Double) -> String,
 ) : androidx.recyclerview.widget.ListAdapter<RulerItem, RecyclerView.ViewHolder>(RulerDiffCallback()) {
 
     override fun getItemViewType(position: Int): Int {
@@ -41,12 +43,14 @@ class RulerAdapter(
             }
             is RulerMeasurementViewHolder -> holder.bind(
                 getItem(position) as RulerItem.RulerMeasurementItem,
-                formatAsAngle
+                formatAsAngle,
+                formatAsDistance,
             )
             is RulerEmptyViewHolder -> holder.bind()
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateCoordSys(newCoordSys: CoordinateSystem) {
         if (coordSys != newCoordSys) {
             coordSys = newCoordSys

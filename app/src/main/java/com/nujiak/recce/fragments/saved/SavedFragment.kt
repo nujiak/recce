@@ -1,5 +1,6 @@
 package com.nujiak.recce.fragments.saved
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.ClipboardManager
 import android.content.Context
@@ -42,6 +43,7 @@ class SavedFragment : Fragment() {
     private lateinit var binding: FragmentSavedBinding
     private lateinit var pinAdapter: PinAdapter
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -58,6 +60,8 @@ class SavedFragment : Fragment() {
             { chain -> onChainLongClick(chain) },
             viewModel.coordinateSystem.value ?: CoordinateSystem.atIndex(0),
             viewModel::formatAsGrids,
+            viewModel::formatAsDistance,
+            viewModel::formatAsArea,
             resources,
         )
         binding.pinRecyclerview.adapter = pinAdapter

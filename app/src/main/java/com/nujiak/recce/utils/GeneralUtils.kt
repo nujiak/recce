@@ -2,33 +2,6 @@ package com.nujiak.recce.utils
 
 import android.content.res.Resources
 import android.util.TypedValue
-import java.text.NumberFormat
-import java.util.Locale
-
-private val singleDecimalNumberFormat = NumberFormat.getNumberInstance(Locale.US).apply {
-    minimumFractionDigits = 1
-    maximumFractionDigits = 1
-}
-
-fun Double.formatAsDistanceString(): String {
-    return if (this < 1000000) {
-        singleDecimalNumberFormat.format(this) + " m"
-    } else {
-        singleDecimalNumberFormat.format(this / 1000) + " km"
-    }
-}
-
-fun Float.formatAsDistanceString(): String {
-    return this.toDouble().formatAsDistanceString()
-}
-
-fun Double.formatAsAreaString(): String {
-    return if (this < 1000000) {
-        singleDecimalNumberFormat.format(this) + " m²"
-    } else {
-        singleDecimalNumberFormat.format(this / 1000000) + " km²"
-    }
-}
 
 /**
  * Converts a length in dp to screen pixels

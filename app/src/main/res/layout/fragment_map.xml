@@ -115,7 +115,7 @@
         <TextView
             android:id="@+id/map_current_distance"
             style="@style/TextAppearance.MaterialComponents.Caption"
-            android:layout_width="80sp"
+            android:layout_width="100sp"
             android:layout_height="wrap_content"
             android:fadingEdge="horizontal"
             android:gravity="end"

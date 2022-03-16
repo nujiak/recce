@@ -1,5 +1,6 @@
 package com.nujiak.recce.fragments.ruler
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,7 @@ class RulerFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     lateinit var binding: FragmentRulerBinding
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -32,6 +34,7 @@ class RulerFragment : Fragment() {
             viewModel.coordinateSystem.value ?: CoordinateSystem.atIndex(0),
             viewModel::formatAsAngle,
             viewModel::formatAsGrids,
+            viewModel::formatAsDistance,
         )
         binding.rulerList.adapter = rulerAdapter
         viewModel.rulerList.observe(viewLifecycleOwner, {
@@ -46,6 +49,9 @@ class RulerFragment : Fragment() {
             rulerAdapter.updateCoordSys(it)
         })
         viewModel.angleUnit.observe(viewLifecycleOwner, {
+            rulerAdapter.notifyDataSetChanged()
+        })
+        viewModel.lengthUnit.observe(viewLifecycleOwner, {
             rulerAdapter.notifyDataSetChanged()
         })
 

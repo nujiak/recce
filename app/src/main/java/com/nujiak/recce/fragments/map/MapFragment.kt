@@ -68,7 +68,6 @@ import com.nujiak.recce.utils.animate
 import com.nujiak.recce.utils.animateColor
 import com.nujiak.recce.utils.degToRad
 import com.nujiak.recce.utils.dpToPx
-import com.nujiak.recce.utils.formatAsDistanceString
 import com.nujiak.recce.utils.withAlpha
 import dagger.hilt.android.AndroidEntryPoint
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence
@@ -324,6 +323,9 @@ class MapFragment :
         }
         viewModel.angleUnit.observe(viewLifecycleOwner) {
             angleUnit = it
+            updateLiveMeasurements()
+        }
+        viewModel.lengthUnit.observe(viewLifecycleOwner) {
             updateLiveMeasurements()
         }
 
@@ -847,7 +849,7 @@ class MapFragment :
             direction += 360
         }
 
-        binding.mapCurrentDistance.text = distance.formatAsDistanceString()
+        binding.mapCurrentDistance.text = viewModel.formatAsDistance(distance)
         binding.mapCurrentDirection.text = viewModel.formatAsAngle(degToRad(direction).toFloat(), false)
     }
 

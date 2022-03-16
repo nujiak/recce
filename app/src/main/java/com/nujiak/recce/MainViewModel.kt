@@ -23,6 +23,7 @@ import com.nujiak.recce.database.toPinsAndChains
 import com.nujiak.recce.database.toShareCode
 import com.nujiak.recce.enums.AngleUnit
 import com.nujiak.recce.enums.CoordinateSystem
+import com.nujiak.recce.enums.LengthUnit
 import com.nujiak.recce.enums.SharedPrefsKey
 import com.nujiak.recce.enums.SortBy
 import com.nujiak.recce.enums.ThemePreference
@@ -219,6 +220,26 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun formatAsDistance(distance: Double): String {
+        val unit = this.lengthUnit.value ?: LengthUnit.METRIC
+        val resources = getApplication<RecceApp>().resources
+        return if (distance / unit.metrePerSmallUnit < unit.smallUnitThreshold) {
+            "%,.${unit.smallUnitPrecision}f ${resources.getString(unit.smallUnit)}".format(distance / unit.metrePerSmallUnit)
+        } else {
+            "%,.${unit.bigUnitPrecision}f ${resources.getString(unit.bigUnit)}".format(distance / unit.metrePerBigUnit)
+        }
+    }
+
+    fun formatAsArea(area: Double): String {
+        val unit = this.lengthUnit.value ?: LengthUnit.METRIC
+        val resources = getApplication<RecceApp>().resources
+        return if (area / unit.metreSquarePerSmallAreaUnit < unit.smallAreaUnitThreshold) {
+            "%,.1f ${resources.getString(unit.smallAreaUnit)}".format(area / unit.metreSquarePerSmallAreaUnit)
+        } else {
+            "%,.2f ${resources.getString(unit.bigAreaUnit)}".format(area / unit.metreSquarePerBigAreaUnit)
+        }
+    }
+
     /**
      * Transforms and formats WGS 84 coordinates into grids
      *
@@ -294,7 +315,7 @@ class MainViewModel @Inject constructor(
     /**
      * Backing property for [toOpenSettings]
      */
-    private val _toOpenSettings = MutableLiveData<Boolean>(false)
+    private val _toOpenSettings = MutableLiveData(false)
 
     /**
      * LiveData to determine whether to open Settings sheet
@@ -370,15 +391,6 @@ class MainViewModel @Inject constructor(
      */
     fun mapGoTo(latLng: LatLng) {
         _mapGoTo.value = latLng
-    }
-
-    /**
-     * Acknowledges that the map has been moved to the Go To location
-     *
-     * Called by [MapFragment][com.nujiak.recce.fragments.MapFragment] after moving the map
-     */
-    fun finishedMapGoTo() {
-        _mapGoTo.value = null
     }
 
     /*
@@ -482,6 +494,13 @@ class MainViewModel @Inject constructor(
      */
     val angleUnit = SharedPreferenceLiveData(sharedPreference, SharedPrefsKey.ANGLE_UNIT).map {
         AngleUnit.atIndex(it)
+    }
+
+    /**
+     * [LiveData] holding the [LengthUnit] to be used according to the user's preference
+     */
+    val lengthUnit = SharedPreferenceLiveData(sharedPreference, SharedPrefsKey.LENGTH_UNIT).map {
+        LengthUnit.atIndex(it)
     }
 
     /*

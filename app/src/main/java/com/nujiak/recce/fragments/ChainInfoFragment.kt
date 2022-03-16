@@ -18,8 +18,6 @@ import com.nujiak.recce.database.Chain
 import com.nujiak.recce.databinding.DialogChainInfoBinding
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.dpToPx
-import com.nujiak.recce.utils.formatAsAreaString
-import com.nujiak.recce.utils.formatAsDistanceString
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -116,13 +114,13 @@ class ChainInfoFragment : DialogFragment() {
         if (chain.cyclical) {
             // Area
             binding.chainDistance.text =
-                SphericalUtil.computeArea(chainNodes.map { it.position }).formatAsAreaString()
+                viewModel.formatAsArea(SphericalUtil.computeArea(chainNodes.map { it.position }))
             binding.chainDistanceDesc.text = binding.root.resources.getString(R.string.area)
             binding.areaIcon.visibility = View.VISIBLE
             binding.routeIcon.visibility = View.INVISIBLE
         } else {
             // Route
-            binding.chainDistance.text = distance.formatAsDistanceString()
+            binding.chainDistance.text = viewModel.formatAsDistance(distance)
             binding.chainDistanceDesc.text = binding.root.resources.getString(R.string.distance)
             binding.areaIcon.visibility = View.INVISIBLE
             binding.routeIcon.visibility = View.VISIBLE

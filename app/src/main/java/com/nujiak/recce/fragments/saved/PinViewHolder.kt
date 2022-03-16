@@ -18,8 +18,6 @@ import com.nujiak.recce.databinding.PinListItemBinding
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.utils.PIN_CARD_BACKGROUNDS
 import com.nujiak.recce.utils.dpToPx
-import com.nujiak.recce.utils.formatAsAreaString
-import com.nujiak.recce.utils.formatAsDistanceString
 
 private const val STROKE_SIZE_DP: Float = 2f
 private const val STROKE_SIZE_SELECTED_DP: Float = 4f
@@ -97,7 +95,9 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
     fun bind(
         item: ChainWrapper,
         onItemClick: (Chain) -> Unit,
-        onItemLongClick: (Chain) -> Boolean
+        onItemLongClick: (Chain) -> Boolean,
+        formatAsDistance: (Double) -> String,
+        formatAsArea: (Double) -> String,
     ) {
         val chain = item.chain
         if (chain.group != "") {
@@ -139,7 +139,7 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
         if (chain.cyclical) {
             // Area
             binding.chainDistance.text =
-                SphericalUtil.computeArea(chainNodes.map { it.position }).formatAsAreaString()
+                formatAsArea(SphericalUtil.computeArea(chainNodes.map { it.position }))
             binding.chainDistanceDesc.text = binding.root.resources.getString(R.string.area)
             binding.areaIcon.apply {
                 visibility = View.VISIBLE
@@ -148,7 +148,7 @@ class ChainViewHolder private constructor(private val binding: PinListChainItemB
             binding.routeIcon.visibility = View.INVISIBLE
         } else {
             // Route
-            binding.chainDistance.text = distance.formatAsDistanceString()
+            binding.chainDistance.text = formatAsDistance(distance)
             binding.chainDistanceDesc.text = binding.root.resources.getString(R.string.distance)
             binding.areaIcon.visibility = View.INVISIBLE
             binding.routeIcon.apply {
