@@ -21,19 +21,19 @@ class PreferenceFragment : PreferenceFragmentCompat() {
         coordSysPreference?.let { it ->
             it.entries = CoordinateSystem.fullNames.map(resources::getString).toTypedArray()
             it.entryValues = it.entries.mapIndexed { index, _ -> index.toString() }.toTypedArray()
-            it.icon.setTint(color)
+            it.icon?.setTint(color)
         }
 
         val angleUnitPreference = findPreference<IntListPreference>("angle_unit")
         angleUnitPreference?.let {
             it.entryValues = it.entries.mapIndexed { index, _ -> index.toString() }.toTypedArray()
-            it.icon.setTint(color)
+            it.icon?.setTint(color)
         }
 
         val themePreference = findPreference<IntListPreference>("theme_pref")
         themePreference?.apply {
             entryValues = entries.mapIndexed { index, _ -> index.toString() }.toTypedArray()
-            icon.setTint(color)
+            icon?.setTint(color)
         }
 
         val lengthUnitPreference = findPreference<IntListPreference>("length_unit")
