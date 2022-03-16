@@ -36,6 +36,8 @@ class PinAdapter(
     private val onChainLongClick: (Chain) -> Boolean,
     private var coordSysId: CoordinateSystem,
     private val formatAsGrids: (Double, Double) -> String,
+    private val formatAsDistance: (Double) -> String,
+    private val formatAsArea:  (Double) -> String,
     private val resources: Resources,
 ) : ListAdapter<SelectorItem, RecyclerView.ViewHolder>(PinDiffCallback()) {
 
@@ -76,7 +78,7 @@ class PinAdapter(
                 holder.bind(getItem(position) as PinWrapper, onPinClick, onPinLongClick, coordSysId, formatAsGrids)
             }
             is ChainViewHolder -> {
-                holder.bind(getItem(position) as ChainWrapper, onChainClick, onChainLongClick)
+                holder.bind(getItem(position) as ChainWrapper, onChainClick, onChainLongClick, formatAsDistance, formatAsArea)
             }
             is HeaderViewHolder -> {
                 holder.bind(getItem(position) as HeaderItem)

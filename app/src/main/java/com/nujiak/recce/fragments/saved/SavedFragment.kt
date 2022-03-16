@@ -58,6 +58,8 @@ class SavedFragment : Fragment() {
             { chain -> onChainLongClick(chain) },
             viewModel.coordinateSystem.value ?: CoordinateSystem.atIndex(0),
             viewModel::formatAsGrids,
+            viewModel::formatAsDistance,
+            viewModel::formatAsArea,
             resources,
         )
         binding.pinRecyclerview.adapter = pinAdapter

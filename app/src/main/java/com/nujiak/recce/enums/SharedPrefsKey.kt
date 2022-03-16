@@ -19,6 +19,12 @@ enum class SharedPrefsKey(val key: String) {
     ANGLE_UNIT("angle_unit"),
 
     /**
+     * Length unit used by the application. See [LengthUnit]
+     */
+
+    LENGTH_UNIT("length_unit"),
+
+    /**
      * Theme used by the application. See [ThemePreference]
      */
     THEME_PREF("theme_pref"),

@@ -13,7 +13,6 @@ import com.nujiak.recce.databinding.FragmentGpsBinding
 import com.nujiak.recce.enums.CoordinateSystem
 import com.nujiak.recce.livedatas.FusedLocationLiveData
 import com.nujiak.recce.utils.dpToPx
-import com.nujiak.recce.utils.formatAsDistanceString
 import com.nujiak.recce.utils.radToDeg
 import com.nujiak.recce.utils.spToPx
 import dagger.hilt.android.AndroidEntryPoint
@@ -106,8 +105,8 @@ class GpsFragment : Fragment() {
     private fun updateLocationUI(locationData: FusedLocationLiveData.LocationData? = lastLocationData) {
         if (locationData != null) {
             val (latitude, longitude, altitude, accuracy) = locationData
-            binding.gpsAccuracy.text = "±" + accuracy.formatAsDistanceString()
-            binding.gpsAltitude.text = altitude.formatAsDistanceString()
+            binding.gpsAccuracy.text = "±" + viewModel.formatAsDistance(accuracy.toDouble())
+            binding.gpsAltitude.text = viewModel.formatAsDistance(altitude)
             binding.gpsGrids.text = viewModel.formatAsGrids(latitude, longitude)
         }
     }

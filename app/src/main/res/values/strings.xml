@@ -48,6 +48,9 @@
     <string name="feet_unit" translatable="false">ft</string>
     <string name="mile_unit" translatable="false">mi</string>
     <string name="nautical_mile_unit" translatable="false">NM</string>
+    <string name="metre_square_unit" translatable="false">m²</string>
+    <string name="kilometre_square_unit" translatable="false">km²</string>
+    <string name="acre_unit" translatable="false">acre</string>
 
     <!-- Pin Selector -->
     <string name="pins">Pins</string>
