@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceFragmentCompat
 import com.nujiak.recce.R
 import com.nujiak.recce.enums.CoordinateSystem
+import com.nujiak.recce.enums.LengthUnit
 
 class PreferenceFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -33,6 +34,12 @@ class PreferenceFragment : PreferenceFragmentCompat() {
         themePreference?.apply {
             entryValues = entries.mapIndexed { index, _ -> index.toString() }.toTypedArray()
             icon.setTint(color)
+        }
+
+        val lengthUnitPreference = findPreference<IntListPreference>("length_unit")
+        lengthUnitPreference?.apply {
+            entries = LengthUnit.names.map(resources::getString).toTypedArray()
+            entryValues = LengthUnit.names.mapIndexed{ index, _ -> index.toString() }.toTypedArray()
         }
     }
 }

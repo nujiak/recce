@@ -10,6 +10,16 @@
     <string name="settings">Settings</string>
     <string name="coordinate_system">Coordinate System</string>
     <string name="angle_unit">Angle Unit</string>
+    <string name="length_unit">Length Unit</string>
+    <string name="name">Name</string>
+    <string name="done">Done</string>
+    <string name="saved">Saved</string>
+    <string name="coordinate">Coordinate</string>
+    <string name="measurement">Measurement</string>
+    <string name="app">App</string>
+    <string name="theme">Theme</string>
+
+    <!-- Coordinate systems -->
     <string name="utm" translatable="false">UTM</string>
     <string name="utm_full" translatable="false">Universal Traverse Mercator (UTM)</string>
     <string name="kertau" translatable="false">Kertau 1948</string>
@@ -19,18 +29,25 @@
     <string name="bng_full" translatable="false">British National Grid (BNG)</string>
     <string name="qth" translatable="false">QTH Locator</string>
     <string name="qth_full" translatable="false">Maidenhead Locator System (QTH Locator)</string>
+
+    <!-- Angle units -->
     <string name="nato_mils" translatable="false">NATO mils</string>
     <string name="degrees" translatable="false">Degrees</string>
-    <string name="name">Name</string>
-    <string name="done">Done</string>
-    <string name="theme">Theme</string>
+
+    <!-- Theme preferences -->
     <string name="light">Light</string>
     <string name="dark">Dark</string>
     <string name="auto">Auto</string>
-    <string name="saved">Saved</string>
-    <string name="coordinate">Coordinate</string>
-    <string name="measurement">Measurement</string>
-    <string name="app">App</string>
+
+    <!-- Length units -->
+    <string name="metric">Metric</string>
+    <string name="imperial">Imperial</string>
+    <string name="nautical_miles">Nautical miles</string>
+    <string name="kilometre_unit" translatable="false">km</string>
+    <string name="metre_unit" translatable="false">m</string>
+    <string name="feet_unit" translatable="false">ft</string>
+    <string name="mile_unit" translatable="false">mi</string>
+    <string name="nautical_mile_unit" translatable="false">NM</string>
 
     <!-- Pin Selector -->
     <string name="pins">Pins</string>
